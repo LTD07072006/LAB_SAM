@@ -67,13 +67,35 @@ license and citation requirements before downloading or redistributing data.
     Useful for the official access/tooling context. It is a restricted
     research dataset, so do not mirror its raw data into GitHub.
 
+13. **Hypersim**  
+    https://github.com/apple/ml-hypersim  
+    Useful for synthetic indoor RGB/depth/geometry data with known camera
+    parameters; it is suitable for controlled ray-casting and uncertainty
+    experiments, but has no native fire labels.
+
+14. **ARKitScenes**  
+    https://github.com/apple/ARKitScenes  
+    Useful for real indoor RGB-D, camera trajectory and reconstruction
+    experiments; check the dataset license and download process.
+
+15. **NYU Depth V2**  
+    https://cs.nyu.edu/~fergus/datasets/nyu_depth_v2.html  
+    Useful for indoor depth and scale sanity checks. It is not a fire dataset
+    and should not be treated as metric ground truth for the fire point.
+
+16. **Region-based Fire Image Annotations**  
+    https://github.com/Chrysophyt/Region-based-Annotation-Data-of-Fire-Images  
+    Useful for improving fire-region/bottom-point supervision when bounding
+    boxes or coarse image-level labels are insufficient. Verify annotations
+    and license before use.
+
 ## Recommended use in this project
 
 ```text
 D-Fire / MIVIA / Fire-Smoke / FLAME
     → detector robustness and hard negatives
 
-ScanNet / SUN RGB-D / TUM RGB-D / Replica / Habitat-Sim
+ScanNet / SUN RGB-D / TUM RGB-D / Replica / Habitat-Sim / Hypersim / ARKitScenes
     → calibration, mesh, ray casting and tracking infrastructure
 
 Measured room + checkerboard + ArUco/AprilTag + fire-marker positions
