@@ -1,0 +1,24 @@
+{
+  "image_size": [224, 224],
+  "intrinsics": {
+    "K": [
+      [800.0, 0.0, 112.0],
+      [0.0, 800.0, 112.0],
+      [0.0, 0.0, 1.0]
+    ],
+    "dist_coeffs": [0.0, 0.0, 0.0, 0.0, 0.0]
+  },
+  "extrinsics": {
+    "R": [
+      [1.0, 0.0, 0.0],
+      [0.0, -0.7682212795973759, -0.6401843996644799],
+      [0.0, 0.6401843996644799, -0.7682212795973759]
+    ],
+    "camera_position": [0.0, -25.0, 30.0]
+  },
+  "metadata": {
+    "status": "provisional_simulation",
+    "warning": "Not a physical camera calibration. Derived from the repository synthetic camera pose and matched to 224x224 test images.",
+    "coordinate_system": "X right, Y forward in room, Z up; metres"
+  }
+}

@@ -1,0 +1,3601 @@
+{
+  "protocol": {
+    "dataset": "source test/fire only",
+    "images": 36,
+    "image_size": [
+      224,
+      224
+    ],
+    "calibration": "synthetic default_calibration matched to 224x224; replace with real calibration",
+    "surface": "analytic GridMap()",
+    "physical_3d_ground_truth": false,
+    "proxy_definition": "predicted ray-hit distance to ray-hit from labelled 2D point",
+    "latency_definition": "model inference + ROI refinement + ray casting/uncertainty; image I/O excluded"
+  },
+  "load_stats": {
+    "indexed_images": 864,
+    "duplicates": 517,
+    "loaded": 517,
+    "fire": 272,
+    "no_fire": 245
+  },
+  "paired_pixel_comparison": {
+    "count": 36,
+    "coarse_mean_px": 9.406638900903154,
+    "refined_mean_px": 9.57465234397321,
+    "mean_improvement_px": -0.1680134430700536,
+    "improved_fraction": 0.6666666666666666
+  },
+  "branch_A_coarse": {
+    "branch": "A",
+    "images": 36,
+    "detected": 36,
+    "detector_recall_on_gt_fire": 1.0,
+    "ray_hits": 36,
+    "ray_hit_rate_all_images": 1.0,
+    "ray_hit_rate_given_detection": 1.0,
+    "uncertainty_hits": 36,
+    "pixel_error_coarse_px": {
+      "count": 36,
+      "mean": 9.406638900903154,
+      "median": 7.317998063997489,
+      "p95": 17.065523211616828,
+      "coverage": 1.0,
+      "missing": 0,
+      "pck10": 0.75,
+      "pck25": 0.9722222222222222
+    },
+    "pixel_error_refined_px": {
+      "count": 0,
+      "coverage": 0.0,
+      "missing": 36,
+      "pck10": null,
+      "pck25": null
+    },
+    "proxy_3d_error_m_vs_oracle_2d": {
+      "count": 36,
+      "mean": 0.5268237847608742,
+      "median": 0.3968818723982763,
+      "p95": 0.8594204944947559,
+      "under_0_5": 0.6388888888888888,
+      "under_1_0": 0.9722222222222222,
+      "under_2_0": 0.9722222222222222
+    },
+    "uncertainty_spread_m": {
+      "count": 36,
+      "mean": 0.1260791728247797,
+      "median": 0.1328942931836904,
+      "p95": 0.1367687421236387
+    },
+    "uncertainty_std_norm_m": {
+      "count": 36,
+      "mean": 0.15347860123450177,
+      "median": 0.16201487327993638,
+      "p95": 0.16632760011497646
+    },
+    "latency_ms": {
+      "end_to_end": {
+        "count": 36,
+        "mean": 110.83060277612984,
+        "median": 102.32549998909235,
+        "p95": 147.98659998632502
+      },
+      "detector": {
+        "count": 36,
+        "mean": 63.92621944542043,
+        "median": 58.90175001695752,
+        "p95": 87.7929499692982
+      },
+      "refiner": {
+        "count": 0
+      },
+      "ray_and_uncertainty": {
+        "count": 36,
+        "mean": 46.850544442552035,
+        "median": 43.39405003702268,
+        "p95": 60.37950000609271
+      }
+    },
+    "rows": [
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_103.jpg",
+        "gt_pixel": [
+          21.999935999999998,
+          167.000064
+        ],
+        "coarse_pixel": [
+          17.196765899658203,
+          165.2417755126953
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          17.196765899658203,
+          165.2417755126953
+        ],
+        "confidence": 0.9996393918991089,
+        "detected": true,
+        "coarse_error_px": 5.114882346389372,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.712192488947366,
+            -1.5767260891679307,
+            -2.2417082460365485
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.448549365945466,
+          -1.7738782973515193,
+          -2.1178712279461926
+        ],
+        "proxy_3d_error_m": 0.3517275885502462,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13500848733887116,
+          "std_m": 0.16435221572131134,
+          "samples": 128
+        },
+        "latency_ms": 108.82120003225282,
+        "detector_ms": 61.275499989278615,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 47.48730000574142
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_104.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          167.000064
+        ],
+        "coarse_pixel": [
+          20.88335418701172,
+          164.7728729248047
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          20.88335418701172,
+          164.7728729248047
+        ],
+        "confidence": 0.9997034668922424,
+        "detected": true,
+        "coarse_error_px": 3.0726171236069457,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.5188688730804865,
+            -1.6110033914213133,
+            -2.155048006098699
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.395809898768412,
+          -1.791318651880136,
+          -2.0937541123945174
+        ],
+        "proxy_3d_error_m": 0.22674665536340843,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13480769081935612,
+          "std_m": 0.1638924741975686,
+          "samples": 128
+        },
+        "latency_ms": 97.42250002454966,
+        "detector_ms": 53.49289998412132,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 43.881500023417175
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_105.jpg",
+        "gt_pixel": [
+          21.999935999999998,
+          168.0
+        ],
+        "coarse_pixel": [
+          13.263822555541992,
+          175.49142456054688
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          13.263822555541992,
+          175.49142456054688
+        ],
+        "confidence": 0.9997264742851257,
+        "detected": true,
+        "coarse_error_px": 11.508306567901503,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.864715133002662,
+            -2.1697354212374904,
+            -2.282740826726478
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.443518984407924,
+          -1.8380686962826225,
+          -2.1131580302631754
+        ],
+        "proxy_3d_error_m": 0.5622875926869115,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13329583023286992,
+          "std_m": 0.1628526140951844,
+          "samples": 128
+        },
+        "latency_ms": 142.5928000244312,
+        "detector_ms": 83.57770001748577,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 58.957300032489
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_108.jpg",
+        "gt_pixel": [
+          21.0,
+          164.000032
+        ],
+        "coarse_pixel": [
+          17.332061767578125,
+          159.42086791992188
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          17.332061767578125,
+          159.42086791992188
+        ],
+        "confidence": 0.9990323781967163,
+        "detected": true,
+        "coarse_error_px": 5.8670703548824,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.7359273537719275,
+            -1.2013942282729282,
+            -2.2639950758909286
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.51662189767408,
+          -1.5631999051115955,
+          -2.1556991333832833
+        ],
+        "proxy_3d_error_m": 0.4367221565601983,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13610814288481718,
+          "std_m": 0.16544696255880068,
+          "samples": 128
+        },
+        "latency_ms": 144.48709995485842,
+        "detector_ms": 84.42520000971854,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 60.00220001442358
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_109.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          32.3514404296875,
+          172.2842559814453
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          32.3514404296875,
+          172.2842559814453
+        ],
+        "confidence": 0.9992483258247375,
+        "detected": true,
+        "coarse_error_px": 11.26679734748712,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.883071946606971,
+            -2.289304239077513,
+            -1.8437190224973783
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.400777100142842,
+          -1.727100873405643,
+          -2.0983593341095776
+        ],
+        "proxy_3d_error_m": 0.8055637396682748,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13196627107310385,
+          "std_m": 0.16027118763813644,
+          "samples": 128
+        },
+        "latency_ms": 144.95410001836717,
+        "detector_ms": 85.80300002358854,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 59.06969995703548
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_110.jpg",
+        "gt_pixel": [
+          21.0,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          25.352264404296875,
+          169.04978942871094
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          25.352264404296875,
+          169.04978942871094
+        ],
+        "confidence": 0.9997904896736145,
+        "detected": true,
+        "coarse_error_px": 5.31450906229097,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.262182905530223,
+            -1.9634106770047062,
+            -2.027435584162145
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.5064419324699365,
+          -1.6921056798381926,
+          -2.146625271755962
+        ],
+        "proxy_3d_error_m": 0.38402481086222684,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1335077891192322,
+          "std_m": 0.1622637161025294,
+          "samples": 128
+        },
+        "latency_ms": 141.89389999955893,
+        "detector_ms": 87.70019997609779,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 54.13020000560209
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_115.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          171.999968
+        ],
+        "coarse_pixel": [
+          15.862772941589355,
+          174.78611755371094
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          15.862772941589355,
+          174.78611755371094
+        ],
+        "confidence": 0.9992820620536804,
+        "detected": true,
+        "coarse_error_px": 7.661854199589287,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.731469476883353,
+            -2.168111990432692,
+            -2.2251066153571095
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.370964976676285,
+          -2.1111339553499846,
+          -2.0695623648737715
+        ],
+        "proxy_3d_error_m": 0.39674173590619094,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13319774241372073,
+          "std_m": 0.1625914138860364,
+          "samples": 128
+        },
+        "latency_ms": 147.86199998343363,
+        "detector_ms": 88.07119994889945,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 59.72359998850152
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_116.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          168.0
+        ],
+        "coarse_pixel": [
+          18.981874465942383,
+          161.44667053222656
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          18.981874465942383,
+          161.44667053222656
+        ],
+        "confidence": 0.999309778213501,
+        "detected": true,
+        "coarse_error_px": 7.687147156777478,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.637091204543618,
+            -1.3623458127772317,
+            -2.2156220201358074
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.390842775855647,
+          -1.8554417624742143,
+          -2.0890709188403385
+        ],
+        "proxy_3d_error_m": 0.5655060437147954,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13561144213810708,
+          "std_m": 0.1648337774831034,
+          "samples": 128
+        },
+        "latency_ms": 149.07929999753833,
+        "detector_ms": 89.5985999959521,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 59.41679998068139
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_117.jpg",
+        "gt_pixel": [
+          21.0,
+          167.000064
+        ],
+        "coarse_pixel": [
+          15.093505859375,
+          166.55628967285156
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          15.093505859375,
+          166.55628967285156
+        ],
+        "confidence": 0.998917818069458,
+        "detected": true,
+        "coarse_error_px": 5.923141791876462,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.817095107115299,
+            -1.6251725385452254,
+            -2.285950258276504
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.501348506072647,
+          -1.7564559614301167,
+          -2.141963426754824
+        ],
+        "proxy_3d_error_m": 0.3710302694471348,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13491254774717976,
+          "std_m": 0.16439919177295698,
+          "samples": 128
+        },
+        "latency_ms": 132.27559998631477,
+        "detector_ms": 78.40360002592206,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 53.817100008018315
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_119.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          164.000032
+        ],
+        "coarse_pixel": [
+          22.214725494384766,
+          158.21054077148438
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          22.214725494384766,
+          158.21054077148438
+        ],
+        "confidence": 0.9998267292976379,
+        "detected": true,
+        "coarse_error_px": 5.842517908928456,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.48125270201219,
+            -1.2101485733622397,
+            -2.1505398338114183
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.410705756831833,
+          -1.5984555653500472,
+          -2.107327751676454
+        ],
+        "proxy_3d_error_m": 0.39702200889036166,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13600256995880738,
+          "std_m": 0.1649911968035237,
+          "samples": 128
+        },
+        "latency_ms": 112.26270004408434,
+        "detector_ms": 73.99520004400983,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 38.214400003198534
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_120.jpg",
+        "gt_pixel": [
+          21.0,
+          161.999936
+        ],
+        "coarse_pixel": [
+          12.73038101196289,
+          156.30844116210938
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          12.73038101196289,
+          156.30844116210938
+        ],
+        "confidence": 0.9996813535690308,
+        "detected": true,
+        "coarse_error_px": 10.03890988589097,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -5.000567155294965,
+            -0.9159413710525506,
+            -2.3873271952627597
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.5267960860574235,
+          -1.4339719089585863,
+          -2.1644383695907585
+        ],
+        "proxy_3d_error_m": 0.7365419830933899,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13692548628760168,
+          "std_m": 0.16658281714335277,
+          "samples": 128
+        },
+        "latency_ms": 99.98400002950802,
+        "detector_ms": 59.44750003982335,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 40.48179998062551
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_121.jpg",
+        "gt_pixel": [
+          24.000032,
+          179.99990400000002
+        ],
+        "coarse_pixel": [
+          19.553272247314453,
+          182.26449584960938
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          19.553272247314453,
+          182.26449584960938
+        ],
+        "confidence": 0.9994519352912903,
+        "detected": true,
+        "coarse_error_px": 4.990195241012237,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.498597095717963,
+            -2.704813812590082,
+            -2.0951474821326777
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.279370139530299,
+          -2.6350043596513544,
+          -2.003354237823519
+        ],
+        "proxy_3d_error_m": 0.24770913939480094,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13122305749351454,
+          "std_m": 0.16028506339970472,
+          "samples": 128
+        },
+        "latency_ms": 106.10739997355267,
+        "detector_ms": 61.16459995973855,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 44.89669995382428
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_122.jpg",
+        "gt_pixel": [
+          21.0,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          14.637332916259766,
+          156.9446258544922
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          14.637332916259766,
+          156.9446258544922
+        ],
+        "confidence": 0.999850869178772,
+        "detected": true,
+        "coarse_error_px": 11.06714031315331,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.894084160283245,
+            -0.9916912241059883,
+            -2.338970494317234
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.5064419324699365,
+          -1.6921056798381926,
+          -2.146625271755962
+        ],
+        "proxy_3d_error_m": 0.8233125720070416,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1367164940689844,
+          "std_m": 0.16624252777218437,
+          "samples": 128
+        },
+        "latency_ms": 129.84499998856336,
+        "detector_ms": 68.28080001287162,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 61.51139998110011
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_123.jpg",
+        "gt_pixel": [
+          25.999903999999997,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          22.940170288085938,
+          162.31971740722656
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          22.940170288085938,
+          162.31971740722656
+        ],
+        "confidence": 0.9999369382858276,
+        "detected": true,
+        "coarse_error_px": 4.7859945408925055,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.422219283965433,
+            -1.4890597791853502,
+            -2.11606507829762
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.242836752816851,
+          -1.779688611032693,
+          -2.025829474819634
+        ],
+        "proxy_3d_error_m": 0.35325015855234826,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1351342689013884,
+          "std_m": 0.16407283022585928,
+          "samples": 128
+        },
+        "latency_ms": 104.65259995544329,
+        "detector_ms": 56.52149999514222,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 48.06940001435578
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_134.jpg",
+        "gt_pixel": [
+          130.99990400000002,
+          195.000064
+        ],
+        "coarse_pixel": [
+          133.34579467773438,
+          203.2555694580078
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          133.34579467773438,
+          203.2555694580078
+        ],
+        "confidence": 0.9998072981834412,
+        "detected": true,
+        "coarse_error_px": 8.582340790196904,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            0.9388940880617433,
+            -5.556750778831109,
+            0.3982304546143389
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          0.8431996195001389,
+          -5.1010494903077515,
+          0.36749153209809293
+        ],
+        "proxy_3d_error_m": 0.46665402283982943,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.10941348697648691,
+          "std_m": 0.12948713609571355,
+          "samples": 128
+        },
+        "latency_ms": 101.36589995818213,
+        "detector_ms": 58.408299984876066,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 42.906600050628185
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_139.jpg",
+        "gt_pixel": [
+          21.999935999999998,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          23.939300537109375,
+          165.1772918701172
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          23.939300537109375,
+          165.1772918701172
+        ],
+        "confidence": 0.9995766282081604,
+        "detected": true,
+        "coarse_error_px": 2.1066147070662518,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.3552940406446075,
+            -1.6907269868574666,
+            -2.079373983655433
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.453579664260686,
+          -1.7095939472995312,
+          -2.1225051700852795
+        ],
+        "proxy_3d_error_m": 0.10897855407725895,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13446314884462054,
+          "std_m": 0.1633276804705071,
+          "samples": 128
+        },
+        "latency_ms": 90.29600000940263,
+        "detector_ms": 54.77510002674535,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 35.46629997435957
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_140.jpg",
+        "gt_pixel": [
+          21.999935999999998,
+          171.000032
+        ],
+        "coarse_pixel": [
+          18.931978225708008,
+          176.24951171875
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          18.931978225708008,
+          176.24951171875
+        ],
+        "confidence": 0.9995455145835876,
+        "detected": true,
+        "coarse_error_px": 6.080246888277333,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.562389208122496,
+            -2.313081436826014,
+            -2.1442058738945526
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.428420569606483,
+          -2.030170843990298,
+          -2.0985434415695003
+        ],
+        "proxy_3d_error_m": 0.31634009763280135,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13259084395366005,
+          "std_m": 0.16176603045734336,
+          "samples": 128
+        },
+        "latency_ms": 99.40240002470091,
+        "detector_ms": 56.6732999868691,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 42.66400000778958
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_141.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          168.0
+        ],
+        "coarse_pixel": [
+          14.63693904876709,
+          168.60227966308594
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          14.63693904876709,
+          168.60227966308594
+        ],
+        "confidence": 0.9990330934524536,
+        "detected": true,
+        "coarse_error_px": 8.384815739390001,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.830179898017636,
+            -1.7495644209650187,
+            -2.2868185669446213
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.390842775855647,
+          -1.8554417624742143,
+          -2.0890709188403385
+        ],
+        "proxy_3d_error_m": 0.4932861752425338,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1345493660389825,
+          "std_m": 0.16406069564673564,
+          "samples": 128
+        },
+        "latency_ms": 98.94499997608364,
+        "detector_ms": 58.5352000198327,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 40.34279996994883
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_142.jpg",
+        "gt_pixel": [
+          24.999968,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          17.55249786376953,
+          160.71876525878906
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          17.55249786376953,
+          160.71876525878906
+        ],
+        "confidence": 0.9997257590293884,
+        "detected": true,
+        "coarse_error_px": 9.129908971833393,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.717248077188538,
+            -1.289733570944417,
+            -2.253245812718081
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.29541131403482,
+          -1.7621471313281205,
+          -2.050022967677851
+        ],
+        "proxy_3d_error_m": 0.6651468646311566,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13585080480532127,
+          "std_m": 0.16517416085849065,
+          "samples": 128
+        },
+        "latency_ms": 94.5874999742955,
+        "detector_ms": 55.526599986478686,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 38.987900014035404
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_143.jpg",
+        "gt_pixel": [
+          21.999935999999998,
+          163.00009599999998
+        ],
+        "coarse_pixel": [
+          18.175981521606445,
+          166.956298828125
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          18.175981521606445,
+          166.956298828125
+        ],
+        "confidence": 0.9994854927062988,
+        "detected": true,
+        "coarse_error_px": 5.502196713140169,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.6510780735351585,
+            -1.7045140629614401,
+            -2.2100967892209944
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.468658821448762,
+          -1.5163128808589477,
+          -2.135914501817698
+        ],
+        "proxy_3d_error_m": 0.2723958153880508,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.134590810024632,
+          "std_m": 0.16386319219931259,
+          "samples": 128
+        },
+        "latency_ms": 101.85289999935776,
+        "detector_ms": 59.26830001408234,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 42.54289995878935
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_144.jpg",
+        "gt_pixel": [
+          21.0,
+          164.999968
+        ],
+        "coarse_pixel": [
+          12.779444694519043,
+          160.95785522460938
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          12.779444694519043,
+          160.95785522460938
+        ],
+        "confidence": 0.9997236132621765,
+        "detected": true,
+        "coarse_error_px": 9.160578869233493,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.97195017474081,
+            -1.2209092760269264,
+            -2.3670580857792523
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.511532724979021,
+          -1.6276915635381748,
+          -2.1512037800322297
+        ],
+        "proxy_3d_error_m": 0.6511905548973839,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1361126802725867,
+          "std_m": 0.1657662792620636,
+          "samples": 128
+        },
+        "latency_ms": 112.49979998683557,
+        "detector_ms": 63.35920002311468,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 49.087899969890714
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_214.jpg",
+        "gt_pixel": [
+          38.999968,
+          206.999968
+        ],
+        "coarse_pixel": [
+          31.957801818847656,
+          209.1620635986328
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          31.957801818847656,
+          209.1620635986328
+        ],
+        "confidence": 0.9999573230743408,
+        "detected": true,
+        "coarse_error_px": 7.3665977154038496,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.742309119279768,
+            -4.54477681693632,
+            -1.642246370914318
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -3.4049341554069628,
+          -4.515994003499802,
+          -1.5023680191378759
+        ],
+        "proxy_3d_error_m": 0.36635538742209334,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.12470843914811858,
+          "std_m": 0.15078672440128457,
+          "samples": 128
+        },
+        "latency_ms": 125.79159997403622,
+        "detector_ms": 69.48509998619556,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 56.256999960169196
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_215.jpg",
+        "gt_pixel": [
+          38.999968,
+          206.999968
+        ],
+        "coarse_pixel": [
+          24.544252395629883,
+          213.47544860839844
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          24.544252395629883,
+          213.47544860839844
+        ],
+        "confidence": 0.9999179840087891,
+        "detected": true,
+        "coarse_error_px": 15.839809428909618,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.089080309464028,
+            -4.6989256587806985,
+            -1.7725684468505598
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -3.4049341554069628,
+          -4.515994003499802,
+          -1.5023680191378759
+        ],
+        "proxy_3d_error_m": 0.7579763992044867,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.12427137857738073,
+          "std_m": 0.15118387823787124,
+          "samples": 128
+        },
+        "latency_ms": 121.87850003829226,
+        "detector_ms": 79.74970003124326,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 42.08240000298247
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_216.jpg",
+        "gt_pixel": [
+          34.000064,
+          206.999968
+        ],
+        "coarse_pixel": [
+          26.93981170654297,
+          209.1428985595703
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          26.93981170654297,
+          209.1428985595703
+        ],
+        "confidence": 0.9995800852775574,
+        "detected": true,
+        "coarse_error_px": 7.378300199260372,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.9907495084401674,
+            -4.472960629670009,
+            -1.751694886707046
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -3.6507640675773674,
+          -4.4449400452170025,
+          -1.6116419542960543
+        ],
+        "proxy_3d_error_m": 0.36876832432935236,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1254705166382259,
+          "std_m": 0.1518779410808743,
+          "samples": 128
+        },
+        "latency_ms": 88.68629997596145,
+        "detector_ms": 51.53150000842288,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 37.11129998555407
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_225.jpg",
+        "gt_pixel": [
+          58.000096000000006,
+          112.999936
+        ],
+        "coarse_pixel": [
+          48.65330505371094,
+          115.35893249511719
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          48.65330505371094,
+          115.35893249511719
+        ],
+        "confidence": 0.9998534917831421,
+        "detected": true,
+        "coarse_error_px": 9.639884099801534,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.244148145015082,
+            1.0962504286332475,
+            -1.5842037563109272
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -2.7517922974158395,
+          1.0594861397004998,
+          -1.350979099511612
+        ],
+        "proxy_3d_error_m": 0.5460399565462748,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13885664812684206,
+          "std_m": 0.17516124049174545,
+          "samples": 128
+        },
+        "latency_ms": 114.38770004315302,
+        "detector_ms": 59.41420001909137,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 54.90129999816418
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_226.jpg",
+        "gt_pixel": [
+          182.0,
+          116.99990400000002
+        ],
+        "coarse_pixel": [
+          186.34585571289062,
+          118.37271118164062
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          186.34585571289062,
+          118.37271118164062
+        ],
+        "confidence": 0.9997711777687073,
+        "detected": true,
+        "coarse_error_px": 4.557527996099214,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            3.4074594110960814,
+            -1.7513584614635462,
+            1.6453904504013508
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          3.222169239276729,
+          -1.6021496170979894,
+          1.5630729252231745
+        ],
+        "proxy_3d_error_m": 0.2517377642730818,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1166670918092011,
+          "std_m": 0.14355294856672546,
+          "samples": 128
+        },
+        "latency_ms": 91.95850003743544,
+        "detector_ms": 52.94040002627298,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 38.9763000421226
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_240.jpg",
+        "gt_pixel": [
+          175.999936,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          177.7386932373047,
+          211.25184631347656
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          177.7386932373047,
+          211.25184631347656
+        ],
+        "confidence": 0.999924898147583,
+        "detected": true,
+        "coarse_error_px": 3.687601597306664,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            2.80102596539662,
+            -6.4269565072769375,
+            1.1064846128482593
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          2.7363957670795367,
+          -6.255740771607641,
+          1.095308680033586
+        ],
+        "proxy_3d_error_m": 0.18334882641992,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.09750144597446678,
+          "std_m": 0.12314223965803042,
+          "samples": 128
+        },
+        "latency_ms": 93.4638999751769,
+        "detector_ms": 53.85019996901974,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 39.57029996672645
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_241.jpg",
+        "gt_pixel": [
+          160.000064,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          161.64599609375,
+          211.8581085205078
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          161.64599609375,
+          211.8581085205078
+        ],
+        "confidence": 0.9999191761016846,
+        "detected": true,
+        "coarse_error_px": 4.194619718079701,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            2.1325107498419227,
+            -6.296205071685332,
+            0.855284925309622
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          2.070226746585497,
+          -6.09202539494915,
+          0.8428504543450543
+        ],
+        "proxy_3d_error_m": 0.2138299640413073,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.10058192191518589,
+          "std_m": 0.1259044954169739,
+          "samples": 128
+        },
+        "latency_ms": 102.2697999724187,
+        "detector_ms": 58.33109997911379,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 43.893099995329976
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_242.jpg",
+        "gt_pixel": [
+          161.0,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          154.2709197998047,
+          209.8131103515625
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          154.2709197998047,
+          209.8131103515625
+        ],
+        "confidence": 0.9999737739562988,
+        "detected": true,
+        "coarse_error_px": 6.969091591736123,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            1.8262240497937146,
+            -6.120122585079635,
+            0.7432290355141191
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          2.1121796312229812,
+          -6.102529253419242,
+          0.8590479889100209
+        ],
+        "proxy_3d_error_m": 0.309021277317897,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.10370377644821846,
+          "std_m": 0.12393495288928738,
+          "samples": 128
+        },
+        "latency_ms": 102.381200005766,
+        "detector_ms": 52.81349999131635,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 49.52450003474951
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_243.jpg",
+        "gt_pixel": [
+          165.99990400000002,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          98.46483612060547,
+          205.17196655273438
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          98.46483612060547,
+          205.17196655273438
+        ],
+        "confidence": 0.9984176158905029,
+        "detected": true,
+        "coarse_error_px": 67.59424993059747,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -0.6075363755487065,
+            -5.224634954417979,
+            -0.2630813185316434
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          2.3213017722115463,
+          -6.154505973306165,
+          0.9391989847882805
+        ],
+        "proxy_3d_error_m": 3.299731949006602,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.11413034991202597,
+          "std_m": 0.1366171103405951,
+          "samples": 128
+        },
+        "latency_ms": 84.03049997286871,
+        "detector_ms": 45.50609999569133,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 38.47859997767955
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_244.jpg",
+        "gt_pixel": [
+          168.999936,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          188.98883056640625,
+          213.54086303710938
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          188.98883056640625,
+          213.54086303710938
+        ],
+        "confidence": 0.9999580383300781,
+        "detected": true,
+        "coarse_error_px": 20.74266455973845,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            3.2559579666376424,
+            -6.639583142550471,
+            1.2595958997092076
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          2.446266359656696,
+          -6.185257167686338,
+          0.9866190386004199
+        ],
+        "proxy_3d_error_m": 0.9677442619578991,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.09499233689227851,
+          "std_m": 0.12083428389129754,
+          "samples": 128
+        },
+        "latency_ms": 95.26899998309091,
+        "detector_ms": 54.94989996077493,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 40.28020001715049
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_258.jpg",
+        "gt_pixel": [
+          91.999936,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          76.74415588378906,
+          211.12184143066406
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          76.74415588378906,
+          211.12184143066406
+        ],
+        "confidence": 0.9999692440032959,
+        "detected": true,
+        "coarse_error_px": 15.571940157705411,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -1.5956256564106583,
+            -5.267305390713815,
+            -0.6867506636818455
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -0.8989934116230833,
+          -5.29420161398896,
+          -0.38743823486876394
+        ],
+        "proxy_3d_error_m": 0.7586882240724633,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.11785624912385999,
+          "std_m": 0.14000918700724996,
+          "samples": 128
+        },
+        "latency_ms": 92.83290000166744,
+        "detector_ms": 55.96450000302866,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 36.82350000599399
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_259.jpg",
+        "gt_pixel": [
+          45.999968,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          44.86882400512695,
+          208.8799591064453
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          44.86882400512695,
+          208.8799591064453
+        ],
+        "confidence": 0.9998612403869629,
+        "detected": true,
+        "coarse_error_px": 1.4331726091151076,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.1119292491376593,
+            -4.708969402605444,
+            -1.3643440364852495
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -3.0601336111550075,
+          -4.673380645227763,
+          -1.3447787330103829
+        ],
+        "proxy_3d_error_m": 0.06581906156867487,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1217655267522836,
+          "std_m": 0.14798527831511277,
+          "samples": 128
+        },
+        "latency_ms": 83.84799998020753,
+        "detector_ms": 54.27829996915534,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 29.52270000241697
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_260.jpg",
+        "gt_pixel": [
+          121.00009599999998,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          133.9339599609375,
+          200.64474487304688
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          133.9339599609375,
+          200.64474487304688
+        ],
+        "confidence": 0.9995567202568054,
+        "detected": true,
+        "coarse_error_px": 14.878951668139806,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            0.9666781370573595,
+            -5.429789700866831,
+            0.4131778102732362
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          0.39716039041005663,
+          -5.65415523399966,
+          0.16763028766607846
+        ],
+        "proxy_3d_error_m": 0.6595331243104571,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.11010693158417895,
+          "std_m": 0.1299748424048401,
+          "samples": 128
+        },
+        "latency_ms": 148.36039999499917,
+        "detector_ms": 70.7976000267081,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 77.50110002234578
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_261.jpg",
+        "gt_pixel": [
+          59.000032,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          58.48234558105469,
+          200.74896240234375
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          58.48234558105469,
+          200.74896240234375
+        ],
+        "confidence": 0.9997573494911194,
+        "detected": true,
+        "coarse_error_px": 7.269398412591128,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -2.479725622037086,
+            -4.4288348612101665,
+            -1.1087950405446492
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -2.4355611214422748,
+          -4.853837298129459,
+          -1.0665045272814702
+        ],
+        "proxy_3d_error_m": 0.4293786930114135,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.12141271865689639,
+          "std_m": 0.14712581925185683,
+          "samples": 128
+        },
+        "latency_ms": 94.43300002021715,
+        "detector_ms": 55.27700000675395,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 39.11160002462566
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_263.jpg",
+        "gt_pixel": [
+          38.999968,
+          206.999968
+        ],
+        "coarse_pixel": [
+          36.817649841308594,
+          205.9370574951172
+        ],
+        "refined_pixel": null,
+        "used_pixel": [
+          36.817649841308594,
+          205.9370574951172
+        ],
+        "confidence": 0.9997648596763611,
+        "detected": true,
+        "coarse_error_px": 2.427404228212616,
+        "refined_error_px": null,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.5162919026135873,
+            -4.421913329541663,
+            -1.556496828282178
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -3.4049341554069628,
+          -4.515994003499802,
+          -1.5023680191378759
+        ],
+        "proxy_3d_error_m": 0.15550449850320228,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.12483592873906263,
+          "std_m": 0.15061553869789976,
+          "samples": 128
+        },
+        "latency_ms": 89.12070002406836,
+        "detector_ms": 48.151299997698516,
+        "refiner_ms": 0.0,
+        "ray_and_uncertainty_ms": 40.92790000140667
+      }
+    ]
+  },
+  "branch_B_refined": {
+    "branch": "B",
+    "images": 36,
+    "detected": 36,
+    "detector_recall_on_gt_fire": 1.0,
+    "ray_hits": 36,
+    "ray_hit_rate_all_images": 1.0,
+    "ray_hit_rate_given_detection": 1.0,
+    "uncertainty_hits": 36,
+    "pixel_error_coarse_px": {
+      "count": 36,
+      "mean": 9.406638900903154,
+      "median": 7.317998063997489,
+      "p95": 17.065523211616828,
+      "coverage": 1.0,
+      "missing": 0,
+      "pck10": 0.75,
+      "pck25": 0.9722222222222222
+    },
+    "pixel_error_refined_px": {
+      "count": 36,
+      "mean": 9.57465234397321,
+      "median": 5.959508849940489,
+      "p95": 24.614091685692507,
+      "coverage": 1.0,
+      "missing": 0,
+      "pck10": 0.6944444444444444,
+      "pck25": 0.9444444444444444
+    },
+    "proxy_3d_error_m_vs_oracle_2d": {
+      "count": 36,
+      "mean": 0.5256445112221209,
+      "median": 0.38950042839245497,
+      "p95": 1.3122138054381614,
+      "under_0_5": 0.6388888888888888,
+      "under_1_0": 0.9166666666666666,
+      "under_2_0": 0.9722222222222222
+    },
+    "uncertainty_spread_m": {
+      "count": 36,
+      "mean": 0.12571817424621579,
+      "median": 0.1316071325902824,
+      "p95": 0.13569168542746157
+    },
+    "uncertainty_std_norm_m": {
+      "count": 36,
+      "mean": 0.15293635164595823,
+      "median": 0.16069025668720616,
+      "p95": 0.1650730313929518
+    },
+    "latency_ms": {
+      "end_to_end": {
+        "count": 36,
+        "mean": 162.25861944743278,
+        "median": 156.6376500413753,
+        "p95": 190.06522496056277
+      },
+      "detector": {
+        "count": 36,
+        "mean": 56.242866672821236,
+        "median": 54.590700019616634,
+        "p95": 68.66142502985895
+      },
+      "refiner": {
+        "count": 36,
+        "mean": 62.58794443662433,
+        "median": 60.55714999092743,
+        "p95": 76.5555249818135
+      },
+      "ray_and_uncertainty": {
+        "count": 36,
+        "mean": 43.32779722527549,
+        "median": 40.750700019998476,
+        "p95": 58.96257502899971
+      }
+    },
+    "rows": [
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_103.jpg",
+        "gt_pixel": [
+          21.999935999999998,
+          167.000064
+        ],
+        "coarse_pixel": [
+          17.196765899658203,
+          165.2417755126953
+        ],
+        "refined_pixel": [
+          18.901840209960938,
+          168.48451232910156
+        ],
+        "used_pixel": [
+          18.901840209960938,
+          168.48451232910156
+        ],
+        "confidence": 0.9996393918991089,
+        "detected": true,
+        "coarse_error_px": 5.114882346389372,
+        "refined_error_px": 3.4353725221626465,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.604607888888216,
+            -1.815518306267986,
+            -2.185288716013215
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.448549365945466,
+          -1.7738782973515193,
+          -2.1178712279461926
+        ],
+        "proxy_3d_error_m": 0.17502362875595803,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13422068029732434,
+          "std_m": 0.16343830889549849,
+          "samples": 128
+        },
+        "latency_ms": 146.9645999604836,
+        "detector_ms": 54.66260004322976,
+        "refiner_ms": 56.43890000646934,
+        "ray_and_uncertainty_ms": 35.761300008744
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_104.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          167.000064
+        ],
+        "coarse_pixel": [
+          20.88335418701172,
+          164.7728729248047
+        ],
+        "refined_pixel": [
+          21.559288024902344,
+          167.20852661132812
+        ],
+        "used_pixel": [
+          21.559288024902344,
+          167.20852661132812
+        ],
+        "confidence": 0.9997034668922424,
+        "detected": true,
+        "coarse_error_px": 3.0726171236069457,
+        "refined_error_px": 1.455810523875533,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.470753465153979,
+            -1.7795937797713997,
+            -2.127511874077104
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.395809898768412,
+          -1.791318651880136,
+          -2.0937541123945174
+        ],
+        "proxy_3d_error_m": 0.0830276896123957,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13425160661462884,
+          "std_m": 0.16328434539114833,
+          "samples": 128
+        },
+        "latency_ms": 155.52850003587082,
+        "detector_ms": 54.72800001734868,
+        "refiner_ms": 57.732800021767616,
+        "ray_and_uncertainty_ms": 42.98140003811568
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_105.jpg",
+        "gt_pixel": [
+          21.999935999999998,
+          168.0
+        ],
+        "coarse_pixel": [
+          13.263822555541992,
+          175.49142456054688
+        ],
+        "refined_pixel": [
+          16.098480224609375,
+          177.8884506225586
+        ],
+        "used_pixel": [
+          16.098480224609375,
+          177.8884506225586
+        ],
+        "confidence": 0.9997264742851257,
+        "detected": true,
+        "coarse_error_px": 11.508306567901503,
+        "refined_error_px": 11.515582311966286,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.702234436090201,
+            -2.370273879002312,
+            -2.2020867383595792
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.443518984407924,
+          -1.8380686962826225,
+          -2.1131580302631754
+        ],
+        "proxy_3d_error_m": 0.5984015011483159,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13253107549649618,
+          "std_m": 0.1618776707744867,
+          "samples": 128
+        },
+        "latency_ms": 165.8612000173889,
+        "detector_ms": 59.665000007953495,
+        "refiner_ms": 65.47430000500754,
+        "ray_and_uncertainty_ms": 40.63560004578903
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_108.jpg",
+        "gt_pixel": [
+          21.0,
+          164.000032
+        ],
+        "coarse_pixel": [
+          17.332061767578125,
+          159.42086791992188
+        ],
+        "refined_pixel": [
+          18.08924102783203,
+          162.28585052490234
+        ],
+        "used_pixel": [
+          18.08924102783203,
+          162.28585052490234
+        ],
+        "confidence": 0.9990323781967163,
+        "detected": true,
+        "coarse_error_px": 5.8670703548824,
+        "refined_error_px": 3.378007685548439,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.680304344009893,
+            -1.4009679212538373,
+            -2.233547252597912
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.51662189767408,
+          -1.5631999051115955,
+          -2.1556991333832833
+        ],
+        "proxy_3d_error_m": 0.24325190541937253,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13551476528060552,
+          "std_m": 0.16479976362862528,
+          "samples": 128
+        },
+        "latency_ms": 150.66839999053627,
+        "detector_ms": 50.418199971318245,
+        "refiner_ms": 59.535899956244975,
+        "ray_and_uncertainty_ms": 40.5888999812305
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_109.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          32.3514404296875,
+          172.2842559814453
+        ],
+        "refined_pixel": [
+          34.003807067871094,
+          173.79927825927734
+        ],
+        "used_pixel": [
+          34.003807067871094,
+          173.79927825927734
+        ],
+        "confidence": 0.9992483258247375,
+        "detected": true,
+        "coarse_error_px": 11.26679734748712,
+        "refined_error_px": 13.487471820228821,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.7913008955681913,
+            -2.4128543953342962,
+            -1.7969546150614697
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.400777100142842,
+          -1.727100873405643,
+          -2.0983593341095776
+        ],
+        "proxy_3d_error_m": 0.9656935028489849,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13139224692521517,
+          "std_m": 0.1595964926628852,
+          "samples": 128
+        },
+        "latency_ms": 165.6518999952823,
+        "detector_ms": 56.29919999046251,
+        "refiner_ms": 56.513599993195385,
+        "ray_and_uncertainty_ms": 52.74030001601204
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_110.jpg",
+        "gt_pixel": [
+          21.0,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          25.352264404296875,
+          169.04978942871094
+        ],
+        "refined_pixel": [
+          27.039710998535156,
+          172.46749114990234
+        ],
+        "used_pixel": [
+          27.039710998535156,
+          172.46749114990234
+        ],
+        "confidence": 0.9997904896736145,
+        "detected": true,
+        "coarse_error_px": 5.31450906229097,
+        "refined_error_px": 8.849169028073103,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.157761748636361,
+            -2.2099492329368715,
+            -1.9703859566431952
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.5064419324699365,
+          -1.6921056798381926,
+          -2.146625271755962
+        ],
+        "proxy_3d_error_m": 0.6486910761491155,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13258149665571015,
+          "std_m": 0.16120513721561522,
+          "samples": 128
+        },
+        "latency_ms": 174.19310001423582,
+        "detector_ms": 77.66030001221225,
+        "refiner_ms": 60.8675999683328,
+        "ray_and_uncertainty_ms": 35.579699964728206
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_115.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          171.999968
+        ],
+        "coarse_pixel": [
+          15.862772941589355,
+          174.78611755371094
+        ],
+        "refined_pixel": [
+          17.435531616210938,
+          182.90665435791016
+        ],
+        "used_pixel": [
+          17.435531616210938,
+          182.90665435791016
+        ],
+        "confidence": 0.9992820620536804,
+        "detected": true,
+        "coarse_error_px": 7.661854199589287,
+        "refined_error_px": 12.244189809503828,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.605350845427813,
+            -2.71090585787163,
+            -2.140983779809826
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.370964976676285,
+          -2.1111339553499846,
+          -2.0695623648737715
+        ],
+        "proxy_3d_error_m": 0.647892035015334,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.131317010950124,
+          "std_m": 0.1605116317924739,
+          "samples": 128
+        },
+        "latency_ms": 149.5351000339724,
+        "detector_ms": 51.77000002004206,
+        "refiner_ms": 61.97380000958219,
+        "ray_and_uncertainty_ms": 35.69470002548769
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_116.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          168.0
+        ],
+        "coarse_pixel": [
+          18.981874465942383,
+          161.44667053222656
+        ],
+        "refined_pixel": [
+          19.5531005859375,
+          164.31546020507812
+        ],
+        "used_pixel": [
+          19.5531005859375,
+          164.31546020507812
+        ],
+        "confidence": 0.999309778213501,
+        "detected": true,
+        "coarse_error_px": 7.687147156777478,
+        "refined_error_px": 5.045553575667476,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.591787429672246,
+            -1.5581181202418932,
+            -2.189214672850884
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.390842775855647,
+          -1.8554417624742143,
+          -2.0890709188403385
+        ],
+        "proxy_3d_error_m": 0.37257062900219434,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1350070079879194,
+          "std_m": 0.16418677491449737,
+          "samples": 128
+        },
+        "latency_ms": 153.51319999899715,
+        "detector_ms": 54.19600004097447,
+        "refiner_ms": 56.86720000812784,
+        "ray_and_uncertainty_ms": 42.3028000514023
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_117.jpg",
+        "gt_pixel": [
+          21.0,
+          167.000064
+        ],
+        "coarse_pixel": [
+          15.093505859375,
+          166.55628967285156
+        ],
+        "refined_pixel": [
+          16.938064575195312,
+          169.21241760253906
+        ],
+        "used_pixel": [
+          16.938064575195312,
+          169.21241760253906
+        ],
+        "confidence": 0.998917818069458,
+        "detected": true,
+        "coarse_error_px": 5.923141791876462,
+        "refined_error_px": 4.625346241953219,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.704715422040455,
+            -1.8284999771218864,
+            -2.228748909295394
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.501348506072647,
+          -1.7564559614301167,
+          -2.141963426754824
+        ],
+        "proxy_3d_error_m": 0.23255141944751295,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1342404027284899,
+          "std_m": 0.16359196672163862,
+          "samples": 128
+        },
+        "latency_ms": 171.31960002006963,
+        "detector_ms": 53.522300033364445,
+        "refiner_ms": 60.65130000934005,
+        "ray_and_uncertainty_ms": 57.05760000273585
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_119.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          164.000032
+        ],
+        "coarse_pixel": [
+          22.214725494384766,
+          158.21054077148438
+        ],
+        "refined_pixel": [
+          24.35071563720703,
+          161.80846405029297
+        ],
+        "used_pixel": [
+          24.35071563720703,
+          161.80846405029297
+        ],
+        "confidence": 0.9998267292976379,
+        "detected": true,
+        "coarse_error_px": 5.842517908928456,
+        "refined_error_px": 2.5743238884399036,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.3500350490044095,
+            -1.481151280110673,
+            -2.083997588276315
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.410705756831833,
+          -1.5984555653500472,
+          -2.107327751676454
+        ],
+        "proxy_3d_error_m": 0.13411012880494236,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13512187671383022,
+          "std_m": 0.16395781575329405,
+          "samples": 128
+        },
+        "latency_ms": 159.49930000351742,
+        "detector_ms": 54.7050999593921,
+        "refiner_ms": 64.94099996052682,
+        "ray_and_uncertainty_ms": 39.766900008544326
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_120.jpg",
+        "gt_pixel": [
+          21.0,
+          161.999936
+        ],
+        "coarse_pixel": [
+          12.73038101196289,
+          156.30844116210938
+        ],
+        "refined_pixel": [
+          15.891990661621094,
+          159.29833221435547
+        ],
+        "used_pixel": [
+          15.891990661621094,
+          159.29833221435547
+        ],
+        "confidence": 0.9996813535690308,
+        "detected": true,
+        "coarse_error_px": 10.03890988589097,
+        "refined_error_px": 5.778444636368417,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.813808709287347,
+            -1.1677757167773493,
+            -2.2992507555790205
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.5267960860574235,
+          -1.4339719089585863,
+          -2.1644383695907585
+        ],
+        "proxy_3d_error_m": 0.41401816148686066,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13622244586802978,
+          "std_m": 0.1656621373788991,
+          "samples": 128
+        },
+        "latency_ms": 151.18689998053014,
+        "detector_ms": 53.66249999497086,
+        "refiner_ms": 61.222199990879744,
+        "ray_and_uncertainty_ms": 36.22079995693639
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_121.jpg",
+        "gt_pixel": [
+          24.000032,
+          179.99990400000002
+        ],
+        "coarse_pixel": [
+          19.553272247314453,
+          182.26449584960938
+        ],
+        "refined_pixel": [
+          22.31598663330078,
+          188.89391326904297
+        ],
+        "used_pixel": [
+          22.31598663330078,
+          188.89391326904297
+        ],
+        "confidence": 0.9994519352912903,
+        "detected": true,
+        "coarse_error_px": 4.990195241012237,
+        "refined_error_px": 9.052038978866754,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.322099005378039,
+            -3.1651247984489217,
+            -1.990357109366908
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.279370139530299,
+          -2.6350043596513544,
+          -2.003354237823519
+        ],
+        "proxy_3d_error_m": 0.531998459542579,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.12937283085248483,
+          "std_m": 0.15817076479420156,
+          "samples": 128
+        },
+        "latency_ms": 152.64290000777692,
+        "detector_ms": 56.34549999376759,
+        "refiner_ms": 55.35530002089217,
+        "ray_and_uncertainty_ms": 40.86579999420792
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_122.jpg",
+        "gt_pixel": [
+          21.0,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          14.637332916259766,
+          156.9446258544922
+        ],
+        "refined_pixel": [
+          15.994964599609375,
+          163.4560317993164
+        ],
+        "used_pixel": [
+          15.994964599609375,
+          163.4560317993164
+        ],
+        "confidence": 0.999850869178772,
+        "detected": true,
+        "coarse_error_px": 11.06714031315331,
+        "refined_error_px": 5.6144158318185,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.7858502624255035,
+            -1.4400013315627866,
+            -2.27878579547097
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.5064419324699365,
+          -1.6921056798381926,
+          -2.146625271755962
+        ],
+        "proxy_3d_error_m": 0.3988634118298536,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13544160590167184,
+          "std_m": 0.16487164042772315,
+          "samples": 128
+        },
+        "latency_ms": 159.26370001398027,
+        "detector_ms": 64.2622000304982,
+        "refiner_ms": 56.217100005596876,
+        "ray_and_uncertainty_ms": 38.66859996924177
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_123.jpg",
+        "gt_pixel": [
+          25.999903999999997,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          22.940170288085938,
+          162.31971740722656
+        ],
+        "refined_pixel": [
+          26.206031799316406,
+          165.30550384521484
+        ],
+        "used_pixel": [
+          26.206031799316406,
+          165.30550384521484
+        ],
+        "confidence": 0.9999369382858276,
+        "detected": true,
+        "coarse_error_px": 4.7859945408925055,
+        "refined_error_px": 0.7243481515243175,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.235316200829944,
+            -1.7388227625003623,
+            -2.0239259094003934
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.242836752816851,
+          -1.779688611032693,
+          -2.025829474819634
+        ],
+        "proxy_3d_error_m": 0.0415956709257166,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13423059660142725,
+          "std_m": 0.16292962358113577,
+          "samples": 128
+        },
+        "latency_ms": 170.48639996210113,
+        "detector_ms": 49.198799999430776,
+        "refiner_ms": 62.70579999545589,
+        "ray_and_uncertainty_ms": 58.45380004029721
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_134.jpg",
+        "gt_pixel": [
+          130.99990400000002,
+          195.000064
+        ],
+        "coarse_pixel": [
+          133.34579467773438,
+          203.2555694580078
+        ],
+        "refined_pixel": [
+          130.5943374633789,
+          206.64144897460938
+        ],
+        "used_pixel": [
+          130.5943374633789,
+          206.64144897460938
+        ],
+        "confidence": 0.9998072981834412,
+        "detected": true,
+        "coarse_error_px": 8.582340790196904,
+        "refined_error_px": 11.648447464906537,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            0.8167533373016943,
+            -5.697581960702241,
+            0.3434838475984314
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          0.8431996195001389,
+          -5.1010494903077515,
+          0.36749153209809293
+        ],
+        "proxy_3d_error_m": 0.597600839182901,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.10880986722069565,
+          "std_m": 0.12926671352124583,
+          "samples": 128
+        },
+        "latency_ms": 235.46820000046864,
+        "detector_ms": 74.8619000078179,
+        "refiner_ms": 90.04310000455007,
+        "ray_and_uncertainty_ms": 70.38539997301996
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_139.jpg",
+        "gt_pixel": [
+          21.999935999999998,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          23.939300537109375,
+          165.1772918701172
+        ],
+        "refined_pixel": [
+          25.932464599609375,
+          168.20360565185547
+        ],
+        "used_pixel": [
+          25.932464599609375,
+          168.20360565185547
+        ],
+        "confidence": 0.9995766282081604,
+        "detected": true,
+        "coarse_error_px": 2.1066147070662518,
+        "refined_error_px": 4.507891098633167,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.235841894975189,
+            -1.9194529839045096,
+            -2.0174096736547575
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.453579664260686,
+          -1.7095939472995312,
+          -2.1225051700852795
+        ],
+        "proxy_3d_error_m": 0.32014936324811255,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13363470087457568,
+          "std_m": 0.16234988751955898,
+          "samples": 128
+        },
+        "latency_ms": 141.09900000039488,
+        "detector_ms": 47.18300001695752,
+        "refiner_ms": 58.751399978064,
+        "ray_and_uncertainty_ms": 35.08420003345236
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_140.jpg",
+        "gt_pixel": [
+          21.999935999999998,
+          171.000032
+        ],
+        "coarse_pixel": [
+          18.931978225708008,
+          176.24951171875
+        ],
+        "refined_pixel": [
+          20.41741943359375,
+          179.08421325683594
+        ],
+        "used_pixel": [
+          20.41741943359375,
+          179.08421325683594
+        ],
+        "confidence": 0.9995455145835876,
+        "detected": true,
+        "coarse_error_px": 6.080246888277333,
+        "refined_error_px": 8.237617694232211,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.47007354884075,
+            -2.517891471511586,
+            -2.0931933812418073
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.428420569606483,
+          -2.030170843990298,
+          -2.0985434415695003
+        ],
+        "proxy_3d_error_m": 0.48952528467318107,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13182201825534962,
+          "std_m": 0.1608688815819384,
+          "samples": 128
+        },
+        "latency_ms": 161.87599999830127,
+        "detector_ms": 51.64989997865632,
+        "refiner_ms": 68.4509999700822,
+        "ray_and_uncertainty_ms": 41.68690001824871
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_141.jpg",
+        "gt_pixel": [
+          23.000096000000003,
+          168.0
+        ],
+        "coarse_pixel": [
+          14.63693904876709,
+          168.60227966308594
+        ],
+        "refined_pixel": [
+          16.195632934570312,
+          171.45457458496094
+        ],
+        "used_pixel": [
+          16.195632934570312,
+          171.45457458496094
+        ],
+        "confidence": 0.9990330934524536,
+        "detected": true,
+        "coarse_error_px": 8.384815739390001,
+        "refined_error_px": 7.63117311898078,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.7319535932894725,
+            -1.9600296849166519,
+            -2.2350342962385135
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.390842775855647,
+          -1.8554417624742143,
+          -2.0890709188403385
+        ],
+        "proxy_3d_error_m": 0.38548739386999387,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13385314950780786,
+          "std_m": 0.1632430651170859,
+          "samples": 128
+        },
+        "latency_ms": 149.12249997723848,
+        "detector_ms": 51.43829999724403,
+        "refiner_ms": 58.92300000414252,
+        "ray_and_uncertainty_ms": 38.68030000012368
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_142.jpg",
+        "gt_pixel": [
+          24.999968,
+          165.99990400000002
+        ],
+        "coarse_pixel": [
+          17.55249786376953,
+          160.71876525878906
+        ],
+        "refined_pixel": [
+          18.43915557861328,
+          163.20468139648438
+        ],
+        "used_pixel": [
+          18.43915557861328,
+          163.20468139648438
+        ],
+        "confidence": 0.9997257590293884,
+        "detected": true,
+        "coarse_error_px": 9.129908971833393,
+        "refined_error_px": 7.131446489445672,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.656823401345554,
+            -1.4666798993348564,
+            -2.221057817984626
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.29541131403482,
+          -1.7621471313281205,
+          -2.050022967677851
+        ],
+        "proxy_3d_error_m": 0.49716446177851853,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13531133989642954,
+          "std_m": 0.16457091557917838,
+          "samples": 128
+        },
+        "latency_ms": 154.08429998205975,
+        "detector_ms": 52.62839997885749,
+        "refiner_ms": 63.75139998272061,
+        "ray_and_uncertainty_ms": 37.603700009640306
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_143.jpg",
+        "gt_pixel": [
+          21.999935999999998,
+          163.00009599999998
+        ],
+        "coarse_pixel": [
+          18.175981521606445,
+          166.956298828125
+        ],
+        "refined_pixel": [
+          21.180137634277344,
+          167.4163589477539
+        ],
+        "used_pixel": [
+          21.180137634277344,
+          167.4163589477539
+        ],
+        "confidence": 0.9994854927062988,
+        "detected": true,
+        "coarse_error_px": 5.502196713140169,
+        "refined_error_px": 4.491708782205909,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.489715808383909,
+            -1.786349795027654,
+            -2.135662307455373
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.468658821448762,
+          -1.5163128808589477,
+          -2.135914501817698
+        ],
+        "proxy_3d_error_m": 0.27085678007858793,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1342418921374225,
+          "std_m": 0.1633013271529606,
+          "samples": 128
+        },
+        "latency_ms": 148.7331999815069,
+        "detector_ms": 53.17609995836392,
+        "refiner_ms": 57.01370001770556,
+        "ray_and_uncertainty_ms": 38.4613000205718
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_144.jpg",
+        "gt_pixel": [
+          21.0,
+          164.999968
+        ],
+        "coarse_pixel": [
+          12.779444694519043,
+          160.95785522460938
+        ],
+        "refined_pixel": [
+          14.9085693359375,
+          164.2246551513672
+        ],
+        "used_pixel": [
+          14.9085693359375,
+          164.2246551513672
+        ],
+        "confidence": 0.9997236132621765,
+        "detected": true,
+        "coarse_error_px": 9.160578869233493,
+        "refined_error_px": 6.14057306351256,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.839715792512233,
+            -1.4708524353075099,
+            -2.3013710452254976
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -4.511532724979021,
+          -1.6276915635381748,
+          -2.1512037800322297
+        ],
+        "proxy_3d_error_m": 0.39351346291491607,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.13537289437455072,
+          "std_m": 0.16487666273096935,
+          "samples": 128
+        },
+        "latency_ms": 153.23080000234768,
+        "detector_ms": 54.13199996110052,
+        "refiner_ms": 53.06999996537343,
+        "ray_and_uncertainty_ms": 45.9442000137642
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_214.jpg",
+        "gt_pixel": [
+          38.999968,
+          206.999968
+        ],
+        "coarse_pixel": [
+          31.957801818847656,
+          209.1620635986328
+        ],
+        "refined_pixel": [
+          33.974281311035156,
+          206.5844497680664
+        ],
+        "used_pixel": [
+          33.974281311035156,
+          206.5844497680664
+        ],
+        "confidence": 0.9999573230743408,
+        "detected": true,
+        "coarse_error_px": 7.3665977154038496,
+        "refined_error_px": 5.042834728276117,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.653779140613167,
+            -4.419814008503504,
+            -1.6148382739272087
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -3.4049341554069628,
+          -4.515994003499802,
+          -1.5023680191378759
+        ],
+        "proxy_3d_error_m": 0.2895237059588409,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.12516807139844152,
+          "std_m": 0.15106240969434911,
+          "samples": 128
+        },
+        "latency_ms": 176.46919999970123,
+        "detector_ms": 50.56320002768189,
+        "refiner_ms": 65.33010001294315,
+        "ray_and_uncertainty_ms": 60.488899995107204
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_215.jpg",
+        "gt_pixel": [
+          38.999968,
+          206.999968
+        ],
+        "coarse_pixel": [
+          24.544252395629883,
+          213.47544860839844
+        ],
+        "refined_pixel": [
+          27.205162048339844,
+          210.98053741455078
+        ],
+        "used_pixel": [
+          27.205162048339844,
+          210.98053741455078
+        ],
+        "confidence": 0.9999179840087891,
+        "detected": true,
+        "coarse_error_px": 15.839809428909618,
+        "refined_error_px": 12.448388662850109,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.969066340326108,
+            -4.586683972875765,
+            -1.7330640749438189
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -3.4049341554069628,
+          -4.515994003499802,
+          -1.5023680191378759
+        ],
+        "proxy_3d_error_m": 0.6135656965610463,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.12481337446464294,
+          "std_m": 0.1513103002221066,
+          "samples": 128
+        },
+        "latency_ms": 151.24390000710264,
+        "detector_ms": 52.41210001986474,
+        "refiner_ms": 56.00900005083531,
+        "ray_and_uncertainty_ms": 42.73729998385534
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_216.jpg",
+        "gt_pixel": [
+          34.000064,
+          206.999968
+        ],
+        "coarse_pixel": [
+          26.93981170654297,
+          209.1428985595703
+        ],
+        "refined_pixel": [
+          30.23333740234375,
+          210.47584533691406
+        ],
+        "used_pixel": [
+          30.23333740234375,
+          210.47584533691406
+        ],
+        "confidence": 0.9995800852775574,
+        "detected": true,
+        "coarse_error_px": 7.378300199260372,
+        "refined_error_px": 5.125422179953947,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.8216503219262425,
+            -4.5988230986978,
+            -1.6709225079472105
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -3.6507640675773674,
+          -4.4449400452170025,
+          -1.6116419542960543
+        ],
+        "proxy_3d_error_m": 0.23747903089567704,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.12459572779600075,
+          "std_m": 0.1507959861772829,
+          "samples": 128
+        },
+        "latency_ms": 185.71359995985404,
+        "detector_ms": 62.41160002537072,
+        "refiner_ms": 73.07719998061657,
+        "ray_and_uncertainty_ms": 50.14379997737706
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_225.jpg",
+        "gt_pixel": [
+          58.000096000000006,
+          112.999936
+        ],
+        "coarse_pixel": [
+          48.65330505371094,
+          115.35893249511719
+        ],
+        "refined_pixel": [
+          34.130775451660156,
+          109.80326843261719
+        ],
+        "used_pixel": [
+          34.130775451660156,
+          109.80326843261719
+        ],
+        "confidence": 0.9998534917831421,
+        "detected": true,
+        "coarse_error_px": 9.639884099801534,
+        "refined_error_px": 24.082424026159746,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -4.0564967045047124,
+            1.7675758211636357,
+            -1.9423364038391178
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -2.7517922974158395,
+          1.0594861397004998,
+          -1.350979099511612
+        ],
+        "proxy_3d_error_m": 1.5979199129659742,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.14082640572056443,
+          "std_m": 0.17735527611951563,
+          "samples": 128
+        },
+        "latency_ms": 151.6647000098601,
+        "detector_ms": 54.20010001398623,
+        "refiner_ms": 59.3593999510631,
+        "ray_and_uncertainty_ms": 37.96879999572411
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_226.jpg",
+        "gt_pixel": [
+          182.0,
+          116.99990400000002
+        ],
+        "coarse_pixel": [
+          186.34585571289062,
+          118.37271118164062
+        ],
+        "refined_pixel": [
+          201.85987091064453,
+          99.89720916748047
+        ],
+        "used_pixel": [
+          201.85987091064453,
+          99.89720916748047
+        ],
+        "confidence": 0.9997711777687073,
+        "detected": true,
+        "coarse_error_px": 4.557527996099214,
+        "refined_error_px": 26.209094664290784,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            4.1455374583409546,
+            -0.9439854144752324,
+            2.0049411507558084
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          3.222169239276729,
+          -1.6021496170979894,
+          1.5630729252231745
+        ],
+        "proxy_3d_error_m": 1.2169784362622238,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.11721815519160231,
+          "std_m": 0.14547673039248235,
+          "samples": 128
+        },
+        "latency_ms": 153.6134000052698,
+        "detector_ms": 54.51879999600351,
+        "refiner_ms": 55.16310001257807,
+        "ray_and_uncertainty_ms": 43.8463999889791
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_240.jpg",
+        "gt_pixel": [
+          175.999936,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          177.7386932373047,
+          211.25184631347656
+        ],
+        "refined_pixel": [
+          178.45108795166016,
+          208.7633514404297
+        ],
+        "used_pixel": [
+          178.45108795166016,
+          208.7633514404297
+        ],
+        "confidence": 0.999924898147583,
+        "detected": true,
+        "coarse_error_px": 3.687601597306664,
+        "refined_error_px": 2.56729388353302,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            2.8358277879254556,
+            -6.316197222267892,
+            1.1290823175123599
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          2.7363957670795367,
+          -6.255740771607641,
+          1.095308680033586
+        ],
+        "proxy_3d_error_m": 0.12117082068091406,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.09791888522909212,
+          "std_m": 0.12350958194895555,
+          "samples": 128
+        },
+        "latency_ms": 156.7658000276424,
+        "detector_ms": 64.4120000069961,
+        "refiner_ms": 55.8537999750115,
+        "ray_and_uncertainty_ms": 36.41449997667223
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_241.jpg",
+        "gt_pixel": [
+          160.000064,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          161.64599609375,
+          211.8581085205078
+        ],
+        "refined_pixel": [
+          160.58018493652344,
+          208.7870330810547
+        ],
+        "used_pixel": [
+          160.58018493652344,
+          208.7870330810547
+        ],
+        "confidence": 0.9999191761016846,
+        "detected": true,
+        "coarse_error_px": 4.194619718079701,
+        "refined_error_px": 0.9778100486468694,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            2.093214453608091,
+            -6.136423815788955,
+            0.8494251327196203
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          2.070226746585497,
+          -6.09202539494915,
+          0.8428504543450543
+        ],
+        "proxy_3d_error_m": 0.05042698526537199,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.10248474920959284,
+          "std_m": 0.12299611412860423,
+          "samples": 128
+        },
+        "latency_ms": 162.93109999969602,
+        "detector_ms": 54.737099970225245,
+        "refiner_ms": 66.66429998585954,
+        "ray_and_uncertainty_ms": 41.43629997270182
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_242.jpg",
+        "gt_pixel": [
+          161.0,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          154.2709197998047,
+          209.8131103515625
+        ],
+        "refined_pixel": [
+          154.25081634521484,
+          208.77399444580078
+        ],
+        "used_pixel": [
+          154.25081634521484,
+          208.77399444580078
+        ],
+        "confidence": 0.9999737739562988,
+        "detected": true,
+        "coarse_error_px": 6.969091591736123,
+        "refined_error_px": 6.793430357654309,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            1.826965567397974,
+            -6.0689517039414795,
+            0.7461882706943435
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          2.1121796312229812,
+          -6.102529253419242,
+          0.8590479889100209
+        ],
+        "proxy_3d_error_m": 0.30856414248617564,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.10406541313638822,
+          "std_m": 0.12415636509560773,
+          "samples": 128
+        },
+        "latency_ms": 163.04810001747683,
+        "detector_ms": 52.98130004666746,
+        "refiner_ms": 66.4536000113003,
+        "ray_and_uncertainty_ms": 43.471099983435124
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_243.jpg",
+        "gt_pixel": [
+          165.99990400000002,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          98.46483612060547,
+          205.17196655273438
+        ],
+        "refined_pixel": [
+          100.5015640258789,
+          204.0173568725586
+        ],
+        "used_pixel": [
+          100.5015640258789,
+          204.0173568725586
+        ],
+        "confidence": 0.9984176158905029,
+        "detected": true,
+        "coarse_error_px": 67.59424993059747,
+        "refined_error_px": 65.6193052461533,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -0.5160145920810002,
+            -5.188724658257403,
+            -0.22394871398752514
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          2.3213017722115463,
+          -6.154505973306165,
+          0.9391989847882805
+        ],
+        "proxy_3d_error_m": 3.2149666046083656,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.11417475031980202,
+          "std_m": 0.1364546495590024,
+          "samples": 128
+        },
+        "latency_ms": 150.22479998879135,
+        "detector_ms": 54.700199980288744,
+        "refiner_ms": 59.4777999795042,
+        "ray_and_uncertainty_ms": 35.936900007072836
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_244.jpg",
+        "gt_pixel": [
+          168.999936,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          188.98883056640625,
+          213.54086303710938
+        ],
+        "refined_pixel": [
+          186.51311492919922,
+          211.25857543945312
+        ],
+        "used_pixel": [
+          186.51311492919922,
+          211.25857543945312
+        ],
+        "confidence": 0.9999580383300781,
+        "detected": true,
+        "coarse_error_px": 20.74266455973845,
+        "refined_error_px": 17.81376927425679,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            3.1606160297958303,
+            -6.510682643300758,
+            1.2362109580513447
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          2.446266359656696,
+          -6.185257167686338,
+          0.9866190386004199
+        ],
+        "proxy_3d_error_m": 0.8237070581596095,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.09591475727814518,
+          "std_m": 0.12166214999481877,
+          "samples": 128
+        },
+        "latency_ms": 162.92960004648194,
+        "detector_ms": 54.70199999399483,
+        "refiner_ms": 69.16080001974478,
+        "ray_and_uncertainty_ms": 38.947599998209625
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_258.jpg",
+        "gt_pixel": [
+          91.999936,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          76.74415588378906,
+          211.12184143066406
+        ],
+        "refined_pixel": [
+          75.62577056884766,
+          208.99019622802734
+        ],
+        "used_pixel": [
+          75.62577056884766,
+          208.99019622802734
+        ],
+        "confidence": 0.9999692440032959,
+        "detected": true,
+        "coarse_error_px": 15.571940157705411,
+        "refined_error_px": 16.404084011722077,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -1.6511263514296295,
+            -5.134425836664743,
+            -0.7158510468792159
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -0.8989934116230833,
+          -5.29420161398896,
+          -0.38743823486876394
+        ],
+        "proxy_3d_error_m": 0.8361143661331313,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1181076196428403,
+          "std_m": 0.14084893264681553,
+          "samples": 128
+        },
+        "latency_ms": 167.52670001005754,
+        "detector_ms": 66.59460003720596,
+        "refiner_ms": 61.35329999960959,
+        "ray_and_uncertainty_ms": 39.49830000055954
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_259.jpg",
+        "gt_pixel": [
+          45.999968,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          44.86882400512695,
+          208.8799591064453
+        ],
+        "refined_pixel": [
+          41.637413024902344,
+          210.06835174560547
+        ],
+        "used_pixel": [
+          41.637413024902344,
+          210.06835174560547
+        ],
+        "confidence": 0.9998612403869629,
+        "detected": true,
+        "coarse_error_px": 1.4331726091151076,
+        "refined_error_px": 4.8280805696518385,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.2645844477404173,
+            -4.733534673167604,
+            -1.4271443204564136
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -3.0601336111550075,
+          -4.673380645227763,
+          -1.3447787330103829
+        ],
+        "proxy_3d_error_m": 0.22847919304214753,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.12221677769100968,
+          "std_m": 0.14838192642211329,
+          "samples": 128
+        },
+        "latency_ms": 156.14620002452284,
+        "detector_ms": 60.81720005022362,
+        "refiner_ms": 60.46299997251481,
+        "ray_and_uncertainty_ms": 34.782900009304285
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_260.jpg",
+        "gt_pixel": [
+          121.00009599999998,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          133.9339599609375,
+          200.64474487304688
+        ],
+        "refined_pixel": [
+          131.66342163085938,
+          203.0959243774414
+        ],
+        "used_pixel": [
+          131.66342163085938,
+          203.0959243774414
+        ],
+        "confidence": 0.9995567202568054,
+        "detected": true,
+        "coarse_error_px": 14.878951668139806,
+        "refined_error_px": 11.736930162875337,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            0.8659098101996736,
+            -5.528535788650057,
+            0.36799711649411293
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          0.39716039041005663,
+          -5.65415523399966,
+          0.16763028766607846
+        ],
+        "proxy_3d_error_m": 0.5250267895047331,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.10978116946273848,
+          "std_m": 0.12987419711180728,
+          "samples": 128
+        },
+        "latency_ms": 203.12009996268898,
+        "detector_ms": 58.12160001369193,
+        "refiner_ms": 86.99049998540431,
+        "ray_and_uncertainty_ms": 57.875200000125915
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_261.jpg",
+        "gt_pixel": [
+          59.000032,
+          207.99990400000002
+        ],
+        "coarse_pixel": [
+          58.48234558105469,
+          200.74896240234375
+        ],
+        "refined_pixel": [
+          60.169090270996094,
+          202.9526824951172
+        ],
+        "used_pixel": [
+          60.169090270996094,
+          202.9526824951172
+        ],
+        "confidence": 0.9997573494911194,
+        "detected": true,
+        "coarse_error_px": 7.269398412591128,
+        "refined_error_px": 5.180843769149583,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -2.393003614221232,
+            -4.580381001868236,
+            -1.0629553789279882
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -2.4355611214422748,
+          -4.853837298129459,
+          -1.0665045272814702
+        ],
+        "proxy_3d_error_m": 0.27677081464599895,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.1210295222972255,
+          "std_m": 0.14612036369955453,
+          "samples": 128
+        },
+        "latency_ms": 173.47480001626536,
+        "detector_ms": 51.39859998598695,
+        "refiner_ms": 72.43229995947331,
+        "ray_and_uncertainty_ms": 49.54590002307668
+      },
+      {
+        "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_263.jpg",
+        "gt_pixel": [
+          38.999968,
+          206.999968
+        ],
+        "coarse_pixel": [
+          36.817649841308594,
+          205.9370574951172
+        ],
+        "refined_pixel": [
+          39.24482727050781,
+          209.27567291259766
+        ],
+        "used_pixel": [
+          39.24482727050781,
+          209.27567291259766
+        ],
+        "confidence": 0.9997648596763611,
+        "detected": true,
+        "coarse_error_px": 2.427404228212616,
+        "refined_error_px": 2.2888400799476454,
+        "location": {
+          "hit": true,
+          "status": "valid_multi_ray",
+          "point": [
+            -3.384175033326475,
+            -4.653680152761602,
+            -1.483446412857539
+          ],
+          "spread_m": 0.0
+        },
+        "oracle_2d_location": [
+          -3.4049341554069628,
+          -4.515994003499802,
+          -1.5023680191378759
+        ],
+        "proxy_3d_error_m": 0.14052204109079575,
+        "uncertainty": {
+          "hit": true,
+          "spread_m": 0.12304738288489296,
+          "std_m": 0.14914214890642083,
+          "samples": 128
+        },
+        "latency_ms": 156.50950005510822,
+        "detector_ms": 56.00750003941357,
+        "refiner_ms": 58.87739994795993,
+        "ray_and_uncertainty_ms": 41.54260002542287
+      }
+    ]
+  }
+}

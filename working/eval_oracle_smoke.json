@@ -1,0 +1,191 @@
+{
+  "mode": "oracle",
+  "images_seen": 10,
+  "images_evaluated": 10,
+  "pixel_error_px": null,
+  "3d_error": {
+    "count": 0
+  },
+  "rows": [
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire0.jpg",
+      "gt_pixel": [
+        100.0,
+        150.0
+      ],
+      "used_pixel": [
+        100.0,
+        150.0
+      ],
+      "detector_pixel": null,
+      "latency_ms": 10.581999958958477,
+      "location": [
+        -0.5686839162405116,
+        -2.1125996706138572,
+        -0.27787053118686345
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire1.webp",
+      "gt_pixel": [
+        335.0,
+        409.0
+      ],
+      "used_pixel": [
+        335.0,
+        409.0
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.666600011754781,
+      "location": [
+        8.197576726240554,
+        -14.560558824524252,
+        0.41844554199049355
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire2.jpg",
+      "gt_pixel": [
+        319.0,
+        259.0
+      ],
+      "used_pixel": [
+        319.0,
+        259.0
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.6899999571032822,
+      "location": [
+        8.130230169233096,
+        -9.320085556100008,
+        2.1653860016079385
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire3.webp",
+      "gt_pixel": [
+        254.0,
+        393.0
+      ],
+      "used_pixel": [
+        254.0,
+        393.0
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.640300044324249,
+      "location": [
+        5.284353604399874,
+        -13.974406828158786,
+        0.43482902710686133
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire4.jpg",
+      "gt_pixel": [
+        387.0,
+        205.0
+      ],
+      "used_pixel": [
+        387.0,
+        205.0
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.6564999930560589,
+      "location": [
+        10.91501178558624,
+        -7.508080756364166,
+        3.2437667583548375
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire5.png",
+      "gt_pixel": [
+        344.0,
+        736.0
+      ],
+      "used_pixel": [
+        344.0,
+        736.0
+      ],
+      "detector_pixel": null,
+      "latency_ms": 2.460799994878471,
+      "location": [
+        7.431681799010945,
+        -23.950036579090263,
+        -2.483243334395116
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire6.png",
+      "gt_pixel": [
+        682.0,
+        470.0
+      ],
+      "used_pixel": [
+        682.0,
+        470.0
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.6997000309638679,
+      "location": [
+        20.49567578856588,
+        -16.473644196638794,
+        -0.3394626048328
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire7.png",
+      "gt_pixel": [
+        563.0,
+        774.0
+      ],
+      "used_pixel": [
+        563.0,
+        774.0
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.6523000192828476,
+      "location": [
+        14.746410074938085,
+        -24.88277968644397,
+        -3.952026533550846
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire8.jpg",
+      "gt_pixel": [
+        159.0,
+        155.0
+      ],
+      "used_pixel": [
+        159.0,
+        155.0
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.7113000028766692,
+      "location": [
+        2.1230893264274053,
+        -3.3574078821415227,
+        0.9947623006252648
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire9.jpg",
+      "gt_pixel": [
+        103.0,
+        192.0
+      ],
+      "used_pixel": [
+        103.0,
+        192.0
+      ],
+      "detector_pixel": null,
+      "latency_ms": 3.3792999456636608,
+      "location": [
+        -0.40800637338680174,
+        -4.568409121670957,
+        -0.1830319793497175
+      ]
+    }
+  ]
+}

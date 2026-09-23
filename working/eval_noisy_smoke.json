@@ -1,0 +1,191 @@
+{
+  "mode": "noisy",
+  "images_seen": 10,
+  "images_evaluated": 10,
+  "pixel_error_px": null,
+  "3d_error": {
+    "count": 0
+  },
+  "rows": [
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire0.jpg",
+      "gt_pixel": [
+        100.0,
+        150.0
+      ],
+      "used_pixel": [
+        101.52358539877216,
+        144.80007946879752
+      ],
+      "detector_pixel": null,
+      "latency_ms": 10.12690004426986,
+      "location": [
+        -0.4985395512571953,
+        -1.827593754940331,
+        -0.24501688817396428
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire1.webp",
+      "gt_pixel": [
+        335.0,
+        409.0
+      ],
+      "used_pixel": [
+        338.75225597903227,
+        413.70282358195607
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.6799999973736703,
+      "location": [
+        8.318935104760609,
+        -14.713863249693475,
+        0.3668184590558283
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire2.jpg",
+      "gt_pixel": [
+        319.0,
+        259.0
+      ],
+      "used_pixel": [
+        309.2448240567308,
+        252.4891024656884
+      ],
+      "detector_pixel": null,
+      "latency_ms": 1.0043999645859003,
+      "location": [
+        7.790462429731056,
+        -9.034729510629461,
+        2.1741490154097214
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire3.webp",
+      "gt_pixel": [
+        254.0,
+        393.0
+      ],
+      "used_pixel": [
+        254.63920201583642,
+        391.41878703828206
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.8482999983243644,
+      "location": [
+        5.312140442947961,
+        -13.920860537650267,
+        0.4502500934052023
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire4.jpg",
+      "gt_pixel": [
+        387.0,
+        205.0
+      ],
+      "used_pixel": [
+        386.91599421247855,
+        200.7347803621321
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.6367000169120729,
+      "location": [
+        10.93425618593987,
+        -7.341564343008621,
+        3.297003679375763
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire5.png",
+      "gt_pixel": [
+        344.0,
+        736.0
+      ],
+      "used_pixel": [
+        348.39698987431416,
+        739.8889596771447
+      ],
+      "detector_pixel": null,
+      "latency_ms": 1.3626000145450234,
+      "location": [
+        7.567671869612418,
+        -24.04635044953325,
+        -2.5420993604307007
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire6.png",
+      "gt_pixel": [
+        682.0,
+        470.0
+      ],
+      "used_pixel": [
+        682.3301534878061,
+        475.63620603484014
+      ],
+      "detector_pixel": null,
+      "latency_ms": 1.566799997817725,
+      "location": [
+        20.47131183243574,
+        -16.644124524539478,
+        -0.4153672906277315
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire7.png",
+      "gt_pixel": [
+        563.0,
+        774.0
+      ],
+      "used_pixel": [
+        565.3375467112602,
+        769.7035376855838
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.7956000044941902,
+      "location": [
+        14.849376493382566,
+        -24.77445536169112,
+        -3.922710851343677
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire8.jpg",
+      "gt_pixel": [
+        159.0,
+        155.0
+      ],
+      "used_pixel": [
+        160.8437539204125,
+        150.20558699585501
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.6837000255472958,
+      "location": [
+        2.2131745080450336,
+        -3.123827223257514,
+        1.0444573867258278
+      ]
+    },
+    {
+      "image": "D:\\LAB\\SAM_Experiment\\fire-samples\\fire9.jpg",
+      "gt_pixel": [
+        103.0,
+        192.0
+      ],
+      "used_pixel": [
+        107.39225150653637,
+        191.75037044506874
+      ],
+      "detector_pixel": null,
+      "latency_ms": 0.7469000411219895,
+      "location": [
+        -0.20831652402167256,
+        -4.61562239962009,
+        -0.09325222030873093
+      ]
+    }
+  ]
+}

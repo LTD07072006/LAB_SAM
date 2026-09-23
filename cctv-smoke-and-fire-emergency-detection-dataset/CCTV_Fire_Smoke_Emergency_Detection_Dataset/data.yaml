@@ -1,0 +1,11 @@
+# Simuletic Smoke And Fire Emergency Dataset. Supports YOLOv8 and YOLO11.
+
+path: .          
+train: images    
+val: images       
+
+
+nc: 1            
+names:
+  0: fire
+  1: smoke

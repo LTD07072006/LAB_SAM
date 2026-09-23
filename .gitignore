@@ -1,0 +1,25 @@
+# Python/runtime artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# Local secrets and machine-specific configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Temporary outputs/cache
+working/tmp/
+working/cache/
+*.log
+Thumbs.db
+desktop.ini
