@@ -41,7 +41,11 @@ train/chạy pipeline mới.
 
 ## File vẫn giữ ở thư mục gốc
 
-Nhóm còn lại gồm `train_week6.py`, `narrow_localizer.py`,
+Các entry point hiện tại của Week 6 là `run_week6.py` và
+`compare_v3_roi.py`; chúng không nằm trong archive. `v3_detector.py` là
+adapter cho checkpoint FPN v3 và cũng được giữ ở thư mục gốc.
+
+Nhóm runtime còn lại gồm `train_week6.py`, `narrow_localizer.py`,
 `train_roi_localizer.py`, `build_coarse_manifest.py`, `fire_detector.py`,
 `detector_adapter.py`, `camera_calibration.py`, `localization.py`,
 `locator.py`, `tracking_3d.py`, `temporal_filter.py`, `point_filter.py`,

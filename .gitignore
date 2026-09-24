@@ -18,6 +18,7 @@ env/
 *.key
 
 # Temporary outputs/cache
+output/
 working/tmp/
 working/cache/
 *.log
