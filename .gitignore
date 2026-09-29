@@ -1,26 +1,52 @@
-# Python/runtime artifacts
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.ipynb_checkpoints/
+# ===== Dữ liệu lớn & file nén =====
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.rar
+
+# ===== Dataset folders =====
+home-fire-dataset/
+s3dis/
+fire-detection-from-cctv/data/data.zip
+home-fire-dataset.zip
+fire-samples/
+cctv-smoke-and-fire-emergency-detection-dataset/
+
+# ===== Model checkpoints & training data =====
+fire-model-data/detector_2d_v2/
+fire-model-data/week6_spatial/
+fire-model-data/coarse_manifest.json
+fire-model-data/best.pth
+fire-model-data/*.pth
+week6_roi_result/*.pth
+*.pth
+*.pt
+*.ckpt
+*.onnx
+
+# ===== Output lớn =====
+working/home_fire_probe/
+v3_outputs/
+output/
+*.jpg
+*.jpeg
+*.png
+
+# ===== Môi trường & IDE =====
 .venv/
 venv/
 env/
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+*.pyo
+*.ipynb_checkpoints/
 
-# Local secrets and machine-specific configuration
-.env
-.env.*
-!.env.example
-*.pem
-*.key
-
-# Temporary outputs/cache
-output/
-working/tmp/
-working/cache/
+# ===== File tạm =====
+working/python_probe.txt
 *.log
+*.tmp
+.DS_Store
 Thumbs.db
-desktop.ini

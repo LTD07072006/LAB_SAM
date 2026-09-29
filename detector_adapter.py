@@ -23,6 +23,10 @@ class Detection2D:
     image_size: tuple[int, int]
     latency_ms: float = 0.0
     source: str = "external"
+    # Optional detector-provided contact hypotheses in original-image
+    # pixels.  This lets a bbox detector pass a bottom band to the 3D stage
+    # without making the generic adapter guess the geometry again.
+    contact_candidates: Optional[np.ndarray] = None
 
     @property
     def p_fire(self) -> float:
@@ -37,6 +41,10 @@ class Detection2D:
         """
         from localization import bottom_contact_pixels, mask_bottom_contact_pixels
 
+        if self.contact_candidates is not None:
+            candidates = np.asarray(self.contact_candidates, dtype=np.float64).reshape(-1, 2)
+            if len(candidates) and np.all(np.isfinite(candidates)):
+                return candidates.copy()
         if self.mask is not None:
             points = mask_bottom_contact_pixels(self.mask, columns=columns)
             if len(points):
@@ -87,6 +95,7 @@ def adapt_detection(raw: Any, image_size: Sequence[int], threshold: float = 0.5,
     bbox = _bbox(_get(raw, "bbox", "box", "xyxy", default=None))
     mask_value = _get(raw, "mask", "segmentation", default=None)
     mask = None if mask_value is None else np.asarray(mask_value).astype(bool)
+    source = str(_get(raw, "source", default=source) or source)
     detected_value = _get(raw, "detected", "is_fire", default=None)
     detected = bool(confidence >= threshold) if detected_value is None else bool(detected_value)
     if point is None and bbox is not None:
@@ -100,6 +109,11 @@ def adapt_detection(raw: Any, image_size: Sequence[int], threshold: float = 0.5,
         image_size=(width, height),
         latency_ms=float(_get(raw, "latency_ms", default=0.0) or 0.0),
         source=source,
+        contact_candidates=(
+            None
+            if _get(raw, "contact_candidates", "contact_pixels", default=None) is None
+            else np.asarray(_get(raw, "contact_candidates", "contact_pixels"), dtype=np.float64).reshape(-1, 2)
+        ),
     )
 
 

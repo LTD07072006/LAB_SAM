@@ -68,7 +68,7 @@ class Fire3DLocalizationPipeline:
         detector: Any,
         calibration: CameraCalibration,
         grid_map: Optional[GridMap] = None,
-        refiner: Optional[ROIRefinerInference] = None,
+        refiner: Optional[Any] = None,
         threshold: float = 0.5,
         use_uncertainty: bool = True,
         tracker: Optional[Fire3DTracker] = None,
@@ -90,7 +90,11 @@ class Fire3DLocalizationPipeline:
         if callable(self.detector):
             raw = self.detector(image)
         elif hasattr(self.detector, "detect"):
-            raw = self.detector.detect(image, warmup=False)
+            try:
+                raw = self.detector.detect(image, warmup=False)
+            except TypeError:
+                # External detectors often expose detect(image) only.
+                raw = self.detector.detect(image)
         else:
             raw = self.detector
         if raw.__class__.__name__ == "DetectionResult":
@@ -210,8 +214,8 @@ def run_samples(args):
 
     detector = FireDetector(args.model, device=args.device, threshold=args.threshold)
     sample_paths = sorted(
-        p for p in args.samples.iterdir()
-        if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}
+        p for p in args.samples.rglob("*")
+        if p.is_file() and p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
     )
     if not sample_paths:
         raise FileNotFoundError(f"No images found in {args.samples}")
@@ -252,7 +256,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--samples", type=Path, default=root / "fire-samples")
     parser.add_argument("--model", type=Path, default=root / "fire-model-data" / "best.pth")
-    parser.add_argument("--roi-checkpoint", type=Path, default=root / "fire-model-data" / "week6_roi" / "best_roi.pth")
+    parser.add_argument("--roi-checkpoint", type=Path, default=root / "week6_roi_result" / "best_roi.pth")
     parser.add_argument("--calibration", type=Path, default=None, help="JSON calibration; default is synthetic fallback")
     parser.add_argument("--mesh", type=Path, default=None, help="JSON triangle mesh in the calibration world frame")
     parser.add_argument("--output", type=Path, default=root / "working" / "localization_results.json")

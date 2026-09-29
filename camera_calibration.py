@@ -45,6 +45,8 @@ class CameraCalibration:
         if K is None:
             raise ValueError("Calibration JSON needs K or camera_matrix")
         distortion = intrinsics.get("dist_coeffs", intrinsics.get("distortion", intrinsics.get("D", [])))
+        if distortion is None:
+            distortion = []
         extrinsics = data.get("extrinsics", data)
         R = extrinsics.get("R", extrinsics.get("rotation"))
         if R is None:
@@ -57,7 +59,11 @@ class CameraCalibration:
         if t is None:
             raise ValueError("Calibration JSON needs t/translation or camera_position")
         size = data.get("image_size", intrinsics.get("image_size"))
+        if isinstance(size, int):
+            size = (size, size)
         image_size = None if size is None else (int(size[0]), int(size[1]))
+        if image_size is not None and min(image_size) <= 0:
+            raise ValueError(f"Calibration image_size must be positive: {image_size}")
         return cls(K, distortion, R, t, image_size)
 
     @classmethod

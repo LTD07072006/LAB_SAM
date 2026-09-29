@@ -1,12 +1,12 @@
 {
   "protocol": {
-    "dataset": "source test/fire only",
+    "dataset": "test/fire selected by even",
     "images": 36,
     "image_size": [
       224,
       224
     ],
-    "calibration": "synthetic default_calibration matched to 224x224; replace with real calibration",
+    "calibration": "synthetic default_calibration",
     "surface": "analytic GridMap()",
     "physical_3d_ground_truth": false,
     "proxy_definition": "predicted ray-hit distance to ray-hit from labelled 2D point",
@@ -76,24 +76,24 @@
     "latency_ms": {
       "end_to_end": {
         "count": 36,
-        "mean": 110.83060277612984,
-        "median": 102.32549998909235,
-        "p95": 147.98659998632502
+        "mean": 254.75595277384855,
+        "median": 105.91450001811609,
+        "p95": 676.5056750155054
       },
       "detector": {
         "count": 36,
-        "mean": 63.92621944542043,
-        "median": 58.90175001695752,
-        "p95": 87.7929499692982
+        "mean": 171.64400000668442,
+        "median": 56.333550019189715,
+        "p95": 477.8832999872975
       },
       "refiner": {
         "count": 0
       },
       "ray_and_uncertainty": {
         "count": 36,
-        "mean": 46.850544442552035,
-        "median": 43.39405003702268,
-        "p95": 60.37950000609271
+        "mean": 83.0215916567896,
+        "median": 44.4769500172697,
+        "p95": 227.08002498256974
       }
     },
     "rows": [
@@ -138,10 +138,10 @@
           "std_m": 0.16435221572131134,
           "samples": 128
         },
-        "latency_ms": 108.82120003225282,
-        "detector_ms": 61.275499989278615,
+        "latency_ms": 200.60189999639988,
+        "detector_ms": 81.78350003436208,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 47.48730000574142
+        "ray_and_uncertainty_ms": 118.76039998605847
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_104.jpg",
@@ -184,10 +184,10 @@
           "std_m": 0.1638924741975686,
           "samples": 128
         },
-        "latency_ms": 97.42250002454966,
-        "detector_ms": 53.49289998412132,
+        "latency_ms": 93.74680009204894,
+        "detector_ms": 49.79690001346171,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 43.881500023417175
+        "ray_and_uncertainty_ms": 43.879900011233985
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_105.jpg",
@@ -230,10 +230,10 @@
           "std_m": 0.1628526140951844,
           "samples": 128
         },
-        "latency_ms": 142.5928000244312,
-        "detector_ms": 83.57770001748577,
+        "latency_ms": 78.50059994962066,
+        "detector_ms": 46.14699992816895,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 58.957300032489
+        "ray_and_uncertainty_ms": 32.31249994132668
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_108.jpg",
@@ -276,10 +276,10 @@
           "std_m": 0.16544696255880068,
           "samples": 128
         },
-        "latency_ms": 144.48709995485842,
-        "detector_ms": 84.42520000971854,
+        "latency_ms": 83.61169998534024,
+        "detector_ms": 44.90570002235472,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 60.00220001442358
+        "ray_and_uncertainty_ms": 38.6579999467358
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_109.jpg",
@@ -322,10 +322,10 @@
           "std_m": 0.16027118763813644,
           "samples": 128
         },
-        "latency_ms": 144.95410001836717,
-        "detector_ms": 85.80300002358854,
+        "latency_ms": 79.19049996417016,
+        "detector_ms": 42.94309997931123,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 59.06969995703548
+        "ray_and_uncertainty_ms": 36.19879996404052
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_110.jpg",
@@ -368,10 +368,10 @@
           "std_m": 0.1622637161025294,
           "samples": 128
         },
-        "latency_ms": 141.89389999955893,
-        "detector_ms": 87.70019997609779,
+        "latency_ms": 120.13250007294118,
+        "detector_ms": 47.29740007314831,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 54.13020000560209
+        "ray_and_uncertainty_ms": 72.74890004191548
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_115.jpg",
@@ -414,10 +414,10 @@
           "std_m": 0.1625914138860364,
           "samples": 128
         },
-        "latency_ms": 147.86199998343363,
-        "detector_ms": 88.07119994889945,
+        "latency_ms": 137.28080003056675,
+        "detector_ms": 99.07110000494868,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 59.72359998850152
+        "ray_and_uncertainty_ms": 38.149200030602515
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_116.jpg",
@@ -460,10 +460,10 @@
           "std_m": 0.1648337774831034,
           "samples": 128
         },
-        "latency_ms": 149.07929999753833,
-        "detector_ms": 89.5985999959521,
+        "latency_ms": 82.21769996453077,
+        "detector_ms": 44.86130003351718,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 59.41679998068139
+        "ray_and_uncertainty_ms": 37.30639989953488
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_117.jpg",
@@ -506,10 +506,10 @@
           "std_m": 0.16439919177295698,
           "samples": 128
         },
-        "latency_ms": 132.27559998631477,
-        "detector_ms": 78.40360002592206,
+        "latency_ms": 122.19210003968328,
+        "detector_ms": 61.22860009782016,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 53.817100008018315
+        "ray_and_uncertainty_ms": 60.9038999537006
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_119.jpg",
@@ -552,10 +552,10 @@
           "std_m": 0.1649911968035237,
           "samples": 128
         },
-        "latency_ms": 112.26270004408434,
-        "detector_ms": 73.99520004400983,
+        "latency_ms": 89.40379996784031,
+        "detector_ms": 45.63589999452233,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 38.214400003198534
+        "ray_and_uncertainty_ms": 43.722699978388846
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_120.jpg",
@@ -598,10 +598,10 @@
           "std_m": 0.16658281714335277,
           "samples": 128
         },
-        "latency_ms": 99.98400002950802,
-        "detector_ms": 59.44750003982335,
+        "latency_ms": 102.11980005260557,
+        "detector_ms": 58.12370008789003,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 40.48179998062551
+        "ray_and_uncertainty_ms": 43.957000016234815
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_121.jpg",
@@ -644,10 +644,10 @@
           "std_m": 0.16028506339970472,
           "samples": 128
         },
-        "latency_ms": 106.10739997355267,
-        "detector_ms": 61.16459995973855,
+        "latency_ms": 99.41729996353388,
+        "detector_ms": 54.37100003473461,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 44.89669995382428
+        "ray_and_uncertainty_ms": 44.996900018304586
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_122.jpg",
@@ -690,10 +690,10 @@
           "std_m": 0.16624252777218437,
           "samples": 128
         },
-        "latency_ms": 129.84499998856336,
-        "detector_ms": 68.28080001287162,
+        "latency_ms": 88.83829996921122,
+        "detector_ms": 48.65450004581362,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 61.51139998110011
+        "ray_and_uncertainty_ms": 40.14389996882528
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_123.jpg",
@@ -736,10 +736,10 @@
           "std_m": 0.16407283022585928,
           "samples": 128
         },
-        "latency_ms": 104.65259995544329,
-        "detector_ms": 56.52149999514222,
+        "latency_ms": 79.20150004792958,
+        "detector_ms": 39.0700000571087,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 48.06940001435578
+        "ray_and_uncertainty_ms": 40.09220004081726
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_134.jpg",
@@ -782,10 +782,10 @@
           "std_m": 0.12948713609571355,
           "samples": 128
         },
-        "latency_ms": 101.36589995818213,
-        "detector_ms": 58.408299984876066,
+        "latency_ms": 109.7091999836266,
+        "detector_ms": 42.490200023166835,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 42.906600050628185
+        "ray_and_uncertainty_ms": 67.13179999496788
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_139.jpg",
@@ -828,10 +828,10 @@
           "std_m": 0.1633276804705071,
           "samples": 128
         },
-        "latency_ms": 90.29600000940263,
-        "detector_ms": 54.77510002674535,
+        "latency_ms": 126.35349994525313,
+        "detector_ms": 71.41149998642504,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 35.46629997435957
+        "ray_and_uncertainty_ms": 54.89329993724823
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_140.jpg",
@@ -874,10 +874,10 @@
           "std_m": 0.16176603045734336,
           "samples": 128
         },
-        "latency_ms": 99.40240002470091,
-        "detector_ms": 56.6732999868691,
+        "latency_ms": 95.0355000095442,
+        "detector_ms": 54.322500014677644,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 42.66400000778958
+        "ray_and_uncertainty_ms": 40.66810000222176
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_141.jpg",
@@ -920,10 +920,10 @@
           "std_m": 0.16406069564673564,
           "samples": 128
         },
-        "latency_ms": 98.94499997608364,
-        "detector_ms": 58.5352000198327,
+        "latency_ms": 101.93680005613714,
+        "detector_ms": 63.72840004041791,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 40.34279996994883
+        "ray_and_uncertainty_ms": 38.16270001698285
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_142.jpg",
@@ -966,10 +966,10 @@
           "std_m": 0.16517416085849065,
           "samples": 128
         },
-        "latency_ms": 94.5874999742955,
-        "detector_ms": 55.526599986478686,
+        "latency_ms": 91.05279995128512,
+        "detector_ms": 52.614000043831766,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 38.987900014035404
+        "ray_and_uncertainty_ms": 38.39300002437085
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_143.jpg",
@@ -1012,10 +1012,10 @@
           "std_m": 0.16386319219931259,
           "samples": 128
         },
-        "latency_ms": 101.85289999935776,
-        "detector_ms": 59.26830001408234,
+        "latency_ms": 97.72779990453273,
+        "detector_ms": 61.24049995560199,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 42.54289995878935
+        "ray_and_uncertainty_ms": 36.43589990679175
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_144.jpg",
@@ -1058,10 +1058,10 @@
           "std_m": 0.1657662792620636,
           "samples": 128
         },
-        "latency_ms": 112.49979998683557,
-        "detector_ms": 63.35920002311468,
+        "latency_ms": 82.01239991467446,
+        "detector_ms": 49.27649989258498,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 49.087899969890714
+        "ray_and_uncertainty_ms": 32.69539994653314
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_214.jpg",
@@ -1104,10 +1104,10 @@
           "std_m": 0.15078672440128457,
           "samples": 128
         },
-        "latency_ms": 125.79159997403622,
-        "detector_ms": 69.48509998619556,
+        "latency_ms": 85.09889990091324,
+        "detector_ms": 54.107999894768,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 56.256999960169196
+        "ray_and_uncertainty_ms": 30.951399938203394
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_215.jpg",
@@ -1150,10 +1150,10 @@
           "std_m": 0.15118387823787124,
           "samples": 128
         },
-        "latency_ms": 121.87850003829226,
-        "detector_ms": 79.74970003124326,
+        "latency_ms": 91.66820009704679,
+        "detector_ms": 51.76640010904521,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 42.08240000298247
+        "ray_and_uncertainty_ms": 39.8642000509426
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_216.jpg",
@@ -1196,10 +1196,10 @@
           "std_m": 0.1518779410808743,
           "samples": 128
         },
-        "latency_ms": 88.68629997596145,
-        "detector_ms": 51.53150000842288,
+        "latency_ms": 88.77419994678348,
+        "detector_ms": 49.13269996177405,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 37.11129998555407
+        "ray_and_uncertainty_ms": 39.59559998475015
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_225.jpg",
@@ -1242,10 +1242,10 @@
           "std_m": 0.17516124049174545,
           "samples": 128
         },
-        "latency_ms": 114.38770004315302,
-        "detector_ms": 59.41420001909137,
+        "latency_ms": 272.00899994932115,
+        "detector_ms": 54.5433999504894,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 54.90129999816418
+        "ray_and_uncertainty_ms": 217.41539996583015
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_226.jpg",
@@ -1288,10 +1288,10 @@
           "std_m": 0.14355294856672546,
           "samples": 128
         },
-        "latency_ms": 91.95850003743544,
-        "detector_ms": 52.94040002627298,
+        "latency_ms": 308.3265000022948,
+        "detector_ms": 195.14730002265424,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 38.9763000421226
+        "ray_and_uncertainty_ms": 113.12179989181459
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_240.jpg",
@@ -1334,10 +1334,10 @@
           "std_m": 0.12314223965803042,
           "samples": 128
         },
-        "latency_ms": 93.4638999751769,
-        "detector_ms": 53.85019996901974,
+        "latency_ms": 305.05109997466207,
+        "detector_ms": 169.01920002419502,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 39.57029996672645
+        "ray_and_uncertainty_ms": 134.77119989693165
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_241.jpg",
@@ -1380,10 +1380,10 @@
           "std_m": 0.1259044954169739,
           "samples": 128
         },
-        "latency_ms": 102.2697999724187,
-        "detector_ms": 58.33109997911379,
+        "latency_ms": 406.28790005575866,
+        "detector_ms": 150.14070004690439,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 43.893099995329976
+        "ray_and_uncertainty_ms": 256.0739000327885
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_242.jpg",
@@ -1426,10 +1426,10 @@
           "std_m": 0.12393495288928738,
           "samples": 128
         },
-        "latency_ms": 102.381200005766,
-        "detector_ms": 52.81349999131635,
+        "latency_ms": 2279.2148999869823,
+        "detector_ms": 2140.799899934791,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 49.52450003474951
+        "ray_and_uncertainty_ms": 138.35450005717576
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_243.jpg",
@@ -1472,10 +1472,10 @@
           "std_m": 0.1366171103405951,
           "samples": 128
         },
-        "latency_ms": 84.03049997286871,
-        "detector_ms": 45.50609999569133,
+        "latency_ms": 267.55780004896224,
+        "detector_ms": 174.63150003459305,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 38.47859997767955
+        "ray_and_uncertainty_ms": 92.87090005818754
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_244.jpg",
@@ -1518,10 +1518,10 @@
           "std_m": 0.12083428389129754,
           "samples": 128
         },
-        "latency_ms": 95.26899998309091,
-        "detector_ms": 54.94989996077493,
+        "latency_ms": 1379.1007999097928,
+        "detector_ms": 1185.47199992463,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 40.28020001715049
+        "ray_and_uncertainty_ms": 193.51020001340657
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_258.jpg",
@@ -1564,10 +1564,10 @@
           "std_m": 0.14000918700724996,
           "samples": 128
         },
-        "latency_ms": 92.83290000166744,
-        "detector_ms": 55.96450000302866,
+        "latency_ms": 352.48380003031343,
+        "detector_ms": 242.0204000081867,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 36.82350000599399
+        "ray_and_uncertainty_ms": 110.41120009031147
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_259.jpg",
@@ -1610,10 +1610,10 @@
           "std_m": 0.14798527831511277,
           "samples": 128
         },
-        "latency_ms": 83.84799998020753,
-        "detector_ms": 54.27829996915534,
+        "latency_ms": 442.3073000507429,
+        "detector_ms": 124.3858999805525,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 29.52270000241697
+        "ray_and_uncertainty_ms": 317.8624000865966
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_260.jpg",
@@ -1656,10 +1656,10 @@
           "std_m": 0.1299748424048401,
           "samples": 128
         },
-        "latency_ms": 148.36039999499917,
-        "detector_ms": 70.7976000267081,
+        "latency_ms": 264.137800084427,
+        "detector_ms": 172.9570000898093,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 77.50110002234578
+        "ray_and_uncertainty_ms": 91.05930000077933
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_261.jpg",
@@ -1702,10 +1702,10 @@
           "std_m": 0.14712581925185683,
           "samples": 128
         },
-        "latency_ms": 94.43300002021715,
-        "detector_ms": 55.27700000675395,
+        "latency_ms": 222.44929999578744,
+        "detector_ms": 126.02949992287904,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 39.11160002462566
+        "ray_and_uncertainty_ms": 96.35150001849979
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_263.jpg",
@@ -1748,10 +1748,10 @@
           "std_m": 0.15061553869789976,
           "samples": 128
         },
-        "latency_ms": 89.12070002406836,
-        "detector_ms": 48.151299997698516,
+        "latency_ms": 246.46349996328354,
+        "detector_ms": 130.05679997149855,
         "refiner_ms": 0.0,
-        "ray_and_uncertainty_ms": 40.92790000140667
+        "ray_and_uncertainty_ms": 116.35289993137121
       }
     ]
   },
@@ -1808,27 +1808,27 @@
     "latency_ms": {
       "end_to_end": {
         "count": 36,
-        "mean": 162.25861944743278,
-        "median": 156.6376500413753,
-        "p95": 190.06522496056277
+        "mean": 426.5328083355497,
+        "median": 412.224950036034,
+        "p95": 515.3466750052758
       },
       "detector": {
         "count": 36,
-        "mean": 56.242866672821236,
-        "median": 54.590700019616634,
-        "p95": 68.66142502985895
+        "mean": 141.7484444391448,
+        "median": 140.09090000763535,
+        "p95": 169.92477505118586
       },
       "refiner": {
         "count": 36,
-        "mean": 62.58794443662433,
-        "median": 60.55714999092743,
-        "p95": 76.5555249818135
+        "mean": 159.55544999451376,
+        "median": 157.3765499633737,
+        "p95": 185.30857498990372
       },
       "ray_and_uncertainty": {
         "count": 36,
-        "mean": 43.32779722527549,
-        "median": 40.750700019998476,
-        "p95": 58.96257502899971
+        "mean": 125.03606111406245,
+        "median": 120.67230005050078,
+        "p95": 165.21895007463172
       }
     },
     "rows": [
@@ -1876,10 +1876,10 @@
           "std_m": 0.16343830889549849,
           "samples": 128
         },
-        "latency_ms": 146.9645999604836,
-        "detector_ms": 54.66260004322976,
-        "refiner_ms": 56.43890000646934,
-        "ray_and_uncertainty_ms": 35.761300008744
+        "latency_ms": 366.69759999495,
+        "detector_ms": 109.69260009005666,
+        "refiner_ms": 126.87710009049624,
+        "ray_and_uncertainty_ms": 130.01439999789
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_104.jpg",
@@ -1925,10 +1925,10 @@
           "std_m": 0.16328434539114833,
           "samples": 128
         },
-        "latency_ms": 155.52850003587082,
-        "detector_ms": 54.72800001734868,
-        "refiner_ms": 57.732800021767616,
-        "ray_and_uncertainty_ms": 42.98140003811568
+        "latency_ms": 401.85729996301234,
+        "detector_ms": 132.4394999537617,
+        "refiner_ms": 157.30199997778982,
+        "ray_and_uncertainty_ms": 111.97389999870211
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_105.jpg",
@@ -1974,10 +1974,10 @@
           "std_m": 0.1618776707744867,
           "samples": 128
         },
-        "latency_ms": 165.8612000173889,
-        "detector_ms": 59.665000007953495,
-        "refiner_ms": 65.47430000500754,
-        "ray_and_uncertainty_ms": 40.63560004578903
+        "latency_ms": 411.7207999806851,
+        "detector_ms": 153.58089993242174,
+        "refiner_ms": 159.88690010271966,
+        "ray_and_uncertainty_ms": 98.07479998562485
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_108.jpg",
@@ -2023,10 +2023,10 @@
           "std_m": 0.16479976362862528,
           "samples": 128
         },
-        "latency_ms": 150.66839999053627,
-        "detector_ms": 50.418199971318245,
-        "refiner_ms": 59.535899956244975,
-        "ray_and_uncertainty_ms": 40.5888999812305
+        "latency_ms": 385.37839998025447,
+        "detector_ms": 137.24469998851418,
+        "refiner_ms": 138.2887999061495,
+        "ray_and_uncertainty_ms": 109.63610000908375
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_109.jpg",
@@ -2072,10 +2072,10 @@
           "std_m": 0.1595964926628852,
           "samples": 128
         },
-        "latency_ms": 165.6518999952823,
-        "detector_ms": 56.29919999046251,
-        "refiner_ms": 56.513599993195385,
-        "ray_and_uncertainty_ms": 52.74030001601204
+        "latency_ms": 368.23000002186745,
+        "detector_ms": 120.3527000034228,
+        "refiner_ms": 140.0792000349611,
+        "ray_and_uncertainty_ms": 107.61479998473078
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_110.jpg",
@@ -2121,10 +2121,10 @@
           "std_m": 0.16120513721561522,
           "samples": 128
         },
-        "latency_ms": 174.19310001423582,
-        "detector_ms": 77.66030001221225,
-        "refiner_ms": 60.8675999683328,
-        "ray_and_uncertainty_ms": 35.579699964728206
+        "latency_ms": 371.2318999459967,
+        "detector_ms": 134.4016999937594,
+        "refiner_ms": 130.91840001288801,
+        "ray_and_uncertainty_ms": 105.74949998408556
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_115.jpg",
@@ -2170,10 +2170,10 @@
           "std_m": 0.1605116317924739,
           "samples": 128
         },
-        "latency_ms": 149.5351000339724,
-        "detector_ms": 51.77000002004206,
-        "refiner_ms": 61.97380000958219,
-        "ray_and_uncertainty_ms": 35.69470002548769
+        "latency_ms": 374.97530004475266,
+        "detector_ms": 122.91450006887317,
+        "refiner_ms": 138.676599948667,
+        "ray_and_uncertainty_ms": 113.23300004005432
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_116.jpg",
@@ -2219,10 +2219,10 @@
           "std_m": 0.16418677491449737,
           "samples": 128
         },
-        "latency_ms": 153.51319999899715,
-        "detector_ms": 54.19600004097447,
-        "refiner_ms": 56.86720000812784,
-        "ray_and_uncertainty_ms": 42.3028000514023
+        "latency_ms": 395.54579998366535,
+        "detector_ms": 128.93679994158447,
+        "refiner_ms": 166.85010003857315,
+        "ray_and_uncertainty_ms": 99.39909994136542
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_117.jpg",
@@ -2268,10 +2268,10 @@
           "std_m": 0.16359196672163862,
           "samples": 128
         },
-        "latency_ms": 171.31960002006963,
-        "detector_ms": 53.522300033364445,
-        "refiner_ms": 60.65130000934005,
-        "ray_and_uncertainty_ms": 57.05760000273585
+        "latency_ms": 379.2724999366328,
+        "detector_ms": 127.30609998106956,
+        "refiner_ms": 142.3083000117913,
+        "ray_and_uncertainty_ms": 109.4990000128746
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_119.jpg",
@@ -2317,10 +2317,10 @@
           "std_m": 0.16395781575329405,
           "samples": 128
         },
-        "latency_ms": 159.49930000351742,
-        "detector_ms": 54.7050999593921,
-        "refiner_ms": 64.94099996052682,
-        "ray_and_uncertainty_ms": 39.766900008544326
+        "latency_ms": 404.27400008775294,
+        "detector_ms": 137.6021000323817,
+        "refiner_ms": 137.38019997254014,
+        "ray_and_uncertainty_ms": 129.0787000907585
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_120.jpg",
@@ -2366,10 +2366,10 @@
           "std_m": 0.1656621373788991,
           "samples": 128
         },
-        "latency_ms": 151.18689998053014,
-        "detector_ms": 53.66249999497086,
-        "refiner_ms": 61.222199990879744,
-        "ray_and_uncertainty_ms": 36.22079995693639
+        "latency_ms": 401.8894999753684,
+        "detector_ms": 150.98649996798486,
+        "refiner_ms": 161.74929996486753,
+        "ray_and_uncertainty_ms": 88.95110001321882
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_121.jpg",
@@ -2415,10 +2415,10 @@
           "std_m": 0.15817076479420156,
           "samples": 128
         },
-        "latency_ms": 152.64290000777692,
-        "detector_ms": 56.34549999376759,
-        "refiner_ms": 55.35530002089217,
-        "ray_and_uncertainty_ms": 40.86579999420792
+        "latency_ms": 420.90569995343685,
+        "detector_ms": 155.50669992808253,
+        "refiner_ms": 155.39760002866387,
+        "ray_and_uncertainty_ms": 109.81089994311333
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_122.jpg",
@@ -2464,10 +2464,10 @@
           "std_m": 0.16487164042772315,
           "samples": 128
         },
-        "latency_ms": 159.26370001398027,
-        "detector_ms": 64.2622000304982,
-        "refiner_ms": 56.217100005596876,
-        "ray_and_uncertainty_ms": 38.66859996924177
+        "latency_ms": 410.76429991517216,
+        "detector_ms": 150.62909992411733,
+        "refiner_ms": 149.03989993035793,
+        "ray_and_uncertainty_ms": 110.83619995042682
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_123.jpg",
@@ -2513,10 +2513,10 @@
           "std_m": 0.16292962358113577,
           "samples": 128
         },
-        "latency_ms": 170.48639996210113,
-        "detector_ms": 49.198799999430776,
-        "refiner_ms": 62.70579999545589,
-        "ray_and_uncertainty_ms": 58.45380004029721
+        "latency_ms": 450.63780003692955,
+        "detector_ms": 161.5006000502035,
+        "refiner_ms": 162.6982999732718,
+        "ray_and_uncertainty_ms": 126.3150000013411
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_134.jpg",
@@ -2562,10 +2562,10 @@
           "std_m": 0.12926671352124583,
           "samples": 128
         },
-        "latency_ms": 235.46820000046864,
-        "detector_ms": 74.8619000078179,
-        "refiner_ms": 90.04310000455007,
-        "ray_and_uncertainty_ms": 70.38539997301996
+        "latency_ms": 459.48029996361583,
+        "detector_ms": 146.28200000151992,
+        "refiner_ms": 173.99249994195998,
+        "ray_and_uncertainty_ms": 138.91800004057586
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_139.jpg",
@@ -2611,10 +2611,10 @@
           "std_m": 0.16234988751955898,
           "samples": 128
         },
-        "latency_ms": 141.09900000039488,
-        "detector_ms": 47.18300001695752,
-        "refiner_ms": 58.751399978064,
-        "ray_and_uncertainty_ms": 35.08420003345236
+        "latency_ms": 446.66700006928295,
+        "detector_ms": 145.2491000527516,
+        "refiner_ms": 160.90000001713634,
+        "ray_and_uncertainty_ms": 140.28250006958842
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_140.jpg",
@@ -2660,10 +2660,10 @@
           "std_m": 0.1608688815819384,
           "samples": 128
         },
-        "latency_ms": 161.87599999830127,
-        "detector_ms": 51.64989997865632,
-        "refiner_ms": 68.4509999700822,
-        "ray_and_uncertainty_ms": 41.68690001824871
+        "latency_ms": 578.6580999847502,
+        "detector_ms": 122.43829993531108,
+        "refiner_ms": 343.6257999856025,
+        "ray_and_uncertainty_ms": 112.44359996635467
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_141.jpg",
@@ -2709,10 +2709,10 @@
           "std_m": 0.1632430651170859,
           "samples": 128
         },
-        "latency_ms": 149.12249997723848,
-        "detector_ms": 51.43829999724403,
-        "refiner_ms": 58.92300000414252,
-        "ray_and_uncertainty_ms": 38.68030000012368
+        "latency_ms": 384.26910003181547,
+        "detector_ms": 110.83699995651841,
+        "refiner_ms": 148.6728999298066,
+        "ray_and_uncertainty_ms": 124.46790002286434
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_142.jpg",
@@ -2758,10 +2758,10 @@
           "std_m": 0.16457091557917838,
           "samples": 128
         },
-        "latency_ms": 154.08429998205975,
-        "detector_ms": 52.62839997885749,
-        "refiner_ms": 63.75139998272061,
-        "ray_and_uncertainty_ms": 37.603700009640306
+        "latency_ms": 378.19640000816435,
+        "detector_ms": 139.0681000193581,
+        "refiner_ms": 137.92390003800392,
+        "ray_and_uncertainty_ms": 101.05079994536936
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_143.jpg",
@@ -2807,10 +2807,10 @@
           "std_m": 0.1633013271529606,
           "samples": 128
         },
-        "latency_ms": 148.7331999815069,
-        "detector_ms": 53.17609995836392,
-        "refiner_ms": 57.01370001770556,
-        "ray_and_uncertainty_ms": 38.4613000205718
+        "latency_ms": 412.72910009138286,
+        "detector_ms": 141.1136999959126,
+        "refiner_ms": 150.60839999932796,
+        "ray_and_uncertainty_ms": 120.83610007539392
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_144.jpg",
@@ -2856,10 +2856,10 @@
           "std_m": 0.16487666273096935,
           "samples": 128
         },
-        "latency_ms": 153.23080000234768,
-        "detector_ms": 54.13199996110052,
-        "refiner_ms": 53.06999996537343,
-        "ray_and_uncertainty_ms": 45.9442000137642
+        "latency_ms": 349.5897001121193,
+        "detector_ms": 118.0831000674516,
+        "refiner_ms": 132.22080003470182,
+        "ray_and_uncertainty_ms": 99.14760000538081
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_214.jpg",
@@ -2905,10 +2905,10 @@
           "std_m": 0.15106240969434911,
           "samples": 128
         },
-        "latency_ms": 176.46919999970123,
-        "detector_ms": 50.56320002768189,
-        "refiner_ms": 65.33010001294315,
-        "ray_and_uncertainty_ms": 60.488899995107204
+        "latency_ms": 457.0987999904901,
+        "detector_ms": 147.90169999469072,
+        "refiner_ms": 188.55690001510084,
+        "ray_and_uncertainty_ms": 120.50850002560765
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_215.jpg",
@@ -2954,10 +2954,10 @@
           "std_m": 0.1513103002221066,
           "samples": 128
         },
-        "latency_ms": 151.24390000710264,
-        "detector_ms": 52.41210001986474,
-        "refiner_ms": 56.00900005083531,
-        "ray_and_uncertainty_ms": 42.73729998385534
+        "latency_ms": 403.5724999848753,
+        "detector_ms": 137.07529997918755,
+        "refiner_ms": 162.45850000996143,
+        "ray_and_uncertainty_ms": 103.84809994138777
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_216.jpg",
@@ -3003,10 +3003,10 @@
           "std_m": 0.1507959861772829,
           "samples": 128
         },
-        "latency_ms": 185.71359995985404,
-        "detector_ms": 62.41160002537072,
-        "refiner_ms": 73.07719998061657,
-        "ray_and_uncertainty_ms": 50.14379997737706
+        "latency_ms": 413.09019993059337,
+        "detector_ms": 135.9819999197498,
+        "refiner_ms": 138.58969998545945,
+        "ray_and_uncertainty_ms": 138.33540002815425
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_225.jpg",
@@ -3052,10 +3052,10 @@
           "std_m": 0.17735527611951563,
           "samples": 128
         },
-        "latency_ms": 151.6647000098601,
-        "detector_ms": 54.20010001398623,
-        "refiner_ms": 59.3593999510631,
-        "ray_and_uncertainty_ms": 37.96879999572411
+        "latency_ms": 492.71389993373305,
+        "detector_ms": 143.96609994582832,
+        "refiner_ms": 173.8270999630913,
+        "ray_and_uncertainty_ms": 174.75070001091808
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_226.jpg",
@@ -3101,10 +3101,10 @@
           "std_m": 0.14547673039248235,
           "samples": 128
         },
-        "latency_ms": 153.6134000052698,
-        "detector_ms": 54.51879999600351,
-        "refiner_ms": 55.16310001257807,
-        "ray_and_uncertainty_ms": 43.8463999889791
+        "latency_ms": 522.1121999202296,
+        "detector_ms": 200.39559993892908,
+        "refiner_ms": 184.22579998150468,
+        "ray_and_uncertainty_ms": 137.35249999444932
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_240.jpg",
@@ -3150,10 +3150,10 @@
           "std_m": 0.12350958194895555,
           "samples": 128
         },
-        "latency_ms": 156.7658000276424,
-        "detector_ms": 64.4120000069961,
-        "refiner_ms": 55.8537999750115,
-        "ray_and_uncertainty_ms": 36.41449997667223
+        "latency_ms": 466.1498999921605,
+        "detector_ms": 148.73190002981573,
+        "refiner_ms": 171.84520000591874,
+        "ray_and_uncertainty_ms": 145.36259998567402
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_241.jpg",
@@ -3199,10 +3199,10 @@
           "std_m": 0.12299611412860423,
           "samples": 128
         },
-        "latency_ms": 162.93109999969602,
-        "detector_ms": 54.737099970225245,
-        "refiner_ms": 66.66429998585954,
-        "ray_and_uncertainty_ms": 41.43629997270182
+        "latency_ms": 464.58540007006377,
+        "detector_ms": 171.66049999650568,
+        "refiner_ms": 157.45109994895756,
+        "ray_and_uncertainty_ms": 135.22769999690354
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_242.jpg",
@@ -3248,10 +3248,10 @@
           "std_m": 0.12415636509560773,
           "samples": 128
         },
-        "latency_ms": 163.04810001747683,
-        "detector_ms": 52.98130004666746,
-        "refiner_ms": 66.4536000113003,
-        "ray_and_uncertainty_ms": 43.471099983435124
+        "latency_ms": 513.0915000336245,
+        "detector_ms": 153.75330008100718,
+        "refiner_ms": 167.0833999523893,
+        "ray_and_uncertainty_ms": 191.98969996068627
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_243.jpg",
@@ -3297,10 +3297,10 @@
           "std_m": 0.1364546495590024,
           "samples": 128
         },
-        "latency_ms": 150.22479998879135,
-        "detector_ms": 54.700199980288744,
-        "refiner_ms": 59.4777999795042,
-        "ray_and_uncertainty_ms": 35.936900007072836
+        "latency_ms": 498.28540009912103,
+        "detector_ms": 169.3462000694126,
+        "refiner_ms": 175.55879999417812,
+        "ray_and_uncertainty_ms": 153.15230004489422
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_244.jpg",
@@ -3346,10 +3346,10 @@
           "std_m": 0.12166214999481877,
           "samples": 128
         },
-        "latency_ms": 162.92960004648194,
-        "detector_ms": 54.70199999399483,
-        "refiner_ms": 69.16080001974478,
-        "ray_and_uncertainty_ms": 38.947599998209625
+        "latency_ms": 434.0881999814883,
+        "detector_ms": 152.402599924244,
+        "refiner_ms": 161.519099958241,
+        "ray_and_uncertainty_ms": 119.95029996614903
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_258.jpg",
@@ -3395,10 +3395,10 @@
           "std_m": 0.14084893264681553,
           "samples": 128
         },
-        "latency_ms": 167.52670001005754,
-        "detector_ms": 66.59460003720596,
-        "refiner_ms": 61.35329999960959,
-        "ray_and_uncertainty_ms": 39.49830000055954
+        "latency_ms": 392.50339998397976,
+        "detector_ms": 157.5879999436438,
+        "refiner_ms": 127.07359995692968,
+        "ray_and_uncertainty_ms": 107.68439993262291
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_259.jpg",
@@ -3444,10 +3444,10 @@
           "std_m": 0.14838192642211329,
           "samples": 128
         },
-        "latency_ms": 156.14620002452284,
-        "detector_ms": 60.81720005022362,
-        "refiner_ms": 60.46299997251481,
-        "ray_and_uncertainty_ms": 34.782900009304285
+        "latency_ms": 408.0167000647634,
+        "detector_ms": 114.72000007051975,
+        "refiner_ms": 145.55790007580072,
+        "ray_and_uncertainty_ms": 147.54260005429387
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_260.jpg",
@@ -3493,10 +3493,10 @@
           "std_m": 0.12987419711180728,
           "samples": 128
         },
-        "latency_ms": 203.12009996268898,
-        "detector_ms": 58.12160001369193,
-        "refiner_ms": 86.99049998540431,
-        "ray_and_uncertainty_ms": 57.875200000125915
+        "latency_ms": 456.11309993546456,
+        "detector_ms": 151.30829997360706,
+        "refiner_ms": 168.83029998280108,
+        "ray_and_uncertainty_ms": 135.79889992251992
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_261.jpg",
@@ -3542,10 +3542,10 @@
           "std_m": 0.14612036369955453,
           "samples": 128
         },
-        "latency_ms": 173.47480001626536,
-        "detector_ms": 51.39859998598695,
-        "refiner_ms": 72.43229995947331,
-        "ray_and_uncertainty_ms": 49.54590002307668
+        "latency_ms": 442.8524000104517,
+        "detector_ms": 134.34830005280674,
+        "refiner_ms": 167.96300001442432,
+        "ray_and_uncertainty_ms": 140.41980006732047
       },
       {
         "image": "D:\\LAB\\SAM_Experiment\\fire-detection-from-cctv\\data\\data\\img_data\\test\\fire\\img_263.jpg",
@@ -3591,10 +3591,10 @@
           "std_m": 0.14914214890642083,
           "samples": 128
         },
-        "latency_ms": 156.50950005510822,
-        "detector_ms": 56.00750003941357,
-        "refiner_ms": 58.87739994795993,
-        "ray_and_uncertainty_ms": 41.54260002542287
+        "latency_ms": 437.93690006714314,
+        "detector_ms": 137.5984000042081,
+        "refiner_ms": 138.05880001746118,
+        "ray_and_uncertainty_ms": 162.0417000958696
       }
     ]
   }

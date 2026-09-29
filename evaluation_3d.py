@@ -27,6 +27,7 @@ from config import DEFAULT_CONFIG
 from detector_adapter import adapt_local_detector_result
 from localization import localize_pixels
 from locator import GridMap
+from mesh_loader import load_triangle_mesh
 from main_localization import Fire3DLocalizationPipeline, default_calibration
 
 
@@ -78,7 +79,7 @@ def evaluate(args):
     first_size = Image.open(paths[0]).size
     calibration = CameraCalibration.from_json(args.calibration) if args.calibration else default_calibration(first_size)
     geometry = calibration.geometry()
-    grid_map = GridMap()
+    grid_map = load_triangle_mesh(args.mesh) if args.mesh else GridMap()
 
     detector = None
     pipeline = None
@@ -114,7 +115,13 @@ def evaluate(args):
             detector_point = None
         else:
             output = pipeline.process(image)
-            used_pixel = None if output["refined"] is None else np.asarray(output["refined"]["point"], dtype=np.float64)
+            refined = output.get("refined")
+            coarse = output.get("detection", {}).get("point")
+            used_pixel = (
+                np.asarray(refined["point"], dtype=np.float64)
+                if refined is not None and refined.get("point") is not None
+                else None if coarse is None else np.asarray(coarse, dtype=np.float64)
+            )
             detector_point = output["detection"].get("point")
             result = None
             if used_pixel is not None:
@@ -162,8 +169,10 @@ def main():
     parser.add_argument("--points", type=Path, default=root / "ground_truth.json")
     parser.add_argument("--labels-3d", type=Path, default=None)
     parser.add_argument("--model", type=Path, default=root / "fire-model-data" / "best.pth")
-    parser.add_argument("--roi-checkpoint", type=Path, default=root / "fire-model-data" / "week6_roi" / "best_roi.pth")
+    parser.add_argument("--roi-checkpoint", type=Path, default=root / "week6_roi_result" / "best_roi.pth")
     parser.add_argument("--calibration", type=Path, default=None)
+    parser.add_argument("--mesh", type=Path, default=None,
+                        help="JSON triangle mesh in the calibration world frame")
     parser.add_argument("--output", type=Path, default=root / "working" / "evaluation_3d.json")
     parser.add_argument("--threshold", type=float, default=DEFAULT_CONFIG.confidence_threshold)
     parser.add_argument("--pixel-sigma", type=float, default=2.0)

@@ -201,8 +201,16 @@ def load_backbone_from_checkpoint(model: ROIRefiner, checkpoint_path: Path):
         for key, value in source.items()
         if key.startswith("backbone.")
     }
+    if not backbone_state:
+        raise ValueError(
+            f"Checkpoint {checkpoint_path} không có trọng số backbone.*; "
+            "không thể khởi tạo ROI refiner từ checkpoint này."
+        )
     result = model.backbone.load_state_dict(backbone_state, strict=False)
-    print(f"loaded_backbone={len(backbone_state)} missing={len(result.missing_keys)} unexpected={len(result.unexpected_keys)}")
+    loaded = len(backbone_state) - len(result.unexpected_keys)
+    if loaded <= 0:
+        raise ValueError(f"Không nạp được trọng số backbone từ {checkpoint_path}")
+    print(f"loaded_backbone={loaded} missing={len(result.missing_keys)} unexpected={len(result.unexpected_keys)}")
     return model
 
 
@@ -269,6 +277,8 @@ class ROIRefinerInference:
         output = self.model(_prepare_image(crop).unsqueeze(0).to(self.device))
         relative = output["coord"][0].detach().cpu().numpy()
         point = np.array([box.left, box.top], dtype=np.float64) + relative * box.side
+        point[0] = np.clip(point[0], 0.0, max(0.0, image.width - 1.0))
+        point[1] = np.clip(point[1], 0.0, max(0.0, image.height - 1.0))
         probabilities = torch.sigmoid(output["heatmap_logits"])[0, 0]
         confidence = float(probabilities.max().detach().cpu())
         return RefinedPoint(
@@ -378,7 +388,7 @@ def main():
     parser.add_argument("--dataset-root", type=Path, default=root / "fire-detection-from-cctv")
     parser.add_argument("--init-checkpoint", type=Path, default=root / "fire-model-data" / "best.pth")
     parser.add_argument("--coarse-manifest", type=Path, default=None, help="JSON coarse points produced by an upstream detector")
-    parser.add_argument("--output-dir", type=Path, default=root / "fire-model-data" / "week6_roi")
+    parser.add_argument("--output-dir", type=Path, default=root / "week6_roi_result")
     parser.add_argument("--epochs", type=int, default=30); parser.add_argument("--batch-size", type=int, default=32); parser.add_argument("--workers", type=int, default=0); parser.add_argument("--lr", type=float, default=3e-4); parser.add_argument("--freeze-epochs", type=int, default=5); parser.add_argument("--repeats", type=int, default=3); parser.add_argument("--roi-fraction", type=float, default=0.70); parser.add_argument("--noise-std", type=float, default=0.08); parser.add_argument("--seed", type=int, default=42); parser.add_argument("--device", default=None); parser.add_argument("--no-pretrained", action="store_true")
     args = parser.parse_args(); train(args)
 

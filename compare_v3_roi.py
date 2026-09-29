@@ -90,7 +90,11 @@ def _get(value: Any, *names: str, default: Any = None) -> Any:
     return default
 
 
-def _point(value: Any, image_size: tuple[int, int]) -> Optional[tuple[float, float]]:
+def _point(
+    value: Any,
+    image_size: tuple[int, int],
+    normalized: Optional[bool] = None,
+) -> Optional[tuple[float, float]]:
     """Read either pixel or normalised coordinates from a detector result."""
     if value is None:
         return None
@@ -102,9 +106,12 @@ def _point(value: Any, image_size: tuple[int, int]) -> Optional[tuple[float, flo
         return None
     x, y = float(array[0]), float(array[1])
     width, height = image_size
-    # Local FireDetector returns pixels. Most custom v3 adapters return either
-    # pixels or [0, 1] coordinates; this convention handles both.
-    if abs(x) <= 1.5 and abs(y) <= 1.5 and (width > 4 or height > 4):
+    # Local FireDetector/V3Detection expose a ``pixel`` field. Other adapters
+    # may expose a normalized ``point``/``coord`` field. Prefer explicit
+    # metadata and only use the numeric heuristic as a last resort.
+    if normalized is None:
+        normalized = abs(x) <= 1.5 and abs(y) <= 1.5 and (width > 4 or height > 4)
+    if normalized:
         x, y = x * width, y * height
     return float(np.clip(x, 0.0, max(0, width - 1))), float(np.clip(y, 0.0, max(0, height - 1)))
 
@@ -118,7 +125,16 @@ def _normalise_prediction(raw: Any, image_size: tuple[int, int], threshold: floa
     except (TypeError, ValueError):
         confidence = 0.0
     value = _get(raw, "point", "pixel", "center", "coord", "coordinates", default=None)
-    point = _point(value, image_size)
+    explicit_normalized = _get(raw, "normalized", "normalized_point", "coord_normalized", default=None)
+    if explicit_normalized is None:
+        if isinstance(raw, dict):
+            # A named ``pixel`` output is already in image coordinates.
+            explicit_normalized = "pixel" not in raw and any(
+                key in raw for key in ("coord", "coordinates", "normalized_point")
+            )
+        else:
+            explicit_normalized = hasattr(raw, "pixel") is False and hasattr(raw, "coord")
+    point = _point(value, image_size, normalized=bool(explicit_normalized) if explicit_normalized is not None else None)
     detected_value = _get(raw, "detected", "is_fire", default=None)
     detected = confidence >= threshold if detected_value is None else bool(detected_value)
     detected = bool(detected and confidence >= threshold and point is not None)
@@ -149,6 +165,27 @@ def _even_selection(records: Sequence[Any], maximum: int) -> list[Any]:
         return records
     indices = np.linspace(0, len(records) - 1, maximum, dtype=int)
     return [records[int(index)] for index in np.unique(indices)]
+
+
+def _diverse_record_selection(records: Sequence[Any], maximum: int) -> list[Any]:
+    """Select a diverse subset before inference so ``--max-images`` is real."""
+    records = list(records)
+    if maximum <= 0 or maximum >= len(records):
+        return records
+    ordered = sorted(records, key=lambda item: str(item.image_path))
+    selected: list[Any] = []
+    groups: set[str] = set()
+    for record in ordered:
+        group = str(getattr(record, "group", "unknown"))
+        if group not in groups:
+            selected.append(record)
+            groups.add(group)
+            if len(selected) >= maximum:
+                return sorted(selected, key=lambda item: str(item.image_path))
+    return _even_selection(ordered, maximum) if len(selected) == 0 else sorted(
+        (selected + [record for record in ordered if record not in selected])[:maximum],
+        key=lambda item: str(item.image_path),
+    )
 
 
 def _metric(errors: Sequence[float], total: int, threshold_values=(10.0, 25.0)) -> dict[str, Any]:
@@ -423,7 +460,10 @@ def evaluate(args: argparse.Namespace) -> list[ComparisonRow]:
         detector.warmup(repeats=1)
 
     rows: list[ComparisonRow] = []
-    run_records = _even_selection(records, args.max_images) if args.selection == "even" else records
+    if args.selection == "even":
+        run_records = _even_selection(records, args.max_images)
+    else:
+        run_records = _diverse_record_selection(records, args.max_images)
     for record in run_records:
         image = Image.open(record.image_path).convert("RGB")
         width, height = image.size
@@ -434,10 +474,11 @@ def evaluate(args: argparse.Namespace) -> list[ComparisonRow]:
         if coarse.point is not None:
             start = time.perf_counter()
             refined = refiner.refine(image, coarse.point)
+            refined_point = _point(getattr(refined, "point", None), image.size)
             roi = Prediction(
                 confidence=float(getattr(refined, "confidence", 0.0)),
-                point=_point(getattr(refined, "point", None), image.size),
-                detected=True,
+                point=refined_point,
+                detected=refined_point is not None,
                 latency_ms=(time.perf_counter() - start) * 1000.0,
             )
         v3_prediction = v3.detect(image)

@@ -1,4 +1,9 @@
-"""Fire detector adapter for legacy and spatial-head checkpoints."""
+"""Fire detector adapter for legacy, spatial and improved 2D checkpoints.
+
+The ``detector_2d_fpn_v2`` branch is intentionally exposed through this same
+adapter so ROI and 3D code can consume the new detector without knowing which
+2D architecture produced the coarse point.
+"""
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, Sequence, Union
@@ -44,7 +49,22 @@ class FireDetector:
         checkpoint = torch.load(self.model_path, map_location="cpu", weights_only=False)
         self.architecture = checkpoint.get("architecture", "legacy_gap_v1")
         backbone = checkpoint.get("backbone", "mobilenetv4_conv_medium")
-        if self.architecture == "spatial_heatmap_v2":
+        self._detector_2d = None
+        if self.architecture == "detector_2d_fpn_v2":
+            # Keep the old FireDetector API as the integration boundary. This
+            # lets all existing ROI/3D scripts consume the higher-resolution
+            # detector without changing their downstream contracts.
+            from detector_2d import Detector2DInference
+
+            self._detector_2d = Detector2DInference(
+                self.model_path,
+                device=self.device,
+                threshold=self.threshold,
+                use_amp=self.use_amp,
+            )
+            self.model = self._detector_2d.model
+            self.spatial_head = True
+        elif self.architecture == "spatial_heatmap_v2":
             from train_week6 import SpatialFireModel
             self.model = SpatialFireModel(backbone=backbone, pretrained=False).to(self.device)
             self.spatial_head = True
@@ -56,12 +76,21 @@ class FireDetector:
         else:
             self.model = FireGrounder(backbone=backbone, pretrained=False).to(self.device)
             self.spatial_head = False
-        self.model.load_state_dict(checkpoint["model"])
+        # Detector2DInference already loaded and validated this checkpoint.
+        # The other legacy branches still load their state dict here.
+        if self._detector_2d is None:
+            self.model.load_state_dict(checkpoint["model"])
         self.model.eval()
         if self.device.type == "cuda": torch.backends.cudnn.benchmark = True
         image_size = checkpoint.get("image_size", (224, 224))
+        if isinstance(image_size, int):
+            image_size = (image_size, image_size)
+        image_size = tuple(int(value) for value in image_size)
+        if len(image_size) != 2 or min(image_size) <= 0:
+            raise ValueError(f"Invalid checkpoint image_size: {image_size!r}")
+        self.image_size = image_size
         self.transform = transforms.Compose([
-            transforms.Resize(tuple(image_size)), transforms.ToTensor(),
+            transforms.Resize(self.image_size), transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ])
         self._warm = False
@@ -71,11 +100,17 @@ class FireDetector:
         if isinstance(item, Image.Image): return item.convert("RGB")
         if isinstance(item, np.ndarray):
             array = item if item.dtype == np.uint8 else np.clip(item, 0, 255).astype(np.uint8)
+            if array.ndim == 2:
+                return Image.fromarray(array, mode="L").convert("RGB")
             return Image.fromarray(array[..., :3]).convert("RGB")
         raise TypeError(f"Unsupported image input: {type(item)!r}")
 
     def warmup(self, repeats=3):
-        dummy = torch.zeros((1, 3, 224, 224), device=self.device)
+        if self._detector_2d is not None:
+            self._detector_2d.warmup(repeats=repeats)
+            self._warm = True
+            return
+        dummy = torch.zeros((1, 3, self.image_size[1], self.image_size[0]), device=self.device)
         with torch.inference_mode():
             for _ in range(max(1, int(repeats))):
                 context = torch.autocast(device_type="cuda", dtype=torch.float16) if self.use_amp else nullcontext()
@@ -84,6 +119,21 @@ class FireDetector:
         self._warm = True
 
     def detect_many(self, items: Sequence, warmup=False):
+        if not items:
+            return []
+        if self._detector_2d is not None:
+            results = self._detector_2d.detect_many(items, warmup=warmup)
+            self._warm = self._detector_2d._warm
+            return [
+                DetectionResult(
+                    confidence=result.confidence,
+                    pixel=result.pixel,
+                    detected=result.detected,
+                    size=result.size,
+                    latency_ms=result.latency_ms,
+                )
+                for result in results
+            ]
         if warmup and not self._warm: self.warmup()
         images = [self._to_image(item) for item in items]
         sizes = [image.size for image in images]

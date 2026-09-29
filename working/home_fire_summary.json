@@ -1,0 +1,26 @@
+{
+  "source": "D:\\LAB\\SAM_Experiment\\home-fire-dataset.zip",
+  "fire_class_id": null,
+  "weak_point_weight": 0.25,
+  "image_count": 6500,
+  "weak_point_count": 0,
+  "split_counts": {
+    "test": 1300,
+    "train": 3900,
+    "val": 1300
+  },
+  "class_bbox_counts": {
+    "1": 3140,
+    "0": 4838
+  },
+  "checks": {
+    "class_1": 3140,
+    "weak_points_skipped_unknown_class": 7978,
+    "class_0": 4838,
+    "empty_or_invalid_label": 135
+  },
+  "weak_manifest_usable": false,
+  "weak_manifest_note": "No weak points were generated because --fire-class was not supplied.",
+  "manifest": "D:\\LAB\\SAM_Experiment\\working\\home_fire_manifest.jsonl",
+  "weak_manifest": "D:\\LAB\\SAM_Experiment\\working\\home_fire_weak_points.jsonl"
+}

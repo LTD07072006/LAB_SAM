@@ -37,13 +37,21 @@ train/chạy pipeline mới.
 
 - `sam-3.ipynb`: notebook train cũ.
 - `sam-week6-spatial-train.ipynb`: notebook spatial detector cũ; workflow mới
-  dùng `sam-week6-roi-train.ipynb` vì mục tiêu là định vị 3D sau detector.
+  dùng `sam-week6-roi-train-complete.ipynb` vì mục tiêu là định vị 3D sau
+  detector.
+- `sam-week6-roi-train.ipynb`: bản notebook ROI rút gọn đã được thay thế bởi
+  `sam-week6-roi-train-complete.ipynb`, bản có kiểm tra input/leakage, tạo
+  coarse manifest, train, đánh giá và smoke test đầy đủ hơn.
 
 ## File vẫn giữ ở thư mục gốc
 
 Các entry point hiện tại của Week 6 là `run_week6.py` và
 `compare_v3_roi.py`; chúng không nằm trong archive. `v3_detector.py` là
 adapter cho checkpoint FPN v3 và cũng được giữ ở thư mục gốc.
+
+`sam-experiment-code/` và `sam-experiment-code.zip` vẫn được giữ ở thư mục
+gốc vì chúng là gói code dùng để upload lên Kaggle; không được coi là bản
+legacy dù có các module trùng với thư mục gốc.
 
 Nhóm runtime còn lại gồm `train_week6.py`, `narrow_localizer.py`,
 `train_roi_localizer.py`, `build_coarse_manifest.py`, `fire_detector.py`,

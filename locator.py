@@ -90,6 +90,12 @@ def intersect_ray_with_grid_result(cam_pos, ray_dir, grid_map, max_dist=1000.0,
     ray_dir = np.asarray(ray_dir, dtype=np.float64).reshape(3)
     norm = np.linalg.norm(ray_dir)
     if norm < 1e-12: return RayHit(False, status="degenerate_ray")
+    max_dist = float(max_dist)
+    step = float(step)
+    if not np.isfinite(max_dist) or max_dist <= 0.0:
+        return RayHit(False, status="invalid_max_dist")
+    if not np.isfinite(step) or step <= 0.0:
+        return RayHit(False, status="invalid_step")
     ray_dir /= norm
     if hasattr(grid_map, "intersect_ray"):
         hit = grid_map.intersect_ray(cam_pos, ray_dir, max_dist=max_dist)

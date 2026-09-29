@@ -33,7 +33,7 @@ from main_localization import default_calibration  # noqa: E402
 from camera_calibration import CameraCalibration  # noqa: E402
 from mesh_loader import load_triangle_mesh  # noqa: E402
 from narrow_localizer import ROIRefinerInference  # noqa: E402
-from train_week6 import load_records  # noqa: E402
+from train_week6 import load_records, split_records  # noqa: E402
 from locator import GridMap  # noqa: E402
 
 
@@ -92,6 +92,43 @@ def _json_value(value: Any):
     return value
 
 
+def _select_records(records, split: str, maximum: int, selection: str, seed: int = 42):
+    """Select positive records deterministically without leaking splits."""
+    positive = [record for record in records if bool(record.has_fire)]
+    if split == "all":
+        selected = positive
+    else:
+        source = [record for record in positive if record.source_split == split]
+        if source:
+            selected = source
+        else:
+            generated = split_records(records, seed=seed)
+            selected = [record for record in generated.get(split, []) if bool(record.has_fire)]
+    selected = sorted(selected, key=lambda record: str(record.image_path))
+    if maximum <= 0 or maximum >= len(selected):
+        return selected
+    if selection == "even":
+        indices = np.linspace(0, len(selected) - 1, maximum, dtype=int)
+        return [selected[int(index)] for index in np.unique(indices)]
+    # A deterministic spread over source groups is preferable to taking the
+    # first consecutive video frames. Fill remaining slots in path order.
+    result = []
+    groups = set()
+    for record in selected:
+        group = str(getattr(record, "group", "unknown"))
+        if group not in groups:
+            result.append(record)
+            groups.add(group)
+            if len(result) >= maximum:
+                return sorted(result, key=lambda item: str(item.image_path))
+    for record in selected:
+        if record not in result:
+            result.append(record)
+        if len(result) >= maximum:
+            break
+    return sorted(result, key=lambda item: str(item.image_path))
+
+
 def _location(camera, grid_map, pixel: Optional[np.ndarray]):
     if pixel is None:
         return None
@@ -146,6 +183,7 @@ def _run_branch(
     camera,
     grid_map: GridMap,
     oracle_locations: dict[str, Any],
+    use_uncertainty: bool = True,
 ) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     coarse_errors: list[float] = []
@@ -187,7 +225,7 @@ def _run_branch(
         used = coarse if name == "A" else refined
         ray_start = time.perf_counter()
         location = _location(camera, grid_map, used)
-        uncertainty = _uncertainty(camera, grid_map, used)
+        uncertainty = _uncertainty(camera, grid_map, used) if use_uncertainty else None
         ray_ms = (time.perf_counter() - ray_start) * 1000.0
         ray_latencies.append(ray_ms)
         total_ms = (time.perf_counter() - start) * 1000.0
@@ -264,22 +302,40 @@ def _run_branch(
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--labels", type=Path, default=ROOT / "fire-model-data" / "dataset_labels (1).json")
+    parser.add_argument("--dataset", "--dataset-root", dest="dataset", type=Path, default=ROOT / "fire-detection-from-cctv")
+    parser.add_argument("--baseline", "--model", dest="baseline", type=Path, default=ROOT / "fire-model-data" / "best.pth")
+    parser.add_argument("--roi", "--roi-checkpoint", dest="roi", type=Path, default=ROOT / "week6_roi_result" / "best_roi.pth")
+    parser.add_argument("--split", choices=("train", "val", "test", "all"), default="test")
+    parser.add_argument("--max-images", type=int, default=0, help="0 means all selected images")
+    parser.add_argument("--selection", choices=("even", "diverse"), default="even")
     parser.add_argument("--output", type=Path, default=ROOT / "working" / "benchmark_ab_test_fire.json")
     parser.add_argument("--threshold", type=float, default=0.5)
-    parser.add_argument("--device", default="cpu")
+    parser.add_argument("--device", default=None)
     parser.add_argument("--calibration", type=Path, default=None)
     parser.add_argument("--mesh", type=Path, default=None)
+    parser.add_argument("--no-uncertainty", action="store_true")
+    parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
-    labels_path = ROOT / "fire-model-data" / "dataset_labels (1).json"
-    dataset_root = ROOT / "fire-detection-from-cctv"
-    detector_path = ROOT / "fire-model-data" / "best.pth"
-    roi_path = ROOT / "week6_roi_result" / "best_roi.pth"
-    records, load_stats = load_records(labels_path, dataset_root)
-    test_fire = [record for record in records if record.source_split == "test" and record.has_fire]
-    test_fire.sort(key=lambda record: str(record.image_path))
+    if args.max_images < 0:
+        raise ValueError("--max-images must be >= 0")
+    if not 0.0 <= args.threshold <= 1.0:
+        raise ValueError("--threshold must be in [0, 1]")
+    for path, label in ((args.labels, "Labels JSON"), (args.baseline, "Baseline checkpoint"), (args.roi, "ROI checkpoint")):
+        if not path.is_file():
+            raise FileNotFoundError(f"{label} not found: {path}")
+    if not args.dataset.is_dir():
+        raise FileNotFoundError(f"Dataset root not found: {args.dataset}")
+    if args.calibration is not None and not args.calibration.is_file():
+        raise FileNotFoundError(f"Calibration not found: {args.calibration}")
+    if args.mesh is not None and not args.mesh.is_file():
+        raise FileNotFoundError(f"Mesh not found: {args.mesh}")
+
+    records, load_stats = load_records(args.labels, args.dataset)
+    test_fire = _select_records(records, args.split, args.max_images, args.selection, args.seed)
     if not test_fire:
-        raise RuntimeError("No positive records found in source test split")
+        raise RuntimeError(f"No positive records found in split={args.split}")
 
     first_size = Image.open(test_fire[0].image_path).size
     if any(Image.open(record.image_path).size != first_size for record in test_fire):
@@ -288,8 +344,8 @@ def main():
     camera = calibration.geometry()
     grid_map = load_triangle_mesh(args.mesh) if args.mesh else GridMap()
 
-    detector = FireDetector(detector_path, device=args.device, threshold=args.threshold, use_amp=False)
-    refiner = ROIRefinerInference(roi_path, device=args.device)
+    detector = FireDetector(args.baseline, device=args.device, threshold=args.threshold, use_amp=False)
+    refiner = ROIRefinerInference(args.roi, device=args.device)
     # Warm up before timing so model construction/first-kernel overhead does
     # not dominate the per-image latency summary.
     detector.warmup(repeats=1)
@@ -306,8 +362,8 @@ def main():
         oracle = _location(camera, grid_map, gt_pixel)
         oracle_locations[str(record.image_path)] = None if oracle is None or not oracle["hit"] else oracle["point"]
 
-    branch_a = _run_branch("A", test_fire, detector, None, camera, grid_map, oracle_locations)
-    branch_b = _run_branch("B", test_fire, detector, refiner, camera, grid_map, oracle_locations)
+    branch_a = _run_branch("A", test_fire, detector, None, camera, grid_map, oracle_locations, not args.no_uncertainty)
+    branch_b = _run_branch("B", test_fire, detector, refiner, camera, grid_map, oracle_locations, not args.no_uncertainty)
 
     paired_coarse: list[float] = []
     paired_refined: list[float] = []
@@ -325,7 +381,7 @@ def main():
 
     report = {
         "protocol": {
-            "dataset": "source test/fire only",
+            "dataset": f"{args.split}/fire selected by {args.selection}",
             "images": len(test_fire),
             "image_size": list(first_size),
             "calibration": str(args.calibration) if args.calibration else "synthetic default_calibration",

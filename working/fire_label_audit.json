@@ -1,0 +1,45 @@
+{
+  "classification_contract": {
+    "fire": 1,
+    "no_fire": 0
+  },
+  "regression_contract": "p_fire is required only when has_fire=1; coordinate loss is masked for has_fire=0",
+  "json_labels": {
+    "path": "D:\\LAB\\SAM_Experiment\\fire-model-data\\dataset_labels (1).json",
+    "records": 1034,
+    "counts": {
+      "class_1": 544,
+      "positive_valid_p_fire": 544,
+      "class_0": 490
+    },
+    "unresolved_images": 0,
+    "unique_resolved_images": 517,
+    "contract_ok": true
+  },
+  "home_fire_yolo": {
+    "root": "D:\\LAB\\SAM_Experiment\\home-fire-dataset",
+    "source_fire_class": 1,
+    "class_bbox_counts": {
+      "0": 4838,
+      "1": 3140
+    },
+    "counts": {
+      "train_images": 3900,
+      "train_label_files": 3900,
+      "source_class_0_boxes": 4838,
+      "source_fire_boxes": 3140,
+      "source_class_1_boxes": 3140,
+      "empty_label_files": 135,
+      "val_images": 1300,
+      "val_label_files": 1300,
+      "test_images": 1300,
+      "test_label_files": 1300
+    },
+    "recommended_one_class_mapping": {
+      "source_fire_class": 1,
+      "model_fire_class": 0,
+      "source_no_fire_class": 0,
+      "negative_images_use_empty_label": true
+    }
+  }
+}

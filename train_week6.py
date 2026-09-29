@@ -138,15 +138,63 @@ def resolve_image_path(raw_path: str, dataset_root: Path,
     return None
 
 
+def _strict_binary_label(value) -> Optional[int]:
+    """Return a semantic binary class, or ``None`` when it is invalid.
+
+    ``has_fire`` is a class label, not a confidence score. Only 0 and 1 are
+    accepted so annotation mistakes cannot be silently converted with a
+    threshold such as ``value > 0.5``.
+    """
+    if isinstance(value, bool):
+        return int(value)
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number) or number not in (0.0, 1.0):
+        return None
+    return int(number)
+
+
+def _normalise_positive_point(value) -> Optional[Tuple[float, float]]:
+    """Validate a positive sample's normalized ``p_fire`` coordinate."""
+    try:
+        xy = np.asarray(value, dtype=np.float64).reshape(-1)
+    except (TypeError, ValueError):
+        return None
+    if len(xy) < 2 or not np.all(np.isfinite(xy[:2])):
+        return None
+    if np.any(xy[:2] < 0.0) or np.any(xy[:2] > 1.0):
+        return None
+    return float(xy[0]), float(xy[1])
+
+
 def load_records(labels_path: Path, dataset_root: Path) -> Tuple[List[Record], Dict[str, int]]:
-    """Load labels, resolve paths and remove duplicate physical images."""
+    """Load strict binary labels, resolve paths and remove duplicates.
+
+    The classification target is exactly ``has_fire=1`` for fire and
+    ``has_fire=0`` for no fire. A positive sample must contain a finite,
+    normalized ``p_fire`` point. A negative sample never contributes a
+    coordinate target; any optional negative point is ignored and audited.
+    """
+    labels_path = Path(labels_path)
+    dataset_root = Path(dataset_root)
+    if not labels_path.is_file():
+        raise FileNotFoundError(f"Labels JSON not found: {labels_path}")
+    if not dataset_root.is_dir():
+        raise FileNotFoundError(f"Dataset root not found: {dataset_root}")
     raw_items = json.loads(labels_path.read_text(encoding="utf-8"))
+    if not isinstance(raw_items, list):
+        raise ValueError(f"Labels JSON must contain a list of records: {labels_path}")
     records: List[Record] = []
     seen = set()
     stats = Counter()
     image_index = _build_image_index(dataset_root)
     stats["indexed_images"] = len(set(image_index.values()))
     for item in raw_items:
+        if not isinstance(item, dict) or "image_path" not in item:
+            stats["invalid"] += 1
+            continue
         resolved = resolve_image_path(str(item["image_path"]), dataset_root, image_index)
         if resolved is None:
             stats["unresolved"] += 1
@@ -156,8 +204,35 @@ def load_records(labels_path: Path, dataset_root: Path) -> Tuple[List[Record], D
             stats["duplicates"] += 1
             continue
         seen.add(key)
-        has_fire = int(item.get("has_fire", 1) > 0.5)
-        xy = item.get("p_fire", [0.0, 0.0]) if has_fire else [0.0, 0.0]
+        if "has_fire" not in item:
+            stats["missing_has_fire"] += 1
+            continue
+        has_fire = _strict_binary_label(item.get("has_fire"))
+        if has_fire is None:
+            stats["non_binary_has_fire"] += 1
+            continue
+        stats[f"class_{has_fire}"] += 1
+
+        if has_fire:
+            xy = _normalise_positive_point(item.get("p_fire"))
+            if xy is None:
+                stats["positive_missing_or_invalid_p_fire"] += 1
+                continue
+        else:
+            # Regression is masked for this sample. A stale negative point
+            # must never become a coordinate target.
+            raw_xy = item.get("p_fire")
+            if raw_xy is not None:
+                try:
+                    negative_xy = np.asarray(raw_xy, dtype=np.float64).reshape(-1)
+                    if len(negative_xy) >= 2 and np.all(np.isfinite(negative_xy[:2])):
+                        if np.any(np.abs(negative_xy[:2]) > 1e-12):
+                            stats["negative_p_fire_ignored"] += 1
+                    else:
+                        stats["negative_p_fire_invalid_ignored"] += 1
+                except (TypeError, ValueError):
+                    stats["negative_p_fire_invalid_ignored"] += 1
+            xy = (0.0, 0.0)
         records.append(Record(
             image_path=str(resolved),
             has_fire=has_fire,

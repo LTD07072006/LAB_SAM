@@ -20,7 +20,6 @@ the one used to launch a script.
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import os
 import shutil
 import subprocess
@@ -73,11 +72,27 @@ def _python_candidates() -> Iterable[Path]:
         yield Path(found)
 
 
+def _is_runnable_python(candidate: Path) -> bool:
+    """Return whether a candidate can actually start, not merely exist."""
+    try:
+        result = subprocess.run(
+            [str(candidate), "-c", "import sys; print(sys.version_info[:2])"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return result.returncode == 0
+
+
 def resolve_python(requested: Optional[Path]) -> Path:
     if requested is not None:
         candidate = _path(requested)
         if not candidate.is_file():
             raise RunnerError(f"Không tìm thấy Python được chỉ định: {candidate}")
+        if not _is_runnable_python(candidate):
+            raise RunnerError(f"Python được chỉ định không khởi động được: {candidate}")
         return candidate.resolve()
     seen: set[str] = set()
     for candidate in _python_candidates():
@@ -85,21 +100,28 @@ def resolve_python(requested: Optional[Path]) -> Path:
         if key in seen:
             continue
         seen.add(key)
-        if candidate.is_file():
+        if candidate.is_file() and _is_runnable_python(candidate):
             return candidate.resolve()
     raise RunnerError("Không tìm thấy python.exe. Hãy truyền --python D:\\path\\to\\python.exe")
 
 
 def check_dependencies(python: Path) -> None:
+    # Use real imports instead of ``find_spec`` only.  A broken torchvision
+    # installation can have a discoverable module while still failing at
+    # import time (which used to make the child process crash later).
     code = (
         "import importlib.util; "
         "mods=" + repr(REQUIRED_MODULES) + "; "
         "missing=[m for m in mods if importlib.util.find_spec(m) is None]; "
-        "print('missing=' + ','.join(missing))"
+        "print('missing=' + ','.join(missing)); "
+        "\nif not missing:\n"
+        "    import numpy, PIL, torch, torchvision, timm\n"
+        "    print('versions=' + repr({'torch': torch.__version__, 'torchvision': torchvision.__version__, 'timm': timm.__version__}))"
     )
     result = subprocess.run([str(python), "-c", code], capture_output=True, text=True)
     if result.returncode != 0:
-        raise RunnerError(f"Không kiểm tra được dependencies bằng {python}:\n{result.stderr.strip()}")
+        detail = (result.stderr or result.stdout).strip()
+        raise RunnerError(f"Dependencies không import được bằng {python}:\n{detail}")
     line = next((item for item in result.stdout.splitlines() if item.startswith("missing=")), "missing=")
     missing = [item for item in line.removeprefix("missing=").split(",") if item]
     if missing:
@@ -117,6 +139,11 @@ def _require_file(path: Path, label: str) -> None:
 
 def _require_dir(path: Path, label: str) -> None:
     if not path.is_dir():
+        raise RunnerError(f"{label} không tồn tại: {path}")
+
+
+def _require_optional_file(path: Optional[Path], label: str) -> None:
+    if path is not None and not path.is_file():
         raise RunnerError(f"{label} không tồn tại: {path}")
 
 
@@ -140,7 +167,7 @@ def _stage_demo_samples(source: Path, output_dir: Path, maximum: int) -> Path:
     """Limit demo images without assuming main_localization has --max-images."""
     if maximum <= 0:
         return source
-    images = sorted(path for path in source.iterdir() if path.suffix.lower() in IMAGE_SUFFIXES)
+    images = sorted(path for path in source.rglob("*") if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES)
     selected = images[:maximum]
     if len(selected) == len(images):
         return source
@@ -205,18 +232,25 @@ def _benchmark_command(args: argparse.Namespace, python: Path, output_root: Path
     if args.benchmark_model == "v3":
         raise RunnerError(
             "benchmark_ab.py hiện benchmark baseline-versus-ROI. "
-            "Dùng --mode compare để so sánh checkpoint v3, hoặc khôi phục benchmark_v3.py."
+            "Dùng --mode compare để so sánh checkpoint v3."
         )
-    if args.max_images:
-        print("WARNING: benchmark_ab.py hiện tại không có --max-images; benchmark sẽ chạy toàn bộ source test/fire.")
     command = [
         str(python), str(ROOT / "benchmark_ab.py"),
+        "--labels", str(args.labels),
+        "--dataset", str(args.dataset),
+        "--baseline", str(args.baseline),
+        "--roi", str(args.roi),
+        "--split", args.split,
+        "--max-images", str(args.max_images),
+        "--selection", args.selection,
         "--output", str(output_root / "benchmark" / "benchmark_ab.json"),
         "--threshold", str(args.threshold),
     ]
     _add_option(command, "--device", args.device)
     _add_option(command, "--calibration", args.calibration)
     _add_option(command, "--mesh", args.mesh)
+    if args.no_uncertainty:
+        command.append("--no-uncertainty")
     return command
 
 
@@ -249,6 +283,8 @@ def main() -> int:
         if value is not None:
             setattr(args, name, _path(value))
     _validate_common(args)
+    _require_optional_file(args.calibration, "Calibration JSON")
+    _require_optional_file(args.mesh, "Mesh JSON")
     python = resolve_python(args.python_executable)
     print(f"python={python}")
     check_dependencies(python)

@@ -97,6 +97,8 @@ def localize_pixels(
     weights = np.asarray(weights, dtype=np.float64).reshape(-1)
     if len(weights) != len(pixels):
         raise ValueError("weights must have one value per pixel")
+    if not np.all(np.isfinite(weights)) or np.any(weights < 0.0) or not np.any(weights > 0.0):
+        raise ValueError("weights must be finite, non-negative, and not all zero")
 
     origins, rays = camera.pixels_to_rays(pixels)
     hits = []
