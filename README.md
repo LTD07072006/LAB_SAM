@@ -52,6 +52,24 @@ refinement checkpoint.
 - `compare_yolo_branch.py`: YOLO bbox/IoU/latency benchmark and visual preview.
 - `audit_fire_labels.py`: dependency-free audit of the `1=fire`, `0=no fire`
   classification contract and the original-to-one-class YOLO mapping.
+- `synthetic_fire_3d.py`: dependency-light metric synthetic fire/room dataset
+  generator with exact 2D-3D camera correspondences and explicit noise.
+- `evaluate_synthetic_fire_3d.py`: clean-versus-noisy ray-casting evaluation
+  in metres for the generated dataset.
+
+See [SYNTHETIC_FIRE_3D.md](SYNTHETIC_FIRE_3D.md) for the synthetic dataset
+contract and commands. The current generated artifact is
+`working/synthetic_fire_3d_v3/`: 240 scene-level sequences, 960 frames at
+640×640, with 672/144/144 train/val/test. It contains 524 visible-fire 2D
+labels, 436 observable no-fire frames, and 288 physically-present but occluded
+events kept separately through `fire_event=1, fire_visible=0, has_fire=0`.
+
+The branch includes `benchmark_synthetic_noise.py`, which evaluates 0/1/3/5/10
+pixel point noise and calibration scales 0/1/2 on the same fixed test scenes,
+and `blender_render_synthetic_fire.py`, an optional Blender adapter that keeps
+the metric camera/mesh/XYZ manifest while adding RGB/depth/mask renders. This
+synthetic branch is for geometry validation, ROI stress testing and controlled
+pretraining; it is not a substitute for real CCTV domain evaluation.
 
 ## Current benchmark status
 
@@ -112,7 +130,7 @@ The detector stage can be retrained independently of ROI and 3D geometry:
 ```powershell
 python train_detector_2d.py `
   --labels "fire-model-data\dataset_labels (1).json" `
-  --dataset-root fire-detection-from-cctv `
+  --dataset-root datasets\fire-detection-from-cctv `
   --init-checkpoint fire-model-data\week6_spatial\best_spatial.pth `
   --output-dir fire-model-data\detector_2d_v2 `
   --image-size 640 `
@@ -128,7 +146,7 @@ classification head. The checkpoint is saved as
 `fire-model-data\best.pth` or the previous spatial checkpoint. If pretrained
 timm weights cannot be downloaded, add `--no-pretrained`.
 
-#### Train on a Kaggle Tesla T4
+#### Train on a Kaggle Tesla T4
 The local `.venv` is CPU-only, so use Kaggle for the full 640×640 run. Your
 large Kaggle Dataset may contain only the archive
 `fire-detection-from-cctv/data/data.zip`; this is sufficient for the image
@@ -225,7 +243,7 @@ python train_roi_localizer.py `
   --coarse-manifest fire-model-data\coarse_manifest_detector_2d_v2.json
 ```
 
-The `home-fire-dataset` is not mixed directly into this point-regression
+The `datasets/D-Fire.zip` dataset is not mixed directly into this point-regression
 training command because it contains YOLO bounding boxes rather than the
 `p_fire` contact-point labels used here. It can be used later for detector
 pretraining or a separate bbox branch.
@@ -258,7 +276,7 @@ cd D:\LAB\SAM_Experiment
 .\.venv\Scripts\Activate.ps1
 python -m pip install ultralytics
 python prepare_home_fire_dataset.py `
-  --root home-fire-dataset `
+  --zip datasets\D-Fire.zip `
   --source-fire-class 1 `
   --manifest-out working\home_fire_manifest_fire1.jsonl `
   --weak-out working\home_fire_weak_points_fire1.jsonl `
@@ -266,7 +284,7 @@ python prepare_home_fire_dataset.py `
   --preview-out working\home_fire_preview_fire1.jpg
 
 python train_home_fire_detector.py `
-  --dataset-root home-fire-dataset `
+  --dataset-root datasets\D-Fire `
   --model yolo11n.pt `
   --epochs 50 --imgsz 640 --batch 16 --device 0 `
   --single-fire-class 1 `
@@ -281,14 +299,14 @@ Benchmark against the original labels with the two ids stated explicitly:
 
 ```powershell
 python compare_yolo_branch.py `
-  --dataset-root home-fire-dataset `
+  --dataset-root datasets\D-Fire `
   --checkpoint working\home_fire_yolo\bbox640\weights\best.pt `
   --source-fire-class 1 --model-fire-class 0 `
   --split test --max-images 100 --device 0 `
   --output-dir output\home_fire_yolo
 
 python export_yolo_coarse_manifest.py `
-  --dataset-root home-fire-dataset `
+  --dataset-root datasets\D-Fire `
   --checkpoint working\home_fire_yolo\bbox640\weights\best.pt `
   --model-fire-class 0 --split test --max-images 0 --device 0 `
   --output working\home_fire_yolo_test_coarse.jsonl
@@ -309,7 +327,7 @@ the legacy `main_localization.py` workflow:
 python run_home_fire_localization.py `
   --checkpoint working\home_fire_yolo\bbox640\weights\best.pt `
   --fire-class 0 `
-  --samples home-fire-dataset\test\images `
+  --samples datasets\D-Fire\test\images `
   --calibration measured_camera.json `
   --mesh measured_room_mesh.json `
   --output output\home_fire_yolo_3d\results.json `
@@ -354,7 +372,7 @@ metric room mesh and 3D fire ground truth use the same coordinate frame.
 
 ```powershell
 python main_localization.py `
-  --samples fire-detection-from-cctv\data\data\img_data\test\fire `
+  --samples datasets\fire-detection-from-cctv\data\data\img_data\test\fire `
   --model fire-model-data\best.pth `
   --roi-checkpoint week6_roi_result\best_roi.pth `
   --calibration calibration_test_224.json `

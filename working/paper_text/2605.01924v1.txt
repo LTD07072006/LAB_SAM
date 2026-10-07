@@ -1,0 +1,1974 @@
+SUBMITTED TO IEEE JOURNAL 1
+SimPB++: Simultaneously Detecting 2D and 3D
+Objects from Multiple Cameras
+Yingqi Tang∗, Zhaotie Meng∗, Erkang Cheng†, and Haibin Ling,Fellow, IEEE
+Abstract—Simultaneous perception of 2D objects in perspective view and 3D objects in Bird’s Eye View (BEV) presents a fundamental
+challenge for multi-camera autonomous driving systems. Existing approaches typically employ a two-stage pipeline with separate
+detectors, where 2D detection results serve only as a one-time initialization cue for 3D detection. In this paper, we proposeSimPB++,
+whichSimultaneously detects 2D objects in thePerspective view and 3D objects in theBEV space from multiple cameras. It applies a
+unified paradigm that integrates 2D and 3D object detection into a single end-to-end model. Specifically, SimPB++ introduces a hybrid
+decoder architecture, where each layer couples a multi-view 2D decoder and a 3D decoder to perform their respective tasks interactively.
+To enable deep interaction between the two tasks, we introduce two novel modules: a Dynamic Query Allocation module that adaptively
+assigns 2D queries to relevant 3D candidates, and an Adaptive Query Aggregation module that progressively refines 3D representations
+using multi-view 2D features. This establishes a cyclic 3D-2D-3D refinement mechanism, allowing bidirectional feature enhancement
+across views. For multi-view 2D detection, we employ Query-group Attention to facilitate intra-group communication among 2D queries.
+To further improve long-range perception, we design a Crop-and-Scale strategy that adaptively zooms into distant regions across
+camera views, and a Propagating Denoising strategy that unifies denoising for both 2D and 3D queries, supported by an auxiliary
+RoI detector branch for foreground enhancement. Moreover, SimPB++ supports training with mixed supervision, combining 2D-only
+and fully annotated data, substantially reducing reliance on expensive 3D labels. Extensive experiments demonstrate that SimPB++
+achieves state-of-the-art performance on the nuScenes benchmark for both 2D and 3D tasks, and excels in long-range detection (up to
+150m) on Argoverse2, highlighting its effectiveness and scalability. Our code is available at: https://github.com/nullmax-vision/SimPB.
+Index Terms—Simultaneous 2D-3D Detection, Multi-camera Object Detection, Bird-eye-view Perception.
+✦
+1 INTRODUCTION
+C
+AMERA-based perception has become a fundamental
+component of modern autonomous driving systems
+due to its low cost and rich semantic representation. Recent
+years have witnessed remarkable progress in 2D object
+detection in perspective views [2], [3], [4], which provides
+strong visual understanding of traffic scenes. Building upon
+these advances, monocular 3D object detection methods
+attempt to directly infer 3D object properties from a single
+camera and predict results in the bird’s eye view (BEV)
+space [5], [6]. However, relying on a single frontal camera
+often limits the spatial coverage and robustness of the
+perception system. To address this limitation, multi-view
+3D object detection methods [7], [8], [9] have been widely
+adopted in recent autonomous driving systems, where sev-
+eral surrounding cameras jointly provide a 360-degree per-
+ception of the environment.
+Existing multi-view 3D detection methods typically pre-
+dict 3D objects directly from multi-camera images without
+performing explicit fusion of monocular predictions (Fig-
+ure 1 (a)). These methods can be broadly categorized into
+two paradigms: dense BEV-based approaches and sparse
+query-based approaches. Dense BEV-based methods [9],
+[10], [11], [12] first lift image features from multiple cameras
+into a unified BEV feature representation and then apply de-
+•Yingqi Tang, Zhaotie Meng, and Erkang Cheng are with Nullmax. E-mail:
+{tangyingqi, mengzhaotie, chengerkang}@nullmax.ai.
+•Haibin Ling is with Westlake University. E-mail: ling-
+haibin@westlake.edu.cn.
+• ∗ Equal contributions. † Corresponding author.
+•A preliminary version [1] of this work has appeared in ECCV 2024.
+(c) United Paradigm for Multi-view 
+2D and 3D Object Detection  
+(b) Multi-view 3D Object 
+Detection with 2D Detection Priors 
+(a) Multi-view 
+3D Object Detection
+3D bbox
+3D detector
+2D bbox
+2D detector
+3D bbox
+3D detector
+2D bbox 3D bbox
+United detector
+Cyclic
+Fig. 1: Comparisons of different multi-view object detection
+pipelines. (a) Multi-view 3D object detection. (b) A two-
+stage multi-view 3D object detector where 2D box detection
+is used as token selection or 3D query initialization. (c) Our
+proposed unified paradigm simultaneously predicts 2D and
+3D results in a single model.
+tection heads to estimate 3D objects. While this design pro-
+vides a structured spatial representation, constructing high-
+resolution BEV features for long-range perception incurs
+substantial computational and memory costs. Alternatively,
+sparse query-based methods [8], [13], [14], [15], [16] adopt a
+DETR-style detection framework [17] that directly interacts
+with multi-view image features using a set of learnable
+object queries, thereby avoiding dense BEV feature con-
+struction. These approaches often leverage backbones pre-
+trained on large-scale 2D detection tasks and have achieved
+competitive performance in camera-only 3D detection.
+arXiv:2605.01924v1  [cs.CV]  3 May 2026
+
+SUBMITTED TO IEEE JOURNAL 2
+Despite these advances, 2D detection in perspective
+views remains an important source of information for multi-
+view perception. In practical systems, 2D detectors can
+provide reliable object localization cues that help identify
+potential 3D objects across different camera views. Con-
+sequently, several recent works [18], [19], [20] attempt to
+improve 3D detection by incorporating 2D detection re-
+sults from multiple cameras (Figure 1(b)). For example,
+MV2D [19] converts 2D bounding boxes into 2.5D anchor
+points using ROI features and camera parameters, while
+Far3D [20] lifts 2D boxes to 3D space with depth predic-
+tions from an auxiliary network. Focal-PETR [18] further
+introduces instance-guided supervision to identify informa-
+tive foreground tokens in perspective views. By leveraging
+strong 2D detection cues, these approaches improve 3D
+detection performance through query initialization or token
+selection.
+However, the above two-detector paradigm still suffers
+from several fundamental limitations. First, the 2D detec-
+tor independently processes each camera view and treats
+the same physical object appearing in different images as
+separate instances. As a result, the subsequent 3D detector
+tends to focus on local observations from individual views
+rather than forming a holistic understanding of the object
+across cameras. Second, the interaction between 2D and 3D
+detection is typically limited to a single stage, such as query
+initialization or foreground filtering, which prevents itera-
+tive refinement of object semantics between the two tasks.
+Third, the use of heterogeneous architectures, e.g., CNN-
+based 2D detectors and Transformer-based 3D detectors,
+complicates model optimization and limits the potential
+benefits of joint training.
+To address these limitations, we proposeSimPB++, a
+unified query-based framework thatSimultaneously per-
+forms 2D detection inPerspective views and 3D detec-
+tion inBEV space using multiple cameras (Figure 1(c)).
+Our framework follows a DETR-style multi-view detection
+pipeline [8], [21], where multi-camera images are processed
+by a shared backbone and encoder to produce enriched
+image features. To jointly model 2D and 3D object repre-
+sentations, we design a hybrid decoder architecture that in-
+terleaves multi-view 2D decoding and 3D decoding within
+each decoder layer. Specifically, each hybrid decoder layer
+contains a 2D decoder module that refines perspective-view
+object queries and a 3D decoder module that updates BEV
+object queries. To bridge the representation gap between
+2D and 3D queries, we introduce aDynamic Query Allo-
+cationmodule that assigns 3D anchors to corresponding
+camera views based on geometric projections and forms
+grouped 2D queries for each image. These 2D queries cap-
+ture view-specific object observations and are subsequently
+fused by anAdaptive Query Aggregationmodule to produce
+updated 3D queries. Through this cyclic3D–2D–3Dinter-
+action, SimPB++ enables continuous information exchange
+between perspective-view detection and BEV detection, al-
+lowing both tasks to mutually enhance each other during
+decoding. Furthermore, we introduce a camera-aware query
+partitioning strategy that groups 2D queries according to
+camera indices. This design enables efficient query-group
+attention within each camera while preventing interference
+from irrelevant views.
+To enhance the detection of distant targets, we propose
+a Crop-and-Scale strategy that generates additional camera
+views by cropping and scaling the original images, allowing
+the model to capture more fine-grained details of small and
+distant targets with dynamic feature sampling. Specifically,
+the additional views create extra camera groups of 2D
+queries, improving the recall of 2D objects and aggregating
+multi-scale features from distant views in the 3D decoder
+layer. We demonstrate that, at a modest computational cost,
+the strategy leads to significant improvements thanks to the
+sparse query detection framework with a fixed number of
+object queries.
+Furthermore, to stabilize and accelerate convergence of
+the training process, we propose a unified denoising strat-
+egy called Propagating Denoising. This strategy constructs
+associated noise anchors in 2D and 3D from 3D ground
+truth, and corresponding noise queries are propagated be-
+tween the 2D and 3D layers, facilitating improved feature
+alignment and enhancing the overall accuracy of the detec-
+tion process. We also enhance the foreground object feature
+by introducing an auxiliary branch without extra inference
+overhead. This branch includes an RoI (Region of Interest)
+detector along with two depth estimators operating at in-
+stance and pixel levels. By incorporating these components,
+the model effectively focuses on the most relevant areas
+within an image while simultaneously deriving precise
+depth information.
+The proposed joint 2D-3D framework allows SimPB++
+to train with partially labeled data, enabling optimization
+using a combination of partially labeled (2D-only) and fully
+labeled (2D and 3D) annotations. Our results show that in-
+corporating partially labeled (2D-only) annotations further
+enhances 3D object detection performance, thereby reducing
+the extensive costs associated with complete 3D labeling.
+In the experiments, SimPB++ is evaluated on the nuScenes
+dataset [22] and Argoverse2 dataset [23]. It achieves out-
+standing results on both 2D and 3D object detection on the
+nuScenes dataset, and long-range 3D object detection on the
+Argoverse2 dataset.
+In summary, our major contributions are as follows:
+•We propose a novel unified query-based detector
+that detects simultaneously 2D objects in the per-
+spective view and 3D objects in the BEV space from
+multiple cameras.
+•We introduce a hybrid decoder for 2D and 3D object
+inference. A Dynamic Query Allocation module and
+an Adaptive Query Aggregation module are used
+to continuously update and refine the interaction
+between 2D and 3D results in a cyclic 3D-2D-3D
+scheme.
+•We design a Crop-and-Scale strategy to enhance
+distant target detections by leveraging a dynamic
+sampling and aggregation module, which provides
+more fine-grained details of the small and distant
+target.
+•We introduce a Propagating Denoising strategy that
+leverages paired 2D and 3D noise queries for stable
+and accelerated convergence. Additionally, an Aux-
+iliary Branch is utilized to enrich spatial and contex-
+tual information, which enhances overall detection
+
+SUBMITTED TO IEEE JOURNAL 3
+accuracy.
+•Our method supports partial-label training, effec-
+tively mitigating the prohibitive cost of 3D annota-
+tions for multi-view object detection.
+•Our method achieves promising performance in both
+multi-view 3D object detection in the BEV space and
+2D box detection in image space on the nuScenes and
+Argoverse2 dataset.
+A preliminary version of this work, named SimPB, has
+been presented in ECCV 2024 [1], which investigates the
+architecture of the hybrid 2D and 3D decoder layer in
+a single model by bridging 2D and 3D queries through
+a novel query allocation and aggregation mechanism. In
+this work, we investigate the potential application of this
+joint 2D-3D paradigm and further enhance performance
+through novel strategies and architectural designs. Com-
+pared with [1], we bring the following new contributions:
+(i)We present a new Crop-and-Scale strategy for long-range
+detection.(ii)We develop a Propagating Denoising strategy
+to stabilize and accelerate convergence.(iii)We enhance
+detection accuracy by integrating an auxiliary branch that
+focuses on foreground objects.(iv)We explore the partial-
+labeling training, which potentially reduces the cost of 3D
+annotations.(v)We conduct extensive experiments on the
+additional Argoverse2 benchmark, with a specific focus on
+long-range target detection tasks.
+2 RELATEDWORK
+2.1 2D Object Detection
+Modern solutions to 2D object detection can be roughly
+divided into CNN-based methods [2], [3], [4], [24], [25], [26]
+and Transformer-based approaches [17], [27], [28], [29], [30],
+[31], [32]. CNN-based methods can be further categorized
+into two-stage and one-stage pipelines. Two-stage CNN
+models [2], [24], [25] first create potential regional proposals
+and then refine them to an accurate bounding box. On the
+other hand, one-stage methods [3], [4], [26] directly compute
+object information and greatly reduce the inference latency.
+More recently, Transformer-based method DETR [17] formu-
+lates detection as a set prediction task and eliminates the
+need for complex post-processing steps, and is extended in
+many later works [28], [29], [30], [31], [32] for improvements.
+Despite the remarkable achievements in object detection
+using single-input images, the exploration of 2D object
+detection from multiple cameras remains relatively limited.
+In this paper, we focus on multi-view 2D object detection,
+where the association of 2D objects observed in different
+cameras is established by utilizing their corresponding 3D
+information in the BEV space.
+2.2 Multi-view 3D Object Detection
+Multi-view 3D object detection can be categorized into two
+main approaches: dense bird’s-eye view (BEV) methods [9],
+[10], [11], [12], [33], [34], [35], [36], [37], [38], [39], [40] and
+sparse query-based methods [13], [14], [15], [16], [18], [20],
+[21], [41], [42], [43], [44].
+Dense BEV methods typically construct an explicit BEV
+feature map from multiple cameras, followed by 3D object
+detection. One example is LSS [10], which builds interme-
+diate BEV features through interpolation from multi-view
+image features with a depth estimation step. The BEVDet
+series [33], [34] follows a similar approach to LSS, con-
+structing the BEV space and utilizing additional data aug-
+mentation techniques to enhance 3D detection performance.
+An alternative method to construct a BEV feature map is
+through the use of attention layers or MLP operators. For
+instance, BEVFormer [9], [35] generates the BEV map using
+learnable grid-shaped BEV queries and employs deformable
+attention operators. Some dense BEV-based approaches [11],
+[12], [36] also explore depth supervision for accurate depth
+estimation to boost object localization. Furthermore, several
+works [37], [38], [39] improve object detection performance
+by propagating long-term historical features and wrapping
+them to the current timestamp.
+Sparse query-based methods directly predict 3D objects
+from image features using learnable object queries. A line
+of research uses sampled points to establish interactions
+with multi-view images through camera parameters. For
+example, DETR3D [8] adapts DETR [17] by generating a
+single 3D reference point from an object query using camera
+parameters to gather image features. DETR4D [42] and the
+Sparse4D series [14], [21], [43] utilize additional reference
+points from 3D objects to effectively aggregate multi-view
+image features. SparseBEV [16] aggregates multi-scale fea-
+tures with adaptive self-attention, allowing for adaptive
+receptive fields. DynamicBEV [44] leverages K-means clus-
+tering and top-K Attention to aggregate local and distant
+features. Additionally, another approach focuses on learning
+flexible mappings between queries and image features via
+attention modules. PETR [13], [41] employs global attention
+by incorporating a 3D position encoding that contains ge-
+ometric information for the mapping. StreamPETR [15] ex-
+tends PETR [13] to a long-sequence 3D detection framework
+by a query propagation mechanism. DualViewDistill [45]
+combines a dense BEV with a sparse query framework to
+distill generative features from a foundation model.
+Unlike traditional multi-view detectors that are confined
+to 3D outputs, SimPB++ introduces a hybrid decoder that
+unifies 2D and 3D tasks. By leveraging anchor projection
+to facilitate 3D-to-2D association, the framework eliminates
+redundant object representations across views and achieves
+seamless synchronization between 2D perspective and 3D
+BEV predictions.
+2.3 2D Auxiliary for 3D Object Detection
+Numerous studies have explored the benefits of utilizing
+2D detectors as auxiliary information to improve 3D per-
+formance. Most approaches perform a detection task on the
+perspective view and transform the results for 3D query
+initialization. For instance, BEVFormer v2 [35] introduces
+perspective 3D output as an additional form of supervision.
+It combines perspective 3D proposals with learnable 3D
+queries in a two-stage manner to enhance the detection
+performance. MV2D [19] generates 2D detection results on
+the image view and then lifts these 2D boxes using an
+implicit sub-network to form 3D queries. Instead, Far3D [20]
+integrates depth estimation with 2D detection results to
+generate reliable 3D queries. It significantly enhances the
+
+SUBMITTED TO IEEE JOURNAL 4
+Cross-AttentionCross-Attention
+Self-AttentionSelf-Attention
+Temporal Cross-AttentionTemporal Cross-Attention
+Query-Group Cross-AttentionQuery-Group Cross-Attention
+Adaptive Query AggregationAdaptive Query Aggregation
+Dynamic Query AllocationDynamic Query Allocation
+Temporal Cross-AttentionTemporal Cross-Attention
+2D object queries
+Query-Group Self-AttentionQuery-Group Self-Attention
+Multi-view 2D Decoder Layer 3D Decoder Layer
+3D object queries3D object queries
+ Updated 3D object queries Updated 3D object queries
+2D Predictions
+Front Left Image Front Image
+BEV
+Object 1Object 1Object 1Object 1
+Object 2Object 2Object 2
+Object 4Object 4Object 4
+Object 3Object 3Object 3
+Hybrid decoder layer
+BackboneBackbone
+Encoder LayerEncoder Layer
+Multi-view Images
+Temporal 3D object queriesTemporal 3D object queries
+Object
+2D Head
+3D Predictions3D Head
+N
+encL
+3D-to-2D 
+Mapping Matrix
+Mapping Matrix
+Associated by 
+2D detector2D detector
+Auxiliary
+Predictions
+3D noise query
+2D noise query
+3D object query
+2D object query 2D detection result
+3D detection result
+Dense DepthNetDense DepthNet
+Instance DepthNetInstance DepthNet
+Auxiliary Branch
+Fig. 2: Overview of SimPB++, a unified multi-view 2D and 3D object detection framework. An image backbone and an
+encoder module extract multi-view features. A hybrid decoder module, comprising multi-view 2D decoder layers and
+3D decoder layers, is utilized to compute 2D and 3D detection results. An auxiliary branch is utilized to enhance feature
+representation in the training stage, while not used in inference.
+perception range and improves the detection performance
+of distant objects. Different from them, FocalPETR [18] per-
+forms 2D detection on the image view to generate salient
+foreground feature tokens, which are subsequently used for
+image feature aggregation along with 3D queries.
+Our SimPB++ differs from the above approaches in sev-
+eral key aspects. Firstly, while those methods integrate 2D
+detectors in a two-stage manner, SimPB++ is an end-to-end
+and one-stage approach that simultaneously produces both
+2D and 3D detection results. Secondly, in those approaches,
+the interaction between 2D and subsequent 3D detectors
+typically occurs only once in a 2D-3D manner. In contrast,
+SimPB++ adopts a cyclic 3D-2D-3D approach to interact
+with both 2D and 3D detectors. This cyclic interaction allows
+for continuous updates and refinement of the association
+between 2D and 3D results within the decoder.
+2.4 Long-range 3D Object Detection
+Long-range 3D object detection remains a critical but chal-
+lenging task in computer vision. Early monocular ap-
+proaches estimate distance via object dimensions like pixel
+height and width [46], [47], but their performance is highly
+sensitive to variations in object size and orientation. Sub-
+sequent methods attempt to directly regress distance [48],
+yet these are constrained by their dependence on large,
+fully-annotated datasets. To mitigate the scarcity of 3D
+annotations for distant objects, recent works adapt more
+sophisticated strategies. For instance, R4D [49] constructs a
+relational graph to infer distant targets using nearby objects
+as references, while LR3D [50] learns a mapping from 2D
+boxes and depth to 3D parameters from close-range objects
+and generalizes it to long-range detection. In the multi-view
+domain, methods often leverage 2D detectors and depth
+estimation. Far3D [20], for example, initializes 3D queries
+using features from regions of interest identified by a 2D
+detector and a depth network. Similarly, the approach in [51]
+employs dual detection networks for different ranges and
+augments LiDAR data with virtual points to enhance depth
+completion. SparseFusion [52] addresses the challenge by
+introducing sparsity from both semantic and geometric per-
+spectives, selectively lifting 2D image regions into the 3D
+space for efficient long-range inference.
+Different from existing approaches, our proposed
+method develops a simultaneous 2D and 3D detection
+framework. Moreover, it introduces a Crop-and-Scale strat-
+egy with dynamic feature sampling tailored for high-
+resolution distant views. This mechanism captures the fine-
+grained details necessary for distant targets, enabling our
+method to outperform detectors specifically designed for
+long-range sensing.
+3 METHOD
+3.1 Overview
+The overall architecture of our query-based SimPB++ is
+shown in Figure 2. Similar to the DETR-like framework [8],
+[17], [21], SimPB++ consists of a backbone, an auxiliary
+branch, an encoder module withL enc layers, and a hybrid
+decoder module withL hybrid layers. GivenVmulti-view im-
+ages{I i}V
+i=1, multi-scale features{F i}V
+i=1 are first extracted
+by a backbone (e.g. ResNet [53] or V2-99 [54]) and followed
+by an encoder module to enhance expression. These multi-
+scale features are then fed into the hybrid decoder module
+for computing 2D and 3D object results. Lastly, to fuse
+temporal information, we follow [15] to propagate top-K 3D
+queries as temporal queries frame by frame.
+
+SUBMITTED TO IEEE JOURNAL 5
+Box Center
+Object-existing 
+Views
+Object-not-existing 
+Views
+Valid association
+Camera groups
+3D object queries
+3D-to-2D MappingAnchor Projection
+Arrange
+2D object queries
+Query Association
+3D object queries
+Grouped 2D object queries
+Target Object
+3D Anchor
+Anchor Center
+Fig. 3: Dynamic Query Allocation. It establishes the query association between the BEV and the perspective view by
+applying 3D anchor projection with camera parameters.
+3.2 Hybrid Decoder Module
+Standard transformer-based 2D detection approaches [17],
+[27], [30] apply a 2D decoder layer to extract 2D boxes
+from the input image. Similarly, popular transformer-based
+multi-view 3D detection methods [8], [13], [15], [21] employ
+a 3D decoder module to compute 3D objects in the BEV
+space. Different from them, we propose a hybrid decoder
+module that simultaneously calculates the 2D objects of each
+input camera and 3D objects in the BEV space. Furthermore,
+in SimPB++, the interaction between 2D and 3D results
+is continuously updated and refined in a cyclic 3D-2D-3D
+manner, which significantly enhances the overall 2D and 3D
+detection performance across multiple cameras.
+Our proposed hybrid decoder module hasL 2d multi-
+view 2D decoder layers andL 3d 3D decoder layers, each
+designed to compute 2D boxes in the perspective view
+and 3D object results in the BEV space, respectively. The
+hybrid decoder module takes a set ofN3D object queries,
+denoted asQ 3d ∈R N×C , along with their corresponding
+anchorsA 3d ={(x, y, z, w, l, h, θ, v x, vy)}. Within the multi-
+view 2D decoder layer, 3D object queriesQ 3d are passed
+through a Dynamic Query Allocation block, which allocates
+them to different camera groups to build 2D object queries
+Q2d ∈R M×C . Also, Query-group Self and Cross Attention
+are utilized to strengthen the interaction among 2D queries
+within each camera group and compute 2D results for each
+input camera. After obtaining 2D object detection results in
+the perspective view, these 2D queries are then processed
+by an Adaptive Query Aggregation block to reconstruct the
+3D queries for the subsequent 3D decoder layers. The 3D
+decoder layer utilizes approaches in [13], [15], [44] with self-
+attention and cross-attention operations and a 3D head to
+extract 3D objects. Additionally, we incorporate a temporal
+cross-attention before both 2D and 3D layers to utilize the
+historical information by interacting with temporal queries.
+3.3 Dynamic Query Allocation
+In the multi-view 2D decoder layer, a Dynamic Query
+Allocation block is designed to allocate 3D object queries
+to different camera groups and construct 2D object queries
+for multi-view 2D detection, as shown in Figure 3. A simple
+way is to uniformly distributeN3D queries toVcameras
+and generate 2D queries. Instead, we utilize camera param-
+eters to allocate a 3D query to its corresponding cameras
+and build related 2D queries.
+By interpreting 3D queries as 3D anchors, we can gen-
+erate a set ofMvalid 2D queries forVinput images. To
+establish the association between the 3D and 2D queries,
+we construct a 3D-to-2D mapping matrixT∈R N×M
+based on the camera parameters. In the mapping matrix
+T, its elementT(i, j) = 1indicates that thei-th 3D query
+is associated with thej-th 2D query. This matrix enables
+dynamic allocation and collection of 2D object queries:
+Q2d =T ⊤ ·Q 3d.(1)
+To determine the validity of a 3D queryq n, we begin
+by projecting itsKobject points (e.g. center point and eight
+corner points of a 3D box) toVimage planes by camera
+intrinsicI∈R 3×3 and extrinsic parametersK∈R 4×4. We
+obtain a set of pointsP v ={p v
+1, pv
+2, . . . , pv
+K |p v
+k = (uv
+k, vv
+k)}
+onv-th image view, wherep v
+k is the projection of thek-th
+point. To determine if the 3D queryq n is valid in thev-th
+image, we define a functionf(q n, v)as:
+f(q n, v) =
+(
+1if∃p v
+k : 0< u v
+k < W,0< v v
+k < H
+0otherwise, (2)
+whereHandWare the spatial resolution of an image.
+ConsideringN3D queries, each camera may have up
+toN2D query candidates. We initialize a diagonal ma-
+trixT v
+C ∈R N×N for thev-th camera, with the diagonal
+values set to 1. We retain only the valid 2D queries and
+eliminate thej-th column iff(q j, v) = 0. We construct the
+mappingT v ∈R N×M v between the 3D queries and theM v
+valid 2D queries for thev-th camera, derived fromT v
+C. By
+concatenating{T v}V
+v=1 along the column index, we obtain
+the mapping matrixTbetween theN3D queries and the
+MPV
+v=1 Mv valid 2D queries.
+In our implementation,Nis predefined for a fixed
+number 3D object queries, whileMis dynamically allocated
+depending on camera parameters and anchor projection.
+
+SUBMITTED TO IEEE JOURNAL 6
+Query-Group Cross-Attention
+Query-Group Self-AttentionQuery-Group Self-Attention
+DA1
+Camera group mask
+DA2DA2 DA3DA3 DA4
+Multi-view 
+image features 2D object queries
+Shared 2D HeadShared 2D Head
+2D preditoins
+Updated 2D object queries
+1M
+2M
+3M
+4M
+2D GT
+DA2
+DA3
+DA4
+Group matching
+Group matching
+Group matching
+Group matching
+ 4F
+ 3F
+ 2F
+ 1F
+Fig. 4: Query-Group Attention. We enforce interaction among 2D queries only within the same camera group. DA represents
+deformable attention.
+Query Fusion Module
+MLPMLP
+3D Head3D Head
+3D bboxes
+Aggregated 3D object queries
+Center indicator
+3D object queries
+2D object queries
+Self-AttentionSelf-Attention
+Projected CenterProjected Center Objcet CenterObjcet Center ConcatenateConcatenate MultiplyMultiply AddAdd
+Fig. 5: Adaptive Query Aggregation. The indicator vector represents whether a 2D query is truncated or not.
+3.4 Query Group Attention
+As described above, after dynamic query allocation, we
+haveM v 2D queries for each camerav, resulting in a total
+ofMvalid 2D queries. To strengthen interactions within
+camera groups, we introduce query-group self-attention and
+query-group cross-attention.
+Specifically, we first create a camera group maskM cg ∈
+RM×M filled with zeros. The value in the mask is then
+set to 1 if the queries originate from the same camera (as
+in Figure 4). Additionally, we introduce an attention mask
+M ∈R M×M as:
+M(i, j) =
+ 0ifM cg(i, j) = 1
+−∞otherwise .(3)
+This attention mask ensures that queries within the same
+camera group can attend to each other while preventing
+queries from different camera groups from attending to one
+another.
+The query-group self-attention modifies the standard
+self-attention mechanism for the 2D query featureX∈
+RM×C by incorporating an attention maskM:
+X=softmax
+
+M+ QKT
+√
+C
+
+V,(4)
+whereQ,KandV∈R M×C represent the 2D queriesQ 2d
+after linear transformationsW Q,W K, andW V , respectively.
+Next, query-group cross-attention is employed to facil-
+itate effective information exchange, yielding precise 2D
+results for each independent input camera.
+In our multi-view 2D decoder, we use the projected
+object center as the reference point for a 2D box. In the
+case of object truncation, we rely on the center of the
+bounding rectangle of the projected anchor. Then, we utilize
+a shared 2D head across cameras to make predictions for
+the 2D bounding box and class. Finally, these predictions
+are matched with the groundtruth in each groups through
+standard Hungarian matching algorithm as in DETR [17].
+3.5 Adaptive Query Aggregation
+After multi-view 2D detection, the 2D object queries are
+utilized to construct 3D queries for subsequent 3D object
+detection. As shown in Figure 5, we propose an Adaptive
+Query Aggregation block to achieve the transformation by
+using the 3D-to-2D mapping matrixT.
+To begin, we extend the 2D queries by incorporating
+information regarding the truncation status1 center ∈ {0,1}
+of a 2D object center:
+˜Q2d =Q 2d ·MLP(Concat(Q 2d,1 center)),(5)
+where1 center = 0for a truncated 2D box where the box
+and anchor centers do not lie in the same image plane due
+to partial object visibility, as illustrated by the green box
+in Figure 3. Otherwise, we set1 center = 1. Consequently,
+it is essential to differentiate these truncated queries from
+non-truncated ones by incorporating distinct weight assign-
+ments.
+
+SUBMITTED TO IEEE JOURNAL 7
+Next, to aggregate ˜Q2d ∈R M×C into 3D queries, we
+replace the simple cross-attention with an integration of the
+3D-to-2D mapping information:
+Qfused
+2d = T· ˜Q2d
+PM
+j=0 Tj
+.(6)
+In this way, the 2D queries, which have been distributed
+from a shared 3D query during the Dynamic Query Al-
+location step, are aggregated back together. Finally, we
+merge these aggregated queries with the original 3D queries
+using a residual connection and a self-attention operation:
+Qagg
+3d =Self-Attn(Q 3d +Q fused
+2d ). Additionally, we employ
+auxiliary 3D supervision to provide guidance for the aggre-
+gated 3D object queries.
+3.6 Crop-and-Scale Strategy
+Detecting distant targets is challenging because these objects
+appear small in the image view, particularly when using
+a downsampled low-resolution input for efficient model
+inference. This results in insufficient and indistinct features
+for small targets, often leading the model to sample adjacent
+background features. Consequently, a detection algorithm
+may struggle not only to distinguish long-range objects but
+also to accurately determine their positions and estimate
+their attributes.
+To address this, we introduce a Crop-and-Scale strategy
+within our framework to generate new distant views that
+preserve fine-grained details, as illustrated in Figure 6.
+Our observation is that distant targets tend to appear in
+consistent, view-specific regions. For example, in the front
+view, distant content is typically centered, whereas in the
+front-right view, it is often concentrated toward the left.
+Leveraging this regularity, we zoom into these regions to
+create additional long-range perspectives that capture most
+distant targets and augment them with richer detail. Thanks
+to our dynamic sampling mechanism, long-range targets
+can sample and aggregate more detailed information from
+this newly created view, while near-range targets maintain
+the same features since their anchors are not projected onto
+this long-range view.
+Instead of transforming model inputsI∈R H×W×3 ,
+we apply cropping and scaling to the original images
+Io ∈R Ho×Wo×3 to prevent aliasing. Since model inputs
+are typically downsampled for computational efficiency, ap-
+plying spatial transformations at such reduced resolutions
+would degrade image quality due to interpolation artifacts.
+Specifically, given a defined crop region, we first extract
+the corresponding patchI c ∈R Hc×Wc×3 from the origi-
+nal high-resolution image. This cropped segment is then
+rescaled to the model’s input dimensions to produce the
+final long-range viewI cs ∈R H×W×3 . The crop regions are
+strategically set based on the localized clusters of distant
+objects within each specific viewpoint. For instance, in the
+front and rear views, the crop is centered on the focal region;
+in the front-right view, the left edge of the crop is aligned
+with the scaled view’s left boundary, while ensuring that
+the horizon aligns with the vertical coordinate of the focal
+point. The resulting imageI cs ∈R H×W×3 is then used as
+an additional distant camera view alongside the multi-view
+image inputs.
+Near target
+Far target
+Feature Sampling
+Far view
+Near view
+Fig. 6: The Crop-and-Scale strategy generates a high-
+resolution distant view and employs a dynamic sampling
+mechanism to provide enhanced features for long-range
+object detection.
+3.7 Propagating Denoising
+Denoising [55] is an effective technique originally developed
+for transformer-based methods such as DETR [17] to accel-
+erate model convergence. It has since been widely adopted
+in transformer-based object detection for both 2D [30], [31],
+[55] and 3D tasks [15], [56]. While numerous existing studies
+have applied this technique to either 2D or 3D detection, to
+the best of our knowledge, no prior work has explored a
+unified denoising formulation that operates jointly across
+both. To improve the 2D-3D interaction, we introduce
+a propagating denoising mechanism that enables mutual
+transformation of noisy queries between 2D and 3D spaces.
+This design promotes joint convergence and strengthens the
+association between 2D and 3D predictions.
+Concretely, we first initialize 3D noisy queriesQ noise
+3d
+and construct noisy 3D anchorsA noise
+3d by adding noise to
+the ground-truth annotations. Unlike conventional detection
+methods that directly construct 2D noisy anchors from 2D
+ground truth, we instead generate noisy 2D queries and
+anchors via the proposed query allocation strategy. Specif-
+ically, we associate the 3D noisy queries and anchors with
+multiple camera views, yielding grouped 2D noisy queries
+Qnoise
+2d and corresponding grouped 2D noisy anchors. Impor-
+tantly, this 3D-to-2D mapping is not performed by project-
+ing the noisy 3D anchors; instead, we rely on ground-truth
+associations to ensure precise alignment. We then reorganize
+the permutation of grouped 2D queries along with their
+associated noise queries and attention masks to facilitate
+grouped self-attention and cross-attention, as illustrated in
+Figure 7. Finally, the updated grouped 2D noisy queries are
+aggregated to restore 3D queries for subsequent processing.
+3.8 Auxiliary Branch
+The original SimPB framework in our preliminary study
+employs a hybrid decoder for joint 2D and 3D detection.
+However, we observe that 2D information is not fully
+exploited during feature extraction. To address this limi-
+tation, we introduce an Auxiliary Branch to enhance fea-
+ture representation, as illustrated in Figure 2. This module
+comprises three components: a 2D Region of Interest (RoI)
+detector, an instance DepthNet, and a dense DepthNet. The
+2D RoI detector identifies foreground objects, while the
+instance DepthNet estimates their corresponding depths.
+
+SUBMITTED TO IEEE JOURNAL 8
+Rearrange 
+Dynamic Query 
+Allocation
+Adaptive Query 
+Aggregation
+Self-Attention
+DA1 DA2 DA3 DA4Query-Group
+ Cross-Attention
+Query-Group
+Self-Attention
+Fig. 7: The Propagating Denoising in multi-view 2D decoder
+layers. DA represents Deformable Attention; we omit the
+temporal cross attention for clarity.
+Both predictions are supervised using the same 2D ground
+truth as the multi-view 2D decoder layers. Additionally, a
+lightweight dense DepthNet predicts a dense depth map,
+supervised by projected LiDAR point clouds. Unlike prior
+works [19], [20] that use detected foreground objects and
+estimated depths to initialize coarse queries, we employ
+the auxiliary branch solely for supervision during training.
+It is discarded at inference time, thereby introducing no
+additional computational overhead.
+3.9 Loss Functions
+The training loss consists of both the multi-view 3D object
+detection loss and the 2D object detection loss, along with
+an auxiliary loss:
+Loverall =L 3d +L 2d +L aux.(7)
+We employ the same 3D detection lossL 3d as described
+in [12], [20], [21]. For the 2D detection loss, we adopt
+Ldetr2d from DETR [17], [27] and incorporate the observation
+angle [57] loss of a 3D box in the image view.
+L2d =L detr2d +λ 1Lalpha.(8)
+As typically done, we encodealpha-angle withsinandcos
+functions:
+Lalpha = 1
+M
+MX
+i=1
+|sin (θi)− csinθi |+|cos (θ i)− ccosθi |.(9)
+where csinθi and ccosθi represent the estimated sine and
+cosine components of the observation angleθ i of an object.
+The auxiliary loss comprises three components, as follows:
+Laux =L roi2d +L ins-depth +λ 2Ldense-depth.(10)
+It integrates RoI loss (including classification and regression
+loss) for foreground detection [20], focal loss for multi-bin
+instance depth prediction, and L1 loss for dense map depth
+estimation. The balancing weights for the loss termsλ 1, λ2
+are empirically set as0.5and0.2, respectively.
+4 EXPERIMENTS
+4.1 Dataset and Metrics
+We evaluate our method using the nuScenes [22] and Argo-
+verse2 [23] benchmarks.
+The nuScenes [22] dataset is a multi-modal video dataset
+consisting of 1000 videos, which are split into training,
+validation, and testing sets, with 700, 150, and 150 videos,
+respectively. Each video is about 20s long, captured by 6
+cameras and annotated with Lidar data at a frequency of
+2Hz. The dataset contains a total of 1.4M annotated 3D
+bounding boxes for 10 classes. The ground truth of 2D
+bounding box is generated from 3D labels following meth-
+ods in [15], [18], [19]. For 3D object detection, we employ
+the official evaluation metrics of nuScenes, including mAP ,
+mATE, mASE, mAOE, mAVE, mAAE, and NDS. Addi-
+tionally, we evaluate the multi-view 2D object detection
+using box detection metrics following the standard COCO
+protocol [58] on the nuScenes validation set.
+The Argoverse2 [23] dataset is particularly used to eval-
+uate performance on detecting distant objects. It consists of
+1000 scenes with data collected at a frequency of 10 Hz.
+It features 26 labeled categories. The dataset is officially
+partitioned into a training set of 700 scenes, a validation set
+of 150 scenes, and a testing set of 150 scenes. For evaluation,
+the Argoverse 2 metrics are recommended, which include
+mAP , CDS, ATE, ASE, and AOE metrics.
+4.2 Implementation Details
+Following previous works [20], [21], we use ResNet50 [53],
+ResNet101 [53], and V2-99 [54] as backbones. To effectively
+leverage multi-view image features in large-scale scenar-
+ios, when using ResNet101 with an input resolution of
+1408×512, we employ a single deformable transformer
+encoder layer and initialize 1200 queries. For all other con-
+figurations, we omit the encoder layer and use 900 queries
+to maintain efficiency while ensuring fair comparisons. In
+the hybrid decoder, we setL 2d = 1andL 3d = 1in each
+hybrid layerL hybrid to include one multi-view 2D decoder
+layer and one 3D decoder layer. The hybrid decoder consists
+of 3 hybrid layers with a total of 6 sub-layers. The scale-
+and-crop strategy is applied to the front and rear views.
+Consequently, 2 additional views are generated as inputs
+for nuScenes, while 3 additional views are generated for
+Argoverse2 because the rear view in Argoverse2 contains
+rear-left and rear-right views. The experiments are trained
+on 8 NVIDIA A800 GPUs and tested on an NVIDIA 4090
+GPU. We do not employ Test Time Augmentation (TTA),
+CBGS [59], or future frames during training. The models are
+trained for 100 epochs on nuScenes [22] and 10 epochs on
+Argoverse2 [23], using the AdamW optimizer with a weight
+decay of 0.001. Other detailed training parameters under
+different settings are listed in Table 1.
+4.3 Main Results
+nuScenes dataset.We first evaluate the 3D and 2D per-
+formance of SimPB++ on the nuScenes validation set. As
+shown in the Table 2, SimPB++ achieves the best results
+in 3D object detection. In particular, compared with recent
+state-of-the-art methods, SimPB brings a clear performance
+
+SUBMITTED TO IEEE JOURNAL 9
+TABLE 1: The implement details on nuScenes and Argoverse2 dataset.
+Dataset Backbone Resoluation Epoch Ablation Epoch Batch size Learning rate weight decay
+nuScenes [22] ResNet50704×256 100 24 6 4e-4 1e-3
+ResNet1011408×512 100 - 2 2e-4 1e-3
+Argoverse2 [23] V2-99960×640 10 3 2 2e-4 1e-3
+TABLE 2: Comparison results of 3D detection on nuScenes validation dataset. * The backbone benefits from perspective
+pertaining.
+Method Backbone Resolution mAP↑NDS↑ mATE↓mASE↓mAOE↓mAVE↓mAAE↓
+SparseBEV* [16] ResNet50 704×256 0.448 0.558 0.595 0.275 0.385 0.2530.187
+StreamPETR* [15] ResNet50 704×256 0.450 0.550 0.613 0.267 0.413 0.265 0.196
+BEVNext* [12] ResNet50 704×256 0.456 0.560 0.530 0.264 0.424 0.252 0.206
+DynamicBEV* [44] ResNet50 704×256 0.464 0.570 0.581 0.271 0.373 0.247 0.190
+RayDN* [56] ResNet50 704×256 0.469 0.563 0.579 0.264 0.433 0.256 0.187
+Sparse4Dv3 [21] ResNet50 704×256 0.469 0.561 0.553 0.274 0.476 0.227 0.200
+CorrBEV* [60] ResNet50 704×256 0.475 0.574 0.598 0.253 0.335 0.246 0.200
+GeoBEV* [40] ResNet50 704×256 0.479 0.575 0.4960.261 0.438 0.236 0.216
+SimPB* ResNet50 704×256 0.487 0.590 0.536 0.261 0.346 0.208 0.187
+SimPB++* ResNet50 704×256 0.505 0.603 0.535 0.258 0.305 0.197 0.193
+SOLOFusion [37] ResNet101 1408×512 0.483 0.582 0.503 0.264 0.381 0.246 0.207
+BEVNext* [12] ResNet101 1408×512 0.500 0.597 0.487 0.260 0.343 0.245 0.197
+SparseBEV* [16] ResNet101 1408×512 0.501 0.592 0.562 0.265 0.321 0.243 0.195
+StreamPETR* [15] ResNet101 1408×512 0.504 0.592 0.569 0.262 0.315 0.257 0.199
+Far3D* [20] ResNet101 1408×512 0.510 0.594 0.551 0.258 0.372 0.238 0.195
+DynamicBEV* [16] ResNet101 1408×512 0.512 0.605 0.575 0.270 0.353 0.236 0.198
+CorrBEV* [60] ResNet101 1408×512 0.517 0.606 0.5540.2470.298 0.2410.189
+RayDN* [56] ResNet101 1408×512 0.518 0.604 0.541 0.260 0.315 0.236 0.200
+GeoBEV* [40] ResNet101 1408×512 0.526 0.615 0.458 0.254 0.318 0.238 0.207
+Sparse4Dv3* [21] ResNet101 1408×512 0.537 0.623 0.511 0.255 0.306 0.194 0.192
+SimPB* ResNet101 1408×512 0.539 0.629 0.475 0.260 0.280 0.192 0.197
+SimPB++* ResNet101 1408×512 0.549 0.639 0.490 0.258 0.233 0.187 0.189
+TABLE 3: Comparison results of 2D detection on nuScenes val dataset. * The backbone benefits from perspective pretraining.
+Method Backbone Resolution AP AP 50 AP75 APS APM APL
+StreamPETR* [15] ResNet50 704×256 0.205 0.404 0.184 0.014 0.129 0.319
+MV2D* [19] ResNet50 704×256 0.226 0.456 0.1980.054 0.1960.297
+DeformableDETR [27] ResNet50 704×256 0.230 0.465 0.201 0.028 0.156 0.339
+SimPB* ResNet50 704×256 0.256 0.495 0.237 0.044 0.177 0.361
+SimPB++* ResNet50 704×256 0.266 0.510 0.247 0.045 0.185 0.371
+StreamPETR* [15] ResNet101 1408×512 0.249 0.465 0.240 0.042 0.191 0.344
+MV2D* [19] ResNet101 1408×512 0.271 0.523 0.250 0.047 0.204 0.367
+DeformableDETR [27] ResNet101 1408×512 0.250 0.502 0.222 0.034 0.175 0.357
+SimPB* ResNet101 1408×512 0.288 0.541 0.276 0.065 0.219 0.388
+SimPB++* ResNet101 1408×512 0.295 0.550 0.286 0.048 0.210 0.402
+advantage, while SimPB++ further improves over SimPB by
+1.8% mAP and 1.3% NDS with the configuration of an input
+resolution of 704×256 and a ResNet50 backbone. Under
+a larger-scale configuration with a resolution of 1408×512
+and ResNet101 backbone, it still achieves gains of 1.0%
+mAP and 1.0% NDS. It is worth noting that there is a
+significant improvement in mAOE, which can be attributed
+to the newly introduced Propagating Denoising module
+withalpha-angle loss that enables more precise estimation
+of object orientations.
+We also evaluate the 2D detection performance of
+SimPB++ on the nuScenes validation set, as shown in the
+Table 3. Compared with the previous version, SimPB++
+achieves improvements of 1.0% and 0.7% AP under the
+two configurations, respectively. These gains can be mainly
+attributed to the proposed Propagating Denoising and Aux-
+iliary Branch, which facilitate coarse obstacle detection and
+enhance feature representation. Additionally, the Crop-and-
+Scale strategy improves the recall of distant objects.
+Argoverse2 dataset.Following [20], [56], we further eval-
+uate the performance of the SimPB++ series on the Ar-
+goverse2 validation set. As shown in Table 4, SimPB++
+achieves competitive results compared to recent state-of-
+the-art methods, demonstrating the potential of the unified
+
+SUBMITTED TO IEEE JOURNAL 10
+TABLE 4: Comparisons on the Argoverse 2 validation dataset with a range of 150 meters.
+Method Backbone Resolution mAP↑CDS↑ mATE↓mASE↓mAOE↓
+BEVStereo [36] V2-99 960×640 0.146 0.104 0.847 0.397 0.901
+SOLOFusion [37] V2-99 960×640 0.149 0.106 0.934 0.425 0.779
+PETR [13] V2-99 960×640 0.176 0.122 0.911 0.339 0.819
+Sparse4Dv2 [43] V2-99 960×640 0.189 0.134 0.832 0.343 0.723
+StreamPETR [15] V2-99 960×640 0.203 0.146 0.843 0.321 0.650
+RayDN [56] V2-99 960×640 0.223 0.161 0.825 0.325 0.629
+Far3D [20] V2-99 960×640 0.244 0.181 0.7960.3040.538
+SimPB [1] V2-99 960×640 0.246 0.186 0.772 0.322 0.525
+SimPB++ V2-99 960×640 0.286 0.217 0.732 0.310 0.499
+TABLE 5: The ablation studies of different combination of multi-view 2D layer and 3D layer in hybrid decoder layer.
+Index 2D layers 3D layers Hybrid layers mAP↑NDS↑ mATE↓mASE↓mAOE↓mAVE↓mAAE↓
+A 0 1 6 0.397 0.504 0.607 0.270 0.5940.2700.196
+B 1 0 6 0.397 0.503 0.635 0.279 0.540 0.297 0.204
+C 2 1 2 0.417 0.508 0.605 0.274 0.543 0.363 0.212
+D 1 2 2 0.419 0.517 0.5990.2690.555 0.300 0.206
+E 3 3 1 0.419 0.523 0.595 0.270 0.526 0.2770.192
+F 1 1 3 0.421 0.527 0.590 0.274 0.492 0.287 0.195
+architecture for detecting distant objects in challenging long-
+range scenarios. Benefiting from the proposed Crop-and-
+Scale module, SimPB++ attains significant gains of 4% mAP
+and 3.1% CDS, highlighting its enhanced capability in long-
+range object detection tasks. A detailed analysis of distant
+target detection is presented in Section 4.4.
+4.4 Ablation Study
+In the ablation experiments, following [16], [40], [56], we
+train 24 epochs on the validation split of nuScenes using a
+ResNet50 backbone with a resolution704×256. To explore
+long-range detection, we also conducted ablation experi-
+ments on the Argoverse2 validation dataset, with a 3-epoch
+training phase using a V2-99 backbone and a resolution of
+960×640resolution. Other training parameters are kept
+consistent unless otherwise specified.
+Choice of Hybrid Decoder.The hybrid decoder in our
+proposed approach is designed with a total number of layers
+given byL total = (L 2d +L 3d)×L hybrid. To ensure a fair
+comparison among different numbers of layers within the
+hybrid decoder, we limit the total number of layers to 6
+by settingL total = 6. The results of our ablation study are
+summarized in Table 5.
+In experimentA, whenL 2d = 0, the hybrid decoder
+becomes a standard 3D decoder module. In experimentB,
+whenL 3d = 0, we have only 2D decoder layers with 3D ob-
+ject deep supervision after the Adaptive Query Aggregation
+block. It shows that, even in these degraded settings, our
+proposed decoder approach still achieves decent 3D object
+detection results. Interestingly, the model in experimentB,
+which exclusively utilizes multi-view 2D decoder layers
+with 3D auxiliary supervision, demonstrates comparable
+performance to experimentA. This observation emphasizes
+the effectiveness of our Dynamic Query Allocation and
+Adaptive Query Aggregation blocks in the proposed multi-
+view 2D decoder. By incorporating both 2D decoder and
+3D decoder layers (experimentsC,D,E, andF), we achieve
+TABLE 6: Ablation studies on query allocation mechanism.
+Allocation Strategy mAP↑NDS↑
+Uniform 0.365 0.474
+Object Center 0.410 0.515
+Object Center + Front-Rear Point0.414 0.520
+Object Center + Anchor Corner 0.421 0.527
+improved performance compared to the degraded settings.
+In experimentE, we also simulate the two-stage scheme of a
+cascade 2D detector and 3D detector by settingL 2d = 3
+andL 3d = 3. In the two-stage method, the 2D detector
+is usually applied to provide initialization of 3D queries.
+This approach yields superior results compared to model
+A, which lacks additional 3D query initialization. Therefore,
+the utilization of the multi-view 2D decoder aids in provid-
+ing more accurate 3D query initialization for the subsequent
+3D decoder in the hybrid decoder. Lastly, modelF, which is
+used in SimPB, employs a cyclic interaction between multi-
+view 2D and 3D layers and provides the best performance
+in terms of both mAP and NDS. In summary, our hybrid
+decoder successfully exchanges information learned during
+both 2D and 3D object detection tasks, leading to improved
+performance of multi-view 3D detection.
+Effect of Dynamic Query Allocation Strategy.In Table 6,
+we compare different ways for query allocation. A simple
+way is to uniformly distribute 3D queries to different cam-
+eras without camera information and generate 2D queries.
+It employs a fixed number of queries for both 2D and
+3D objects, without considering the varying number of
+targets in different cameras. As a result, it overlooks the
+potential benefits of utilizing 2D objects in the image view.
+We propose three different ways to dynamically allocate
+3D anchors to their corresponding cameras using camera
+parameters. This includes projecting a single object center,
+an object center with front and rear face centers, and an
+
+SUBMITTED TO IEEE JOURNAL 11
+TABLE 7: Ablation studies on query aggregation mecha-
+nism.
+Aggregation Strategy mAP↑NDS↑
+Cross-Attention 0.365 0.474
+Cross-Attention + Supervision 0.399 0.495
+Query Fusion 0.389 0.489
+Query Fusion + Supervision 0.421 0.527
+TABLE 8: Ablation studies on the effectiveness of the
+enhancement strategies including Crop-and-Scale (CAS),
+Propagating Denosing (PDN), and Auxiliary Branch (AUX).
+CAS PDN AUX nuScenes Argoverse2
+mAP↑NDS↑ mAP↑CDS↑
+0.421 0.527 0.202 0.149
+✓ 0.432 0.533 0.217 0.162
+✓ ✓ 0.446 0.546 0.224 0.165
+✓ ✓ ✓ 0.460 0.555 0.233 0.172
+object center with eight corner points. These dynamic query
+allocation methods yield superior results compared to the
+uniform method. In multi-view object detection, objects can
+appear across different cameras. Therefore, projecting only
+the single object center to one camera may lead to inaccurate
+localization of truncated objects in other cameras. To address
+this limitation, we propose projecting additional points such
+as the front and rear face centers of an object, as well as
+the eight corner points of a 3D box. These approaches yield
+improved results compared to using only a single object
+center. In summary, by utilizing the object center and eight
+corners of a 3D box, our method achieves the best results.
+Effect of Adaptive Query Aggregation Strategy.In Table 7,
+we explore different methods to fuse 2D queries ˜Q2d and
+3D queriesQ 3d. We compare our proposed query fusion
+approach with a simple cross-attention fusion method. Ad-
+ditionally, we investigate the impact of applying deep su-
+pervision to the fused 3D queriesQ agg
+3d by using 3D ground
+truth. The results show that our query fusion approach
+outperforms the simple cross-attention fusion method. This
+finding validates the effectiveness of our Adaptive Query
+Aggregation block in successfully fusing 2D queries to
+construct 3D queries for the subsequent layer. Furthermore,
+incorporating 3D deep supervision for the aggregated 3D
+queries in the multi-view 2D decoder enhances the detection
+performance for both methods.
+Ablation on Enhancement Strategies.To verify the effec-
+tiveness of enhancement strategies, including Scale-and-
+Crop (SAC), Propagating Denosing (PDN), and Auxil-
+iary Branch (AUX), we conduct ablation experiments on
+nuScenes and Argoverse2. As shown in Table 8, we sequen-
+tially add modules to extend the baseline model SimPB into
+SimPB++ from top to bottom. It can be observed that adding
+each strategy provides a positive return compared to the
+previous variation. Employing the Scale-and-Crop strategy
+yields improvements of 0.15% in mAP and 0.13% in CDS on
+Argoverse2, as it is compatible with the evaluation of long-
+range objects. Meanwhile, utilizing the propagating denois-
+ing strategy enhances mAP by 0.14% and NDS by 0.13%
+on the nuScenes dataset, facilitating faster convergence.
+TABLE 9: Ablation studies on the additional views of Scale-
+and-Crop Strategy.
+Additional Views nuScenes Argoverse2
+mAP↑NDS↑FPS↑ mAP↑CDS↑FPS↑
+- 0.448 0.545 17.0 0.216 0.160 6.2
+Front & Fear 0.460 0.555 15.6 0.233 0.172 4.9
+All Surroundings0.473 0.567 14.4 0.249 0.184 4.0
+TABLE 10: Ablation studies on the scale rate of Scale-and-
+Crop Strategy.
+Scale Rate nuScenes Argoverse2
+mAP↑NDS↑ mAP↑CDS↑
+1.5 0.455 0.553 0.232 0.172
+2.0 0.460 0.555 0.233 0.172
+2.5 0.458 0.555 0.231 0.171
+TABLE 11: Ablation studies on the Propagating Denoising.
+3D-denosing 2D-denosing nuScenes Argoverse2
+mAP↑NDS↑ mAP↑CDS↑
+0.434 0.537 0.224 0.163
+✓ 0.452 0.548 0.230 0.168
+✓ ✓ 0.460 0.555 0.233 0.172
+Additionally, the auxiliary branch strengthens foreground
+features with depth estimation before the decoder, achieving
+a new record. There is a notable improvement in integrating
+three strategies compared with the baseline model. Only 24
+epoch training with about 5 hours can achieve comparable
+score with previous state-of-art works on nuScenes dataset.
+Effect of Crop-and-Scale strategy.We conduct two ablation
+studies to evaluate the proposed Crop-and-Scale strategy:
+one examining the impact of incorporating additional views,
+and another analyzing the effect of different scale rates.
+Table 9 compares the strategy with different combinations
+of additional perspective views. Compared to the baseline,
+enabling the Crop-and-Scale strategy with additional front
+and rear views improves performance by supplying fine-
+grained information. Extending the approach to include
+all surrounding views yields further gains. However, we
+adopt the front-rear configuration as the default for two
+reasons: first, front and rear views contain more task-
+relevant information than side views, which predominantly
+capture street scenes and buildings; second, incorporating
+all surrounding views increases training time and reduces
+inference efficiency. A detailed analysis of training with all
+surrounding views is provided in the Appendix.
+Table 10 presents the results of the Crop-and-Scale strat-
+egy with different scale rates (1.5, 2.0, and 2.5). The com-
+parable performance across these settings demonstrates the
+model’s strong generalization ability. We select a scale rate of
+2.0 as the default, as it achieves the best overall performance.
+Effect of Propagating Denoising.The Propagating Denois-
+ing module integrates joint denoising of 3D and 2D tasks,
+where 2D denoising is an extension built upon the 3D de-
+noising foundation. To disentangle the contribution of each
+component, we conduct ablation experiments by enabling
+the 3D and 2D denoising modules separately within the
+Propagating Denoising framework.
+
+SUBMITTED TO IEEE JOURNAL 12
+0.4 0.6 0.8 1.0
+full-labeled ratio
+0.35
+0.4
+0.45mAP
+w/ PLT
+wo/ PLT
+0.4 0.6 0.8 1.0
+full-labeled ratio
+0.45
+0.5
+0.55NDS
+w/ PLT
+wo/ PLT
+0.4 0.6 0.8 1.0
+full-labeled ratio
+0.35
+0.4
+0.45
+0.5
+mAP
+w/ PLT
+wo/ PLT
+0.4 0.6 0.8 1.0
+full-labeled ratio
+0.45
+0.5
+0.55
+0.6
+CDS
+w/ PLT
+wo/ PLT
+nuScenes Argoverse2
+Fig. 8: Performance analysis of Partial Labeling Training (PLT) with additional 2D-only labeled data for training.
+TABLE 12: Ablation studies on the Auxiliary Branch.
+Map DepthNet RoI Detector Ins. DepthNetnuScenes Argoverse2mAP↑NDS↑ mAP↑CDS↑
+0.446 0.546 0.209 0.155✓ 0.451 0.548 0.217 0.159✓ ✓ 0.453 0.550 0.227 0.168✓ ✓ ✓ 0.460 0.555 0.233 0.172
+TABLE 13: The ablation studies of camera observation loss.
+λalpha mAP↑NDS↑mAOE↓
+- 0.421 0.514 0.611
+0.25 0.4250.519 0.582
+0.50 0.421 0.527 0.492
+1.00 0.418 0.5230.465
+As shown in Table 11, activating the 3D denoising
+module alone yields a substantial improvement in model
+performance, confirming the effectiveness of noise reduction
+in enhancing feature quality. When 2D denoising is further
+incorporated to activate the full Propagating Denoising
+mechanism, the model achieves an additional performance
+gain. This incremental improvement highlights the syner-
+gistic effect between the 3D and 2D denoising components:
+the 3D module establishes a robust foundation for spatial
+structure refinement, while the 2D extension complements
+it by capturing fine-grained texture details, collectively
+strengthening the model’s ability to process noisy inputs.
+Impact of observation angle loss.We also investigate the
+influence of the observation angle lossL alpha. By incorpo-
+ratingL alpha from the image view into the training loss, we
+observe a slight improvement in mAP and NDS, along with
+a significant decrease in the mean average orientation error
+(mAOE). Increasing the weight ofλ alpha leads to a decrease
+in mAOE.λ alpha = 0.5is used in our SimPB++.
+4.5 Analysis and Discussion
+Analysis of Long-range Detection.
+To evaluate the long-range detection capability of our
+approach, we conduct distance-segmented experiments on
+the Argoverse2 dataset, comparing SimPB++ against both
+its preliminary version SimPB [1] and Far3D [20], a method
+specifically designed for long-range object detection.
+As shown in Figure 9, we group objects into four dis-
+tance intervals: a global range (0–150 m) and three long-
+range intervals (60–90m, 90–120m, and 120–150m). Our pre-
+vious version, SimPB, achieves slightly better performance
+0-150m 60-90m 90-120m 120-150m
+distance range
+0.0
+0.1
+0.2
+0.3mAP
+Far3D
+SimPB
+SimPB++
+0-150m 60-90m 90-120m 120-150m
+distance range
+0.0
+0.05
+0.1
+0.15
+0.2
+CDS
+Far3D
+SimPB
+SimPB++
+Fig. 9: Comparison of long-range detection on Argoverse2.
+than Far3D over the global range but falls short in the long-
+range intervals, where it is marginally outperformed by
+Far3D. In contrast, SimPB++ demonstrates comprehensive
+superiority: it not only preserves the strengths of SimPB
+in short-range detection but also excels in long-range sce-
+narios, achieving enhanced overall performance across all
+distance ranges.
+Analysis of Partial-labeling Training.
+It is widely recognized that 3D annotation is significantly
+more difficult and expensive than 2D labeling. Given that
+the SimPB++ framework integrates both 2D and 3D capabil-
+ities, it can naturally accommodate training with either type
+of annotation. This raises an important question:Can we
+leverage low-cost 2D labels to improve 3D detection performance
+within SimPB++?
+To investigate this, we conduct experiments on the
+nuScenes dataset [22]. We compare two training strategies:
+(1) training with varying proportions of fully annotated
+data (containing both 2D and 3D labels), and (2) partial-
+labeling training, where we augment the fully annotated
+data with additional 2D-only labeled samples, with the
+proportion of such partial annotations fixed at 0.2. As shown
+in Figure 8, with additional partial-labeling 2D data in the
+training consistently improves 3D detection performance.
+Notably, when compared to training with the same amount
+of fully annotated data, the partial-labeling method reaches
+the performance of models trained exclusively on full 3D
+annotations. These results demonstrate that the unified ar-
+chitecture of SimPB++ can effectively mitigate the scarcity
+of 3D annotation data by incorporating readily available 2D
+labels to enhance model performance.
+Analysis of Inference Efficiency.In our previous version,
+inference efficiency is constrained by the dynamic query
+allocation module, which relies on iterative loops across
+
+SUBMITTED TO IEEE JOURNAL 13
+(a) MV2D(b) SimPB++
+Fig. 10: Comparison of association strategies. (a) MV2D (2D-to-3D association): Red arrows indicate duplicate or unrelated
+3D results derived from 2D priors. (b) SimPB++ (3D-to-2D association): Green arrows show accurate 3D-2D correspondence
+for cross-camera targets, showcasing superior association accuracy.
+TABLE 14: The analysis of the efficiency on a NVIDIA 4090
+GPU. CAS indicates the Crop-and-Scale strategy.
+Dataset Method Backbone Resolution CAS FPS
+SimPB ResNet50704×256 12.0
+SimPB++ ResNet50704×256 16.0
+SimPB++ ResNet50 704×256 ✓ 15.6
+SimPB ResNet1011408×512 7.8
+SimPB++ ResNet1011408×512 10.5
+nuScenes
+SimPB++ ResNet1011408×512 ✓ 9.2
+SimPB V2-99960×640 4.6
+SimPB++ V2-99960×640 6.4Argoverse2
+SimPB++ V2-99 960×640 ✓ 4.9
+multiple camera views. To address this limitation, we opti-
+mize the process by restructuring the allocation into parallel
+operations, enabling concurrent execution across batch sizes
+and camera views. Additionally, we remove the encoder
+layer in low-resolution configurations to further speed up
+inference. As reported in Table 14, SimPB++ reduces infer-
+ence time compared to SimPB, both with and without the
+Crop-and-Scale strategy. The Crop-and-Scale module intro-
+duces distant camera views as additional inputs to enhance
+long-range detection. This addition has a negligible impact
+on lightweight backbones and low-resolution settings, with
+FPS decreasing only slightly from 16.0 to 15.6. For heavier
+backbones, the reduction remains acceptable, at 1.3 and 1.5
+FPS, respectively. Overall, SimPB++ maintains a favorable
+speed advantage over other state-of-the-art methods.
+4.6 Qualitative Evaluation
+To conduct a qualitative analysis of the association establish-
+ment between 2D-to-3D and 3D-to-2D, we compare the de-
+tection results of MV2D and SimPB++ in the same keyframe.
+The detection results of several cross-camera targets are
+shown in Figure 10, where the yellow boxes represent the
+2D detection results, and the blue boxes represent the 3D
+detection results.
+In the case of a cross-camera targetO, MV2D initially
+employs a 2D detector to generate multiple 2D bounding
+boxes (using two as an example). These 2D results are
+used to initialize 3D queries through a 2D-to-3D association
+method. However, multiple 3D queries are associated with
+the targetO. Only one of these 3D queries accurately pre-
+dicts the target, while the other may produce a duplicated
+nearby object ( 1⃝in Figure 10 (a)) or even an unrelated result
+StreamPETRSimPB++
+(a) (b) (c) (d)
+Fig. 11: Visualization results of StreamPETR and SimPB++.
+( 2⃝in Figure 10 (b))). This discrepancy arises during the
+Hungarian matching step, where only the best candidate
+query is optimized as the positive sample, resulting in the
+suppression of the remaining 3D queries. Consequently, the
+2D information from a specific view of the suppressed 3D
+query is discarded, despite it can provide relevant informa-
+tion about the same target.
+To address this issue, SimPB++ adopts a novel approach
+to establish the association between 2D and 3D results
+using a 3D-to-2D method. For a cross-camera target, we
+distribute its 3D queries to different views for 2D detection
+tasks and subsequently aggregate the results to form a
+single 3D query. To this end, for a cross-camera object,
+SimPB++ only produces one 3D detection result along with
+its corresponding 2D detection in each relevant camera.
+Also, our cyclic 3D-2D-3D interaction ensures there is a
+single coherent representation of the target across different
+views, eliminating redundancy outputs and enhancing the
+accuracy of the results (in Figure 10 (b))).
+4.6.1 Qualitative Comparison with State-of-the-Arts
+SimPB++ provides improved accuracy in detecting crowd
+objects such as traffic cones and pedestrians compared to
+StreamPETR [15]. For instance, while StreamPETR incor-
+rectly identifies two traffic cones as a single entity, SimPB++
+accurately detects them as separate objects (green circle in
+Figure 11 (a)). In Figure 11 (b), StreamPETR also provides
+an inaccurate estimation of the locations of pedestrians and
+traffic cones, showing that crowd objects tend to cluster
+around their neighboring objects. In contrast, SimPB++ pro-
+vides more precise results and successfully distinguishes
+crowded and small objects. This improvement can be at-
+tributed to the novel cyclic 3D-2D-3D scheme of SimPB++,
+where the iterative and interactive process of 2D and 3D
+information enhances the refinement of queries, resulting in
+more accurate detection results.
+
+SUBMITTED TO IEEE JOURNAL 14
+Fig. 12: Detection results on the nuScenes validation dataset.
+Fig. 13: Detection results on the Argoverse2 validation dataset.
+SimPB++ also demonstrates its advantage in detecting
+distant targets and performs well even in challenging sce-
+narios. For example, SimPB++ successfully detects pedes-
+trians and cars at far distances, whereas StreamPETR fails
+to do so (red circle in Figure 11 (c)). Furthermore, despite
+encountering difficulties in predicting small and distant tar-
+gets within complex environments, such as rain (as shown
+in 11 (d)), SimPB++ can still provide reliable 2D detections.
+These 2D detections can be utilized in subsequent post-
+processing steps within a practical autonomous driving
+perception system.
+4.6.2 More Visualization Results
+The visualizations of the 2D and 3D detection results of
+SimPB++ are depicted in Figure 12 and Figure 13, where
+the 2D predicted results are highlighted in yellow and the
+3D results are represented in blue.
+5 CONCLUSION ANDLIMITATION
+This paper presents a single-stage query-based framework
+for unified 2D and 3D multi-view detection. We introduce
+a Hybrid Decoder that interleaves 2D and 3D layers for
+image-space and BEV-space, facilitated by dynamic alloca-
+tion and adaptive aggregation modules for seamless cyclic
+2D-3D interaction. To enhance perception, query-group at-
+tention refines intra-camera interactions, while a crop-and-
+scale strategy optimizes long-range detection via dynamic
+sampling. Performance is further improved by a propagat-
+ing denoising strategy for unified query refinement and an
+auxiliary branch (ROI and depth-guided) to fortify fore-
+ground features. Finally, we demonstrate that partial label
+training significantly alleviates the 3D annotation burden,
+offering a cost-effective solution for large-scale autonomous
+driving. We thoroughly evaluate SimPB++ on the nuScenes
+dataset with extensive experiments for both 2D and 3D
+tasks, as well as on the Argoverse2 dataset for distant 3D
+detection.
+
+SUBMITTED TO IEEE JOURNAL 15
+REFERENCES
+[1] Y. Tang, Z. Meng, and E. Cheng, “Simpb: A single model for
+2d and 3d object detection from multiple cameras,” inEuropean
+Conference on Computer Vision, 2024.
+[2] S. Ren, K. He, R. Girshick, and J. Sun, “Faster r-cnn: Towards
+real-time object detection with region proposal networks,”IEEE
+Transactions on Pattern Analysis and Machine Intelligence, pp. 1137–
+1149, 2017.
+[3] J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, “You only
+look once: Unified, real-time object detection,” inIEEE Conference
+on Computer Vision and Pattern Recognition, 2016, pp. 779–788.
+[4] Z. Tian, C. Shen, H. Chen, and T. He, “Fcos: Fully convolutional
+one-stage object detection,” inIEEE International Conference on
+Computer Vision, 2019, pp. 9627–9636.
+[5] X. Chen, K. Kundu, Z. Zhang, H. Ma, S. Fidler, and R. Urtasun,
+“Monocular 3d object detection for autonomous driving,” inIEEE
+Conference on Computer Vision and Pattern Recognition, 2016, pp.
+2147–2156.
+[6] G. Brazil and X. Liu, “M3d-rpn: Monocular 3d region proposal
+network for object detection,” inIEEE International Conference on
+Computer Vision, 2019, pp. 9287–9296.
+[7] T. Wang, X. Zhu, J. Pang, and D. Lin, “Fcos3d: Fully convolutional
+one-stage monocular 3d object detection,” inIEEE International
+Conference on Computer Vision, 2021, pp. 913–922.
+[8] Y. Wang, V . Guizilini, T. Zhang, Y. Wang, H. Zhao, and J. Solomon,
+“Detr3d: 3d object detection from multi-view images via 3d-to-2d
+queries,” 2021, pp. 180–191.
+[9] Z. Li, W. Wang, H. Li, E. Xie, C. Sima, T. Lu, Y. Qiao, and J. Dai,
+“Bevformer: Learning bird’s-eye-view representation from multi-
+camera images via spatiotemporal transformers,” inEuropean Con-
+ference on Computer Vision, 2022, pp. 1–18.
+[10] J. Philion and S. Fidler, “Lift, splat, shoot: Encoding images from
+arbitrary camera rigs by implicitly unprojecting to 3d,” inEuropean
+Conference on Computer Vision, 2020, pp. 194–210.
+[11] Y. Li, Z. Ge, G. Yu, J. Yang, Z. Wang, Y. Shi, J. Sun, and Z. Li,
+“Bevdepth: Acquisition of reliable depth for multi-view 3d object
+detection,” inAAAI Conference on Artificial Intelligence, 2023, pp.
+1477–1485.
+[12] Z. Li, S. Lan, J. M. Alvarez, and Z. Wu, “Bevnext: Reviving dense
+bev frameworks for 3d object detection,” inIEEE Conference on
+Computer Vision and Pattern Recognition, 2024, pp. 20 113–20 123.
+[13] Y. Liu, T. Wang, X. Zhang, and J. Sun, “Petr: Position embedding
+transformation for multi-view 3d object detection,” inEuropean
+Conference on Computer Vision, 2022, pp. 531–548.
+[14] X. Lin, T. Lin, Z. Pei, L. Huang, and Z. Su, “Sparse4d: Multi-view
+3d object detection with sparse spatial-temporal fusion,”arXiv
+preprint arXiv:2211.10581, 2022.
+[15] S. Wang, Y. Liu, T. Wang, Y. Li, and X. Zhang, “Exploring object-
+centric temporal modeling for efficient multi-view 3d object detec-
+tion,” inIEEE International Conference on Computer Vision, 2023, pp.
+3621–3631.
+[16] H. Liu, Y. Teng, T. Lu, H. Wang, and L. Wang, “Sparsebev:
+High-performance sparse 3d object detection from multi-camera
+videos,” inIEEE International Conference on Computer Vision, 2023,
+pp. 18 580–18 590.
+[17] C. Nicolas, M. Francisco, S. Gabriel, U. Nicolas, K. Alexander,
+and Z. Sergey, “End-to-end object detection with transformers,”
+inEuropean Conference on Computer Vision, 2020, pp. 213—-229.
+[18] S. Wang, X. Jiang, and Y. Li, “Focal-petr: Embracing foreground
+for efficient multi-camera 3d object detection,”IEEE Transactions
+on Intelligent Vehicles, 2023.
+[19] Z. Wang, Z. Huang, J. Fu, N. Wang, and S. Liu, “Object as query:
+Equipping any 2d object detector with 3d detection ability,” in
+IEEE International Conference on Computer Vision, 2023, pp. 3791–
+3800.
+[20] X. Jiang, S. Li, Y. Liu, S. Wang, F. Jia, T. Wang, L. Han, and
+X. Zhang, “Far3d: Expanding the horizon for surround-view 3d
+object detection,” inAAAI Conference on Artificial Intelligence, 2023.
+[21] X. Lin, Z. Pei, T. Lin, L. Huang, and Z. Su, “Sparse4d v3: Ad-
+vancing end-to-end 3d detection and tracking,”arXiv preprint
+arXiv:2311.11722, 2023.
+[22] H. Caesar, V . Bankiti, A. H. Lang, S. Vora, V . E. Liong, Q. Xu,
+A. Krishnan, Y. Pan, G. Baldan, and O. Beijbom, “nuscenes: A
+multimodal dataset for autonomous driving,” inIEEE Conference
+on Computer Vision and Pattern Recognition, 2020, pp. 11 618–11 628.
+[23] B. Wilson, W. Qi, T. Agarwal, J. Lambert, J. Singh, S. Khandelwal,
+B. Pan, R. Kumar, A. Hartnett, J. Pontes, D. Ramanan, P . Carr, and
+J. Hays, “Argoverse 2: Next generation datasets for self-driving
+perception and forecasting,” inAdvances in Neural Information
+Processing Systems, Aug 2021.
+[24] Z. Cai and N. Vasconcelos, “Cascade r-cnn: Delving into high
+quality object detection,” inIEEE Conference on Computer Vision
+and Pattern Recognition, 2018, pp. 6154–6162.
+[25] J. Pang, K. Chen, J. Shi, H. Feng, W. Ouyang, and D. Lin, “Libra
+r-cnn: Towards balanced learning for object detection,” inIEEE
+Conference on Computer Vision and Pattern Recognition, 2019, pp.
+821–830.
+[26] K. Duan, S. Bai, L. Xie, H. Qi, Q. Huang, and Q. Tian, “Center-
+net: Keypoint triplets for object detection,” inIEEE International
+Conference on Computer Vision, 2019, pp. 6569–6578.
+[27] X. Zhu, W. Su, L. Lu, B. Li, X. Wang, and J. Dai, “Deformable
+detr: Deformable transformers for end-to-end object detection,” in
+International Conference on Learning Representations, 2020.
+[28] D. Meng, X. Chen, Z. Fan, G. Zeng, H. Li, Y. Yuan, L. Sun, and
+J. Wang, “Conditional detr for fast training convergence,” inIEEE
+International Conference on Computer Vision, 2021, pp. 3651–3660.
+[29] B. Roh, J. Shin, W. Shin, and S. Kim, “Sparse detr: Efficient end-
+to-end object detection with learnable sparsity,” inInternational
+Conference on Learning Representations, 2021.
+[30] S. Liu, F. Li, H. Zhang, X. Yang, X. Qi, H. Su, J. Zhu, and L. Zhang,
+“Dab-detr: Dynamic anchor boxes are better queries for detr,” in
+International Conference on Learning Representations, 2022.
+[31] H. Zhang, F. Li, S. Liu, L. Zhang, H. Su, J. Zhu, L. M. Ni, and H.-
+Y. Shum, “Dino: Detr with improved denoising anchor boxes for
+end-to-end object detection,” inInternational Conference on Learning
+Representations, 2022.
+[32] Z. Zong, G. Song, and Y. Liu, “Detrs with collaborative hybrid
+assignments training,” inIEEE International Conference on Computer
+Vision, 2023, pp. 6748–6758.
+[33] J. Huang, G. Huang, Z. Zhu, Y. Ye, and D. Du, “Bevdet: High-
+performance multi-camera 3d object detection in bird-eye-view,”
+arXiv preprint arXiv:2112.11790, 2021.
+[34] J. Huang and G. Huang, “Bevdet4d: Exploit temporal cues in
+multi-camera 3d object detection,”arXiv preprint arXiv:2203.17054,
+2022.
+[35] C. Yang, Y. Chen, H. Tian, C. Tao, X. Zhu, Z. Zhang, G. Huang,
+H. Li, Y. Qiao, L. Lu, J. Zhou, and J. Dai, “Bevformer v2: Adapting
+modern image backbones to bird’s-eye-view recognition via per-
+spective supervision,” inIEEE Conference on Computer Vision and
+Pattern Recognition, 2023, pp. 17 830–17 839.
+[36] Y. Li, H. Bao, Z. Ge, J. Yang, J. Sun, and Z. Li, “Bevstereo:
+Enhancing depth estimation in multi-view 3d object detection with
+temporal stereo,” inAAAI Conference on Artificial Intelligence, 2023,
+pp. 1486–1494.
+[37] J. Park, C. Xu, S. Yang, K. Keutzer, K. Kitani, M. Tomizuka, and
+W. Zhan, “Time will tell: New outlooks and a baseline for temporal
+multi-view 3d object detection,” inInternational Conference on
+Learning Representations, 2023.
+[38] C. Han, J. Yang, J. Sun, Z. Ge, R. Dong, H. Zhou, W. Mao, Y. Peng,
+and X. Zhang, “Exploring recurrent long-term temporal fusion for
+multi-view 3d perception,”IEEE Robotics and Automation Letters,
+vol. 9, no. 7, pp. 6544–6551, 2024.
+[39] Z. Zong, D. Jiang, G. Song, Z. Xue, J. Su, H. Li, and Y. Liu,
+“Temporal enhanced training of multi-view 3d object detector via
+historical object prediction,” inIEEE International Conference on
+Computer Vision, 2023.
+[40] J. Zhang, Y. Zhang, Y. Qi, Z. Fu, Q. Liu, and Y. Wang, “Geobev:
+Learning geometric bev representation for multi-view 3d object
+detection,” inAAAI Conference on Artificial Intelligence, vol. 39,
+no. 9, 2025, pp. 9960–9968.
+[41] Y. Liu, J. Yan, F. Jia, S. Li, A. Gao, T. Wang, and X. Zhang, “Petrv2:
+A unified framework for 3d perception from multi-camera im-
+ages,” inIEEE International Conference on Computer Vision, 2023,
+pp. 3262–3272.
+[42] Z. Luo, C. Zhou, G. Zhang, and S. Lu, “Detr4d: Direct multi-
+view 3d object detection with sparse attention,”arXiv preprint
+arXiv:2212.07849, 2022.
+[43] X. Lin, T. Lin, Z. Pei, L. Huang, and Z. Su, “Sparse4d v2:
+Recurrent temporal fusion with sparse model,”arXiv preprint
+arXiv:2305.14018, 2023.
+
+SUBMITTED TO IEEE JOURNAL 16
+[44] J. Yao and Y. Lai, “Dynamicbev: Leveraging dynamic queries
+and temporal context for 3d object detection,”arXiv preprint
+arXiv:2310.05989, 2023.
+[45] M. K ¨appeler, ¨Ozg ¨un C ¸ ic ¸ek, D. Cattaneo, C. Gl¨aser, Y. Miron, and
+A. Valada, “Bridging perspectives: Foundation model guided bev
+maps for 3d object detection and tracking,” 2025.
+[46] F. G ¨okc ¸e, G.¨Uc ¸oluk, E. S ¸ahin, and S. Kalkan, “Vision-based detec-
+tion and distance estimation of micro unmanned aerial vehicles,”
+Sensors, vol. 15, no. 9, pp. 23 805–23 846, 2015.
+[47] M. A. Haseeb, J. Guan, D. Ristic-Durrant, and A. Gr ¨aser, “Disnet:
+A novel method for distance estimation from monocular camera,”
+10th Planning, Perception and Navigation for Intelligent Vehicles (PP-
+NIV18), IROS, 2018.
+[48] J. Zhu, Y. Fang, H. Abu-Haimed, K. Lien, D. Fu, and J. Gu, “Learn-
+ing object-specific distance from a monocular image,”CoRR, 2019.
+[49] Y. Li, T. Chen, M. Kabkab, R. Yu, L. Jing, Y. You, and H. Zhao, “R4d:
+Utilizing reference objects for long-range distance estimation,”
+arXiv preprint arXiv:2206.04831, 2022.
+[50] Z. Yang, Z. Yu, C. Choy, R. Wang, A. Anandkumar, and J. M.
+Alvarez, “Improving distant 3d object detection using 2d box
+supervision,” inIEEE Conference on Computer Vision and Pattern
+Recognition, 2024, pp. 14 853–14 863.
+[51] A. Khoche, L. P . S´anchez, N. Batool, S. S. Mansouri, and P . Jensfelt,
+“Towards long-range 3d object detection for autonomous vehi-
+cles,” in2024 IEEE Intelligent Vehicles Symposium. IEEE, 2024, pp.
+2206–2212.
+[52] Y. Li, H. Li, Z. Huang, H. Chang, and N. Wang, “Sparsefusion:
+Efficient sparse multi-modal fusion framework for long-range 3d
+perception,”arXiv preprint arXiv:2403.10036, 2024.
+[53] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning
+for image recognition,” inIEEE Conference on Computer Vision and
+Pattern Recognition, 2016, pp. 770–778.
+[54] Y. Lee, J.-w. Hwang, S. Lee, Y. Bae, and J. Park, “An energy
+and gpu-computation efficient backbone network for real-time
+object detection,” inIEEE Conference on Computer Vision and Pattern
+Recognition, 2019.
+[55] F. Li, H. Zhang, S. Liu, J. Guo, L. M. Ni, and L. Zhang, “Dn-
+detr: Accelerate detr training by introducing query denoising,” in
+IEEE Conference on Computer Vision and Pattern Recognition, 2022,
+pp. 13 619–13 627.
+[56] F. Liu, T. Huang, Q. Zhang, H. Yao, C. Zhang, F. Wan, Q. Ye, and
+Y. Zhou, “Ray denoising: Depth-aware hard negative sampling
+for multi-view 3d object detection,” inEuropean Conference on
+Computer Vision. Springer, 2024, pp. 200–217.
+[57] A. Mousavian, D. Anguelov, J. Flynn, and J. Kosecka, “3d bound-
+ing box estimation using deep learning and geometry,” inIEEE
+Conference on Computer Vision and Pattern Recognition, 2017, pp.
+7074–7082.
+[58] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P . Perona, D. Ramanan,
+P . Doll´ar, and C. L. Zitnick, “Microsoft coco: Common objects in
+context,” inEuropean Conference on Computer Vision. Springer,
+2014, pp. 740–755.
+[59] B. Zhu, Z. Jiang, X. Zhou, Z. Li, and G. Yu, “Class-balanced
+grouping and sampling for point cloud 3d object detection,”arXiv
+preprint arXiv:1908.09492, 2019.
+[60] Z. Xue, M. Guo, H. Fan, S. Zhang, and Z. Zhang, “Corrbev: Multi-
+view 3d object detection by correlation learning with multi-modal
+prototypes,” inIEEE Conference on Computer Vision and Pattern
+Recognition, 2025, pp. 27 413–27 423.
+
+SUBMITTED TO IEEE JOURNAL 1
+Supplementary Material
+This supplementary material contains additional details
+of the main manuscript and provides more experiment
+analysis. In Section A.1, we present the difference between
+SimPB++ and other previous works that utilize 2D results
+as priors. Next, we elaborate on the complete architecture
+and give more implementation details in Section A.2. Then,
+we provide an experiment analysis on the association accu-
+racy in Section A.3. Finally, more visualization results are
+illustrated in Section A.4.
+A.1 Utilizing 2D Results as Priors
+We highlight the distinctions between SimPB++ and pre-
+vious approaches that use 2D results as priors from two
+perspectives: architecture and association. A comprehensive
+comparison is provided in Figure S.1.
+Architecture.We categorize the previous methods into
+two groups: query initialization and feature selection, as
+summarized below.
+•Query Initialization: In this category, 3D queries are
+typically initialized from 2D boxes that are detected
+by a 2D detector (as shown in Figure S.1 (a)).
+•Feature Selection: The methods focus on foreground
+tokens through 2D supervision and then select them
+for interaction with 3D queries (as shown in Figure
+S.1 (b)).
+All these methods employ a 2D detector (or utilize a 2D
+head) to predict 2D results as a preliminary step before
+applying a 3D detector. In contrast, SimPB++ takes a distinct
+approach. It performs simultaneous multi-view 2D and 3D
+detection within a single model using cyclic 2D & 3D
+decoder layers (as illustrated in Figure S.1 (c)). SimPB++
+is a one-stage method that does not rely on an off-the-shelf
+2D detector.
+Association.For association, we refer to the connection
+between 2D and 3D results for the same target. A summary
+of the association of previous methods is listed as follows.
+•Query Initialization: This method employs a heuris-
+tic default association, where a 3D query is linked
+to a 2D box for its initialization. This association is
+referred to as a 2D-to-3D association (as shown in
+Figure S.1 (a)).
+•Feature Selection: In this approach, the association
+between 3D queries and selected 2D image tokens,
+supervised by a 2D detector, is learned through the
+transformer (as shown in Figure S.1 (b)). However,
+it does not explicitly establish a direct association
+between 2D and 3D results.
+In contrast, our method determines the association by pro-
+jecting 3D anchors and matching them with the correspond-
+ing 2D results (as illustrated in Figure S.1 (c)) . In this way,
+our approach establishes a 3D-to-2D association between 2D
+and 3D results. The 3D-to-2D association has the advantage
+of aggregating 2D information more efficiently and avoiding
+the generation of redundant 3D results. We give a detailed
+analysis in Section A.3.2.
+A.2 More Implementation Details
+A.2.1 Architecture Details
+To maintain clarity, some minor components in Figure 2
+of the main manuscript have been omitted. We provide
+the complete architecture of SimPB++ in Figure S.2 for a
+comprehensive view. Specifically, we include arrow lines to
+illustrate the connections between self-attention and cross-
+attention in both the multi-view 2D decoder layer and the
+3D decoder layer. Additionally, we visualize the residual
+connection from the output of temporal cross-attention to
+the Adaptive Query Aggregation module. The aggregated
+3D queries are separately shown as the output of a multi-
+view 2D decoder layer, which is used as input for the
+3D head for deep supervision. Furthermore, to display the
+temporal propagation, we add an arrow line to indicate the
+updated object queries linking to the temporal 3D object
+queries.
+In contrast to the preliminary architecture, SimPB++
+extends the framework to support arbitrary multi-view
+input configurations. Based on this, we first implement a
+Crop-and-Scale strategy to construct a long-range view as
+shown in Figure S.2 (left), the cropped and scaled region
+is highlighted by a dashed boundary. Secondly, we inte-
+grate auxiliary training branches, including a lightweight
+2D detector and a DepthNet, targeting both dense maps and
+instance-level objects without increasing inference latency.
+Finally, to facilitate faster convergence, a query denoising
+strategy is applied to both 2D and 3D queries, which are
+represented as squares with slanted line in our diagrams.
+A.2.2 More Allocation Details
+In the Dynamic Query Allocation module, a 3D query is
+allocated to a maximum of one object center (anchor center)
+and multiple projection centers (box center) across different
+camera views by projecting it using camera parameters, as
+shown in Figure 3. The projection center typically represents
+a truncated portion of a cross-view target. The total number
+of 2D object queries during the allocation process is equal to
+the combined count of object centers and projection centers.
+During the early stages of training, the presence of inac-
+curate anchors can lead to a rapid increase in the number
+of projection centers, resulting in convergence challenges.
+To address it, we introduce two constraint strategies to
+optimize the allocation during training.
+•The number of projection centers is limited to a max-
+imum of100for each camera group. Consequently,
+the total number of 2D queries is restricted to a
+maximum ofN+ 100×V, whereNrepresents the
+number of 3D queries andVdenotes the number of
+cameras.
+•To mitigate the impact of incorrectly projected an-
+chors, we limit the maximum size{l, w, h}of the
+anchors to{35,35,10}, which is computed from the
+training split of nuScenes dataset.
+For instance, while the number of 3D queries is fixed at
+N= 900acrossV= 6cameras, the number of 2D queries
+
+SUBMITTED TO IEEE JOURNAL 2
+2D detector2D detector
+3D decoder layer3D decoder layer
+3D decoder layer3D decoder layer
+3D decoder layer3D decoder layer
+3D decoder layer3D decoder layer
+3D decoder layer3D decoder layer
+3D decoder layer3D decoder layer
+3D object queries
+predictions
+Multi-view images
+query initialization
+2D detector2D detector
+3D decoder layer3D decoder layer
+3D decoder layer3D decoder layer
+3D decoder layer3D decoder layer
+3D decoder layer3D decoder layer
+3D decoder layer3D decoder layer
+3D decoder layer3D decoder layer
+3D object queries
+predictions
+Multi-view images
+feature selection 
+3D decoder layer3D decoder layer
+2D decoder layer2D decoder layer
+3D decoder layer3D decoder layer
+2D decoder layer2D decoder layer
+3D decoder layer3D decoder layer
+2D decoder layer2D decoder layer
+3D object queries
+predictions
+(a) Query initialization (b) Feature selection (c) Cyclic 2D&3D layers
+Fig. S.1: Comparison of SimPB++ with previous approaches utilizing 2D results as priors. We roughly categorize these
+previous methods into two categories, (a) query initialization and (b) feature selection. Instead, SimPB++ introduces a
+unified paradigm using novel cyclic 2D&3D layers as in (c).
+Cross-AttentionCross-Attention
+Self-AttentionSelf-Attention
+Temporal Cross-AttentionTemporal Cross-Attention
+Query-Group Cross-AttentionQuery-Group Cross-Attention
+Adaptive Query AggregationAdaptive Query Aggregation
+Dynamic Query AllocationDynamic Query Allocation
+Temporal Cross-AttentionTemporal Cross-Attention
+2D object queries
+Query-Group Self-AttentionQuery-Group Self-Attention
+Multi-view 2D Decoder Layer 3D Decoder Layer
+3D object queries
+ Updated 3D object queries Updated 3D object queries
+2D Predictions
+Front Left Image Front Image
+BEV
+Object 1Object 1Object 1Object 1
+Object 2Object 2Object 2
+Object 4Object 4Object 4
+Object 3Object 3Object 3
+Hybrid Decoder Layer
+BackboneBackbone
+Multi-view Images Temporal 3D object queriesTemporal 3D object queries
+Object
+2D Head
+3D Predictions3D Head
+N
+3D-to-2D 
+Mapping Matrix
+Aggregated 3D object queriesAggregated 3D object queries
+Topk
+3D Head 3D Predictions
+3D Labels
+2D Labels
+d2loss
+d3loss
+d3loss
+Residual Connection
+3D noise query
+2D noise query
+3D object query
+2D object query 2D detection result
+3D detection result
+Encoder LayerEncoder Layer
+2D detector2D detector
+Auxiliary Predictions
+Dense DepthNetDense DepthNet
+Instance DepthNetInstance DepthNet
+Auxiliary Branch
+Mapping Matrix
+Associated by 
+encL
+Crop-and-Scale
+Crop-and-Scale
+Fig. S.2: Comprehensive architecture of SimPB++.
+Mis dynamically adjusted based on anchor projections,
+averaging approximately 1,100. Despite this increased query
+count, the impact on computational overhead remains neg-
+ligible.
+A.3 More Experimental Analysis
+A.3.1 About nuScenes test splits
+The groundtruth for the nuScenes test set has not been made
+publicly available. We are submitting our predictions to the
+EvalAI server for evaluation, as outlined in the official man-
+ual. However, prior to our paper submission, the EvalAI
+server is unable to provide test evaluation results, revealing
+stuck status. Many individuals have encountered the same
+issue, and it has been reported in the corresponding issues
+on the nuScenes and EvalAI official GitHub repositories, yet
+have not received any positive feedback regarding this mat-
+ter. As a result, the results of SimPB++ on the nuScenes test
+split cannot be presented in the paper. We will update the
+test results on our project website as soon as the evaluation
+available.
+A.3.2 Effect of Association
+Two-stage methods usually only provide a default associa-
+tion between 3D and 2D results during query initialization
+(as shown in Figure S.1 (a)). In contrast, SimPB++ explicitly
+constructs the association of 2D and 3D detection results (as
+shown in Figure S.1 (c)). To quantitatively evaluate the as-
+sociation, we design a metric termed Association Accuracy
+Rate (AAR) to measure the accuracy rate of association and
+also apply Recall as an evaluation metric as well.
+Suppose there areN 3d 3D groundtruth boxes{G i
+3d}N3d
+i=1
+andN 2d projected 2D boxes{G i
+2d}N2d
+i=1 on the image views
+as 2D boxes label in the validation dataset. We can obtain
+M3d 3D box prediction{P i
+3d}M3d
+i=1 andM 2d 2D prediction
+{P i
+2d}M2d
+i=1 from the network. Typically, a candidate match is
+established between a 3D prediction and a 2D groundtruth
+
+SUBMITTED TO IEEE JOURNAL 3
+Fig. S.3: AAR (Association Accuracy Rate) and Recall
+curves.
+box. The total number of candidates matching is denoted
+as#Matching {3D-pred, 2D-gt}. From these candidate matches,
+we select valid associations between 3D predictions and 2D
+predictions generated by the network. The valid matching
+number is#ValidMatching {3D-pred, 2D-pred}. Therefore, we
+define the association evaluation metric AAR as follows:
+AAR=
+#ValidMatching{3D-pred, 2D-pred}
+#Matching{3D-pred, 2D-gt}
+×100%,(S.1)
+Recall=
+#Matching{3D-pred, 2D-gt}
+N2d
+×100%.(S.2)
+For a given 3D predictionP i
+3d andj-th 2D groundtruth
+Gj
+2d onv-th image view. And we denote the associated 3D
+groundtruth ofG j
+2d asG j
+3d for simplicity.P i
+3d→2d is the
+bounding rectangle onv-th view projected fromP i
+3d. The
+connection betweenP i
+3d andG j
+2d is a candidate matching if
+the following conditions are met:
+Φ(P i
+3d, Gj
+2d) =
+
+
+
+1Dist(P i
+3d, Gj
+3d)≤τ dis &
+IoU(P i
+3d→2d, Gj
+2d)≥τ iou &
+Cls(P i
+3d, Gj
+3d) = 1
+0otherwise
+,(S.3)
+where Dist represents the Euclidean distance between the
+centers of two 3D boxes, and Cls indicates whether the labels
+of the two boxes are the same or not. Similarly, we denote a
+valid candidate between thei-th 3D predictionP i
+3d and the
+k-th 2D predictionP k
+2d when the following conditions are
+met:
+Ψ(P i
+3d, P k
+2d) =
+
+
+
+1 Φ(P i
+3d, Gj
+2d) = 1 &
+IoU(P k
+2d, Gj
+2d)≥τ iou &
+Cls(P k
+2d, Gj
+2d) = 1
+0otherwise
+.(S.4)
+Therefore, AAR can be rewritten as:
+AAR=
+PM3d
+i=1
+PM2d
+k=1 Ψ(P i
+3d, P k
+2d)
+PM3d
+i=1
+PN2d
+j=1 Φ(P i
+3d, Gj
+2d)
+×100%.(S.5)
+We fix theτ dis = 2and adjustτ iou from 0.1 to 0.9 to
+draw the AAR and Recall curves. As shown in Figure S.3,
+the accuracy and recall decrease as the IOU thresholdτ iou
+increases. However, SimPB++ constantly gains higher AAR
+and Recall metrics with a large margin on both settings.
+The utilization of the 3D-to-2D association in SimPB++
+demonstrates higher accuracy compared to the 2D-to-3D as-
+sociation used in MV2D. This approach not only maintains
+a larger number of matched predictions but also ensures
+better alignment of 2D and 3D features. As a result, the 2D
+information to the same target is effectively leveraged for
+3D tasks, leading to improved performance.
+A.4 More Visualization Results
+We provide comprehensive visualizations in the supple-
+mentary material, including video sequences of SimPB++’s
+2D and 3D detection performances on both nuScenes and
+Argoverse 2.

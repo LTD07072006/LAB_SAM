@@ -41,6 +41,8 @@ from PIL import Image, ImageEnhance
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import functional as TF
 
+from project_paths import CCTV_DATASET
+
 
 ARCHITECTURE = "detector_2d_fpn_v2"
 DEFAULT_BACKBONE = "mobilenetv4_conv_medium"
@@ -835,7 +837,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Train the improved 2D fire detector before ROI")
     root = Path(__file__).resolve().parent
     parser.add_argument("--labels", type=Path, default=root / "fire-model-data" / "dataset_labels (1).json")
-    parser.add_argument("--dataset-root", type=Path, default=root / "fire-detection-from-cctv")
+    parser.add_argument("--dataset-root", type=Path, default=CCTV_DATASET)
     parser.add_argument(
         "--output-dir",
         type=Path,

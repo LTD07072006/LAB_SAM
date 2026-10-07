@@ -1,0 +1,20 @@
+{
+  "dataset": "FIRE-SMOKE-DATASET",
+  "source_zip": "D:\\LAB\\SAM_Experiment\\datasets\\FIRE-SMOKE-DATASET.zip",
+  "extracted_root": "D:\\LAB\\SAM_Experiment\\datasets\\fire_smoke_dataset",
+  "manifest": "D:\\LAB\\SAM_Experiment\\working\\fire_smoke_binary\\manifest.jsonl",
+  "records": 3000,
+  "class_mapping": {
+    "Fire": 1,
+    "Smoke": 0,
+    "Neutral": 0
+  },
+  "source_counts": {
+    "fire": 1000,
+    "smoke": 1000,
+    "neutral": 1000
+  },
+  "p_fire_records": 0,
+  "xyz_records": 0,
+  "warning": "Classification/domain pretraining only; no ROI or physical 3D labels."
+}

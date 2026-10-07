@@ -16,6 +16,7 @@ from pathlib import Path
 from PIL import Image
 
 from home_fire_detector_adapter import HomeFireYOLO, bottom_band_points
+from project_paths import D_FIRE_ROOT
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
@@ -31,7 +32,7 @@ def iter_images(root: Path, split: str):
 def main() -> None:
     root = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset-root", type=Path, default=root / "home-fire-dataset")
+    parser.add_argument("--dataset-root", type=Path, default=D_FIRE_ROOT)
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=root / "working" / "home_fire_yolo_coarse.jsonl")
     parser.add_argument("--split", choices=("train", "val", "test"), default="test")

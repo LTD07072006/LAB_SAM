@@ -1,0 +1,28 @@
+{
+  "source": "D:\\LAB\\SAM_Experiment\\datasets\\D-Fire.zip",
+  "fire_class_id": 1,
+  "weak_point_weight": 0.25,
+  "image_count": 21527,
+  "weak_point_count": 14685,
+  "split_counts": {
+    "test": 4306,
+    "train": 14122,
+    "val": 3099
+  },
+  "class_bbox_counts": {
+    "0": 11846,
+    "1": 14685
+  },
+  "checks": {
+    "empty_or_invalid_label": 9841,
+    "class_0": 11846,
+    "weak_points_skipped_non_fire_class": 11846,
+    "class_1": 14685,
+    "invalid_geometry": 18,
+    "out_of_range": 8
+  },
+  "weak_manifest_usable": true,
+  "weak_manifest_note": "Only the selected fire class was converted to weak bottom-center points.",
+  "manifest": "D:\\LAB\\SAM_Experiment\\working\\dfire_detector\\manifest.jsonl",
+  "weak_manifest": "D:\\LAB\\SAM_Experiment\\working\\dfire_detector\\weak_points.jsonl"
+}

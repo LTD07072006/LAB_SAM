@@ -1,0 +1,42 @@
+{
+  "format": "LAB_SAM.synthetic_fire_3d.v2",
+  "created_with": "synthetic_fire_3d.py",
+  "image_size": [
+    640,
+    640
+  ],
+  "room_size_m": [
+    8.0,
+    14.0,
+    4.0
+  ],
+  "mesh_profile": "obstacles",
+  "coordinate_system": "X lateral, Y forward, Z up; fire contact lies on floor or an obstacle top",
+  "label_contract": {
+    "has_fire": "1=fire, 0=no fire",
+    "fire_event": "physical fire exists in the scene, including an occluded fire",
+    "fire_visible": "1 when the clean contact point is visible from the camera",
+    "p_fire": "clean contact point normalised by original image width/height",
+    "p_fire_noisy": "simulated detector/ROI observation; never ground truth",
+    "fire_xyz_world": "metric 3D contact point in room frame"
+  },
+  "split_policy": "sequence/scene-level split: adjacent frames stay together",
+  "occlusion_policy": "occluded events keep fire_event=1 but has_fire=0 and no 2D point",
+  "noise_policy": {
+    "image_noise": "Gaussian sensor noise, blur, brightness and JPEG compression",
+    "label_noise": "pixel Gaussian perturbation plus miss probability",
+    "calibration_noise": "focal/principal-point, rotation and camera-position perturbations"
+  },
+  "counts": {
+    "records": 960,
+    "scenes": 240,
+    "train": 672,
+    "val": 144,
+    "test": 144,
+    "fire": 524,
+    "no_fire": 436,
+    "fire_events": 812,
+    "visible_fire": 524,
+    "occluded_fire": 288
+  }
+}

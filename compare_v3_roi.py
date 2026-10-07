@@ -3,7 +3,7 @@
 The comparison is deliberately a 2D evaluation:
 
     labels -> upstream detector (coarse) -> ROIRefiner
-                                  \-> v3 detector
+                                  -> v3 detector
 
 The script draws the labelled point and every available prediction on each
 image, writes a contact sheet, and prints pixel MAE/PCK statistics.  It does
@@ -29,6 +29,8 @@ from typing import Any, Optional, Sequence
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+
+from project_paths import CCTV_DATASET
 
 
 ROOT = Path(__file__).resolve().parent
@@ -494,7 +496,7 @@ def main() -> None:
     _configure_console()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--labels", type=Path, default=ROOT / "fire-model-data" / "dataset_labels (1).json")
-    parser.add_argument("--dataset", type=Path, default=ROOT / "fire-detection-from-cctv")
+    parser.add_argument("--dataset", type=Path, default=CCTV_DATASET)
     parser.add_argument("--baseline", type=Path, default=ROOT / "fire-model-data" / "best.pth")
     parser.add_argument("--roi", type=Path, default=ROOT / "week6_roi_result" / "best_roi.pth")
     parser.add_argument("--v3", type=Path, default=default_v3_checkpoint())

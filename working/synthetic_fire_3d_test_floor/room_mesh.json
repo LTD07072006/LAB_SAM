@@ -1,0 +1,56 @@
+{
+  "metadata": {
+    "units": "metres",
+    "coordinate_system": "world: X lateral, Y forward, Z up",
+    "mesh_profile": "floor",
+    "room_size_m": [
+      8.0,
+      14.0,
+      4.0
+    ],
+    "open_front": true,
+    "surface_labels": [
+      "floor",
+      "floor"
+    ]
+  },
+  "vertices": [
+    [
+      -4.0,
+      0.0,
+      0.0
+    ],
+    [
+      4.0,
+      0.0,
+      0.0
+    ],
+    [
+      4.0,
+      14.0,
+      0.0
+    ],
+    [
+      -4.0,
+      14.0,
+      0.0
+    ]
+  ],
+  "faces": [
+    [
+      0,
+      1,
+      2
+    ],
+    [
+      0,
+      2,
+      3
+    ]
+  ],
+  "face_labels": [
+    "floor",
+    "floor"
+  ],
+  "obstacles": []
+}

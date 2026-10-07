@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "status": "measured_real_room",
+    "units": "metres",
+    "coordinate_system": "room marker frame; X lateral, Y forward, Z up",
+    "calibration_method": "Zhang checkerboard intrinsics + solvePnP room markers",
+    "source": "template only; replace all values with measurements"
+  },
+  "image_size": [1920, 1080],
+  "intrinsics": {
+    "K": [[1200.0, 0.0, 960.0], [0.0, 1200.0, 540.0], [0.0, 0.0, 1.0]],
+    "dist_coeffs": [0.0, 0.0, 0.0, 0.0, 0.0]
+  },
+  "extrinsics": {
+    "R": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+    "camera_position": [0.0, 0.0, 2.0]
+  }
+}

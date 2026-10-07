@@ -64,11 +64,18 @@ class Fire3DTracker:
             return Track3DState(**self.state.__dict__)
 
         measurement = np.asarray(point, dtype=np.float64).reshape(3)
-        measurement_cov = (
-            np.asarray(covariance, dtype=np.float64).reshape(3, 3)
-            if covariance is not None
-            else np.eye(3, dtype=np.float64) * 0.25
-        )
+        if covariance is None:
+            measurement_cov = np.eye(3, dtype=np.float64) * 0.25
+        else:
+            covariance_array = np.asarray(covariance, dtype=np.float64)
+            if covariance_array.shape == (3,):
+                # ``localization.FireLocalization.std`` is a per-axis
+                # standard deviation, not a 3x3 covariance matrix.
+                measurement_cov = np.diag(np.maximum(covariance_array, 1e-6) ** 2)
+            else:
+                measurement_cov = covariance_array.reshape(3, 3)
+            measurement_cov = 0.5 * (measurement_cov + measurement_cov.T)
+            measurement_cov += np.eye(3, dtype=np.float64) * 1e-6
 
         if self.state.point is None:
             self.state.point = measurement.copy()

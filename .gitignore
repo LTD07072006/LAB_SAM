@@ -5,6 +5,9 @@
 *.7z
 *.rar
 
+# ===== Dataset archive and local dataset tree =====
+datasets/
+
 # ===== Dataset folders =====
 home-fire-dataset/
 s3dis/

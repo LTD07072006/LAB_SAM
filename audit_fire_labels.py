@@ -23,6 +23,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Optional
 
+from project_paths import CCTV_DATASET, D_FIRE_ROOT
+
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 SPLITS = ("train", "val", "test")
@@ -200,8 +202,8 @@ def main() -> None:
     project_root = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--labels", type=Path, default=project_root / "fire-model-data" / "dataset_labels (1).json")
-    parser.add_argument("--dataset-root", type=Path, default=project_root / "fire-detection-from-cctv")
-    parser.add_argument("--yolo-root", type=Path, default=project_root / "home-fire-dataset")
+    parser.add_argument("--dataset-root", type=Path, default=CCTV_DATASET)
+    parser.add_argument("--yolo-root", type=Path, default=D_FIRE_ROOT)
     parser.add_argument("--source-fire-class", type=int, default=1)
     parser.add_argument("--output", type=Path, default=project_root / "working" / "fire_label_audit.json")
     args = parser.parse_args()

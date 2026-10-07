@@ -27,6 +27,7 @@ from detector_adapter import Detection2D, adapt_detection, adapt_local_detector_
 from localization import FireLocalization, localize_pixels, localize_with_uncertainty
 from locator import CameraGeometry, GridMap
 from mesh_loader import load_triangle_mesh
+from project_paths import FIRE_SAMPLES
 from tracking_3d import Fire3DTracker
 from temporal_filter import DetectionSmoother
 
@@ -254,7 +255,7 @@ def run_samples(args):
 def main():
     root = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--samples", type=Path, default=root / "fire-samples")
+    parser.add_argument("--samples", type=Path, default=FIRE_SAMPLES)
     parser.add_argument("--model", type=Path, default=root / "fire-model-data" / "best.pth")
     parser.add_argument("--roi-checkpoint", type=Path, default=root / "week6_roi_result" / "best_roi.pth")
     parser.add_argument("--calibration", type=Path, default=None, help="JSON calibration; default is synthetic fallback")

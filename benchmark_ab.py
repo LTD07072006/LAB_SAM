@@ -22,6 +22,8 @@ from typing import Any, Optional
 import numpy as np
 from PIL import Image
 
+from project_paths import CCTV_DATASET
+
 
 ROOT = Path(__file__).resolve().parent
 if str(ROOT) not in sys.path:
@@ -303,7 +305,7 @@ def _run_branch(
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--labels", type=Path, default=ROOT / "fire-model-data" / "dataset_labels (1).json")
-    parser.add_argument("--dataset", "--dataset-root", dest="dataset", type=Path, default=ROOT / "fire-detection-from-cctv")
+    parser.add_argument("--dataset", "--dataset-root", dest="dataset", type=Path, default=CCTV_DATASET)
     parser.add_argument("--baseline", "--model", dest="baseline", type=Path, default=ROOT / "fire-model-data" / "best.pth")
     parser.add_argument("--roi", "--roi-checkpoint", dest="roi", type=Path, default=ROOT / "week6_roi_result" / "best_roi.pth")
     parser.add_argument("--split", choices=("train", "val", "test", "all"), default="test")

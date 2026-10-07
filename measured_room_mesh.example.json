@@ -1,0 +1,10 @@
+{
+  "metadata": {
+    "status": "measured_real_room",
+    "units": "metres",
+    "coordinate_system": "same room marker frame as the camera calibration",
+    "source": "template only; replace vertices/faces with measured geometry"
+  },
+  "vertices": [[0.0, 0.0, 0.0], [4.0, 0.0, 0.0], [4.0, 6.0, 0.0], [0.0, 6.0, 0.0]],
+  "faces": [[0, 1, 2], [0, 2, 3]]
+}

@@ -31,6 +31,7 @@ from camera_calibration import CameraCalibration
 from home_fire_detector_adapter import HomeFireYOLO, bottom_band_points
 from home_fire_3d_pipeline import Fire3DLocalizationPipeline, _json_value
 from mesh_loader import load_triangle_mesh
+from project_paths import D_FIRE_ROOT
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
@@ -102,7 +103,7 @@ def main() -> None:
         required=True,
         help="Fire class id in the model checkpoint; use 0 for the one-class checkpoint",
     )
-    parser.add_argument("--samples", type=Path, default=root / "home-fire-dataset" / "test" / "images")
+    parser.add_argument("--samples", type=Path, default=D_FIRE_ROOT / "test" / "images")
     parser.add_argument("--calibration", type=Path, required=True, help="Measured camera calibration JSON")
     parser.add_argument("--mesh", type=Path, required=True, help="Metric room triangle mesh JSON")
     parser.add_argument("--roi-checkpoint", type=Path, default=None, help="Optional ROI refiner; omitted for YOLO->ray baseline")

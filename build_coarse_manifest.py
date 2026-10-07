@@ -7,6 +7,8 @@ from pathlib import Path
 
 from PIL import Image
 
+from project_paths import CCTV_DATASET
+
 from fire_detector import FireDetector
 from train_week6 import load_records
 
@@ -15,7 +17,7 @@ def main():
     root = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--labels", type=Path, default=root / "fire-model-data" / "dataset_labels (1).json")
-    parser.add_argument("--dataset-root", type=Path, default=root / "fire-detection-from-cctv")
+    parser.add_argument("--dataset-root", type=Path, default=CCTV_DATASET)
     parser.add_argument("--model", type=Path, default=root / "fire-model-data" / "best.pth")
     parser.add_argument("--output", type=Path, default=root / "fire-model-data" / "coarse_manifest.json")
     parser.add_argument("--threshold", type=float, default=0.2)

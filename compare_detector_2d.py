@@ -22,6 +22,8 @@ import numpy as np
 import torch
 from PIL import Image, ImageDraw
 
+from project_paths import CCTV_DATASET
+
 from detector_2d import Detector2DInference
 from fire_detector import FireDetector
 from train_week6 import load_records, split_records
@@ -116,7 +118,7 @@ def _contact_sheet(items: list[Image.Image], output: Path, columns: int = 2) -> 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--labels", type=Path, default=ROOT / "fire-model-data" / "dataset_labels (1).json")
-    parser.add_argument("--dataset", type=Path, default=ROOT / "fire-detection-from-cctv")
+    parser.add_argument("--dataset", type=Path, default=CCTV_DATASET)
     parser.add_argument("--old", type=Path, default=ROOT / "fire-model-data" / "best.pth")
     parser.add_argument("--new", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, default=ROOT / "output" / "detector_2d_comparison")

@@ -27,6 +27,8 @@ import sys
 from pathlib import Path
 from typing import Iterable, Optional
 
+from project_paths import CCTV_DATASET, FIRE_SAMPLES
+
 
 ROOT = Path(__file__).resolve().parent
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
@@ -267,8 +269,8 @@ def main() -> int:
     parser.add_argument("--roi", "--roi-checkpoint", dest="roi", type=Path, default=ROOT / "week6_roi_result" / "best_roi.pth")
     parser.add_argument("--v3", type=Path, default=default_v3_checkpoint())
     parser.add_argument("--labels", type=Path, default=ROOT / "fire-model-data" / "dataset_labels (1).json")
-    parser.add_argument("--dataset", type=Path, default=ROOT / "fire-detection-from-cctv")
-    parser.add_argument("--samples", type=Path, default=ROOT / "fire-samples")
+    parser.add_argument("--dataset", type=Path, default=CCTV_DATASET)
+    parser.add_argument("--samples", type=Path, default=FIRE_SAMPLES)
     parser.add_argument("--baseline", "--model", dest="baseline", type=Path, default=ROOT / "fire-model-data" / "best.pth")
     parser.add_argument("--output-dir", type=Path, default=ROOT / "output" / "week6_run")
     parser.add_argument("--split", choices=("train", "val", "test", "all"), default="test")

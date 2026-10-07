@@ -14,6 +14,8 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
+from project_paths import D_FIRE_ROOT
+
 
 SPLITS = ("train", "val", "test")
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
@@ -258,7 +260,7 @@ def train(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     root = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset-root", type=Path, default=root / "home-fire-dataset")
+    parser.add_argument("--dataset-root", type=Path, default=D_FIRE_ROOT)
     parser.add_argument("--model", default="yolo11n.pt")
     parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--imgsz", type=int, default=640)

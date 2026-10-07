@@ -29,6 +29,7 @@ from localization import localize_pixels
 from locator import GridMap
 from mesh_loader import load_triangle_mesh
 from main_localization import Fire3DLocalizationPipeline, default_calibration
+from project_paths import FIRE_SAMPLES
 
 
 def _load_points(path: Path) -> dict[str, tuple[float, float]]:
@@ -165,7 +166,7 @@ def main():
     root = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=("oracle", "noisy", "detector"), default="oracle")
-    parser.add_argument("--images", type=Path, default=root / "fire-samples")
+    parser.add_argument("--images", type=Path, default=FIRE_SAMPLES)
     parser.add_argument("--points", type=Path, default=root / "ground_truth.json")
     parser.add_argument("--labels-3d", type=Path, default=None)
     parser.add_argument("--model", type=Path, default=root / "fire-model-data" / "best.pth")

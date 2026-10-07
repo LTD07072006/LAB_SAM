@@ -2,12 +2,14 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from project_paths import CCTV_DATASET, FIRE_SAMPLES
+
 ROOT = Path(__file__).resolve().parent
 
 @dataclass(frozen=True)
 class RuntimeConfig:
     model_path: Path = ROOT / "fire-model-data" / "best.pth"
-    sample_dir: Path = ROOT / "fire-samples"
+    sample_dir: Path = FIRE_SAMPLES
     confidence_threshold: float = 0.50
     temporal_alpha: float = 0.35
     temporal_window: int = 5

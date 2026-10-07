@@ -91,6 +91,44 @@ license and citation requirements before downloading or redistributing data.
 
 ## Recommended use in this project
 
+## Optional D-Fire add-on (keeps the old datasets unchanged)
+
+The downloaded D-Fire archive is stored as `datasets/D-Fire.zip`. Create the
+small manifests directly from the ZIP; this does not make a second 3 GB image
+copy:
+
+```powershell
+python prepare_dfire_dataset.py `
+  --zip datasets\D-Fire.zip `
+  --output working\dfire_detector
+```
+
+This creates `working/dfire_detector/manifest.jsonl`,
+`working/dfire_detector/weak_points.jsonl`, `summary.json` and a small preview.
+It does not edit `datasets/archive.zip`, `datasets/fire-detection-from-cctv`, any video folder,
+checkpoints, or existing Week 6 outputs. The generated records are suitable
+for a detector branch. The weak bottom-center point is a bbox-derived
+hypothesis; `p_fire` and `fire_xyz_world` remain unsuitable for final ROI/3D
+ground truth until manually checked.
+
+## FIRE-SMOKE-DATASET add-on
+
+`FIRE-SMOKE-DATASET.zip` is a folder-labelled binary classification dataset:
+`Fire=1`, `Smoke=0`, `Neutral=0`. Prepare it separately with:
+
+```powershell
+python prepare_fire_smoke_dataset.py `
+  --zip datasets\FIRE-SMOKE-DATASET.zip `
+  --extract-root datasets\fire_smoke_dataset `
+  --output working\fire_smoke_binary
+```
+
+The script creates an isolated extracted copy and `manifest.jsonl`; it does
+not touch the old 1.7 GB archive, CCTV dataset, videos, checkpoints or
+outputs. This dataset helps classification/domain pretraining only. It has no
+`p_fire`, camera calibration, room mesh or XYZ labels, so it must not enter
+the ROI ground-truth or final 3D test split.
+
 ```text
 D-Fire / MIVIA / Fire-Smoke / FLAME
     → detector robustness and hard negatives

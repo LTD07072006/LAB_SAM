@@ -37,6 +37,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import BinaryIO, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple
 
+from project_paths import D_FIRE_ZIP
+
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 
@@ -383,10 +385,15 @@ def build_manifests(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    source = parser.add_mutually_exclusive_group(required=True)
-    source.add_argument("--zip", type=Path, help="Home Fire YOLO ZIP archive")
-    source.add_argument("--root", type=Path, help="Extracted dataset root")
+    source = parser.add_mutually_exclusive_group(required=False)
     project_root = Path(__file__).resolve().parent
+    source.add_argument(
+        "--zip",
+        type=Path,
+        default=None,
+        help="Home Fire/D-Fire YOLO ZIP archive",
+    )
+    source.add_argument("--root", type=Path, help="Extracted dataset root")
     parser.add_argument("--manifest-out", type=Path, default=project_root / "working" / "home_fire_manifest.jsonl")
     parser.add_argument("--weak-out", type=Path, default=project_root / "working" / "home_fire_weak_points.jsonl")
     parser.add_argument("--summary-out", type=Path, default=project_root / "working" / "home_fire_summary.json")
@@ -406,6 +413,8 @@ def main() -> None:
     parser.add_argument("--weak-weight", type=float, default=0.25)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
+    if args.zip is None and args.root is None:
+        args.zip = D_FIRE_ZIP
     summary = build_manifests(
         archive=args.zip,
         root=args.root,

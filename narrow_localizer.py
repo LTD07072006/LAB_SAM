@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, Sequence
@@ -23,6 +24,7 @@ from PIL import Image, ImageEnhance, ImageOps
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import functional as TF
 
+from project_paths import CCTV_DATASET
 from train_week6 import load_records, save_checkpoint, seed_everything, split_records
 
 
@@ -30,6 +32,48 @@ ROI_ARCHITECTURE = "narrow_roi_localizer_v1"
 ROI_IMAGE_SIZE = (224, 224)
 ROI_MEAN = (0.485, 0.456, 0.406)
 ROI_STD = (0.229, 0.224, 0.225)
+
+
+def _manifest_key_candidates(path_text: str) -> list[str]:
+    """Return stable keys for a manifest path from any operating system.
+
+    Coarse manifests are often generated on Kaggle and then consumed on
+    Windows (or the other way around).  Absolute paths therefore cannot be
+    the only lookup key.  The ``split/class/file`` key is specific enough for
+    this dataset while remaining portable between machines.
+    """
+    normalized = str(path_text).replace("\\", "/").lower()
+    keys: list[str] = [normalized]
+    match = re.search(r"(?:^|/)img_data/(train|test|val)/([^/]+/[^/]+)$", normalized)
+    if match:
+        split = match.group(1)
+        relative = match.group(2)
+        keys.extend((f"{split}/{relative}", f"img_data/{split}/{relative}"))
+    # Basenames are only a last-resort fallback.  The dataset contains the
+    # same filenames in different source splits, so resolving by basename
+    # before split/class/file could silently attach the wrong coarse point.
+    if "/" in normalized:
+        keys.append(normalized.rsplit("/", 1)[-1])
+    # Preserve insertion order while removing aliases that are identical.
+    return list(dict.fromkeys(keys))
+
+
+def _index_coarse_manifest(manifest: dict) -> dict:
+    """Index absolute and portable aliases without changing manifest data."""
+    indexed: dict = {}
+    for raw_key, value in manifest.items():
+        for key in _manifest_key_candidates(str(raw_key)):
+            indexed.setdefault(key, value)
+    return indexed
+
+
+def _lookup_coarse_manifest(indexed_manifest: dict, image_path: str):
+    """Find a coarse prediction despite Kaggle/local absolute-path changes."""
+    for key in _manifest_key_candidates(image_path):
+        value = indexed_manifest.get(key)
+        if value is not None:
+            return value
+    return None
 
 
 @dataclass
@@ -91,7 +135,7 @@ class NarrowROIDataset(Dataset):
         self.roi_fraction = float(roi_fraction)
         self.noise_std = float(noise_std)
         self.seed = int(seed)
-        self.coarse_manifest = coarse_manifest or {}
+        self.coarse_manifest = _index_coarse_manifest(coarse_manifest or {})
 
     def __len__(self):
         return len(self.records) * self.repeats
@@ -102,9 +146,7 @@ class NarrowROIDataset(Dataset):
         image = Image.open(record.image_path).convert("RGB")
         width, height = image.size
         gt = np.array([record.x_norm * width, record.y_norm * height], dtype=np.float64)
-        manifest_item = self.coarse_manifest.get(record.image_path)
-        if manifest_item is None:
-            manifest_item = self.coarse_manifest.get(Path(record.image_path).name)
+        manifest_item = _lookup_coarse_manifest(self.coarse_manifest, record.image_path)
         manifest_point = None
         if isinstance(manifest_item, dict):
             manifest_point = manifest_item.get("point")
@@ -132,12 +174,17 @@ class NarrowROIDataset(Dataset):
                     np.array([record.x_norm, record.y_norm]) + rng.normal(0.0, self.noise_std, 2),
                     0.02, 0.98,
                 )
-            if self.train:
-                image = ImageEnhance.Brightness(image).enhance(float(rng.uniform(0.85, 1.15)))
-                image = ImageEnhance.Contrast(image).enhance(float(rng.uniform(0.85, 1.15)))
-                image = ImageEnhance.Color(image).enhance(float(rng.uniform(0.90, 1.10)))
         else:
             coarse_norm = np.array([record.x_norm, record.y_norm], dtype=np.float64)
+
+        # Apply appearance augmentation to both real-detector and synthetic
+        # coarse points.  Previously this was only reached in the synthetic
+        # fallback branch, so ROI training with a real coarse manifest saw no
+        # colour/brightness variation at all.
+        if self.train:
+            image = ImageEnhance.Brightness(image).enhance(float(rng.uniform(0.85, 1.15)))
+            image = ImageEnhance.Contrast(image).enhance(float(rng.uniform(0.85, 1.15)))
+            image = ImageEnhance.Color(image).enhance(float(rng.uniform(0.90, 1.10)))
         coarse = coarse_norm * np.array([width, height], dtype=np.float64)
         crop, box = _crop_square(image, coarse, self.roi_fraction)
         target_rel = (gt - np.array([box.left, box.top])) / box.side
@@ -154,11 +201,12 @@ class ROIRefiner(nn.Module):
     """Spatial ROI localizer; no fire/no-fire classification head."""
 
     def __init__(self, backbone="mobilenetv4_conv_medium", pretrained=True,
-                 heatmap_size=28, temperature=0.07):
+                 heatmap_size=28, temperature=0.07, dropout=0.15):
         super().__init__()
         self.backbone_name = backbone
         self.heatmap_size = int(heatmap_size)
         self.temperature = float(temperature)
+        self.dropout_p = float(np.clip(dropout, 0.0, 0.8))
         self.backbone = timm.create_model(backbone, pretrained=pretrained, num_classes=0, global_pool="")
         info = getattr(self.backbone, "feature_info", None)
         if info:
@@ -172,6 +220,9 @@ class ROIRefiner(nn.Module):
             nn.BatchNorm2d(256),
             nn.SiLU(inplace=True),
         )
+        # This layer has no trainable parameters.  Existing checkpoints remain
+        # compatible and dropout is active only during training.
+        self.feature_dropout = nn.Dropout2d(self.dropout_p)
         self.heatmap = nn.Conv2d(256, 1, 1)
 
     def _soft_argmax(self, logits):
@@ -187,6 +238,7 @@ class ROIRefiner(nn.Module):
     def forward(self, x):
         features = self.backbone.forward_features(x)
         features = self.neck(features)
+        features = self.feature_dropout(features)
         features = F.interpolate(features, size=(self.heatmap_size, self.heatmap_size), mode="bilinear", align_corners=False)
         logits = self.heatmap(features)
         return {"coord": self._soft_argmax(logits), "heatmap_logits": logits}
@@ -263,6 +315,7 @@ class ROIRefinerInference:
             pretrained=False,
             heatmap_size=int(checkpoint.get("heatmap_size", 28)),
             temperature=float(checkpoint.get("temperature", 0.07)),
+            dropout=float(checkpoint.get("dropout", 0.0)),
         ).to(self.device)
         self.model.load_state_dict(checkpoint["model"], strict=True)
         self.model.eval()
@@ -292,7 +345,8 @@ class ROIRefinerInference:
 def run_roi_epoch(model, loader, device, optimizer=None):
     training = optimizer is not None
     model.train(training)
-    losses, metrics = [], []
+    loss_sums, metric_sums = {}, {}
+    sample_count = 0
     for images, targets, meta, _ in loader:
         images, targets, meta = images.to(device), targets.to(device), meta.to(device)
         if training:
@@ -303,11 +357,17 @@ def run_roi_epoch(model, loader, device, optimizer=None):
             loss["total"].backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
             optimizer.step()
-        losses.append({k: float(v.detach().cpu()) for k, v in loss.items()})
-        metrics.append(roi_metrics(outputs, targets, meta))
-    keys = losses[0].keys()
-    loss_mean = {k: float(np.mean([v[k] for v in losses])) for k in keys}
-    metric_mean = {k: float(np.mean([v[k] for v in metrics])) for k in metrics[0]}
+        batch_count = int(images.shape[0])
+        sample_count += batch_count
+        for key, value in loss.items():
+            loss_sums[key] = loss_sums.get(key, 0.0) + float(value.detach().cpu()) * batch_count
+        batch_metrics = roi_metrics(outputs, targets, meta)
+        for key, value in batch_metrics.items():
+            metric_sums[key] = metric_sums.get(key, 0.0) + float(value) * batch_count
+    if sample_count <= 0:
+        raise RuntimeError("ROI loader produced zero samples")
+    loss_mean = {key: value / sample_count for key, value in loss_sums.items()}
+    metric_mean = {key: value / sample_count for key, value in metric_sums.items()}
     return loss_mean, metric_mean
 
 
@@ -320,8 +380,12 @@ def train(args):
     coarse_manifest = {}
     if args.coarse_manifest:
         coarse_manifest = json.loads(args.coarse_manifest.read_text(encoding="utf-8"))
+        if not isinstance(coarse_manifest, dict):
+            raise ValueError("coarse manifest must contain a JSON object")
+        coarse_manifest = _index_coarse_manifest(coarse_manifest)
+
         def has_coarse(record):
-            item = coarse_manifest.get(record.image_path, coarse_manifest.get(Path(record.image_path).name))
+            item = _lookup_coarse_manifest(coarse_manifest, record.image_path)
             return isinstance(item, dict) and item.get("point") is not None
         available_counts = {key: sum(has_coarse(record) for record in value) for key, value in positives.items()}
         print(f"coarse_manifest_positive_splits={available_counts}")
@@ -342,14 +406,19 @@ def train(args):
     # If an existing checkpoint is supplied, avoid an unnecessary network
     # download: its backbone weights are loaded immediately below.
     use_pretrained = not args.no_pretrained and not bool(args.init_checkpoint)
-    model = ROIRefiner(pretrained=use_pretrained).to(device)
+    model = ROIRefiner(pretrained=use_pretrained, dropout=args.dropout).to(device)
     if args.init_checkpoint:
         load_backbone_from_checkpoint(model, args.init_checkpoint)
     if args.freeze_epochs > 0:
         for parameter in model.backbone.parameters():
             parameter.requires_grad = False
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     best = float("inf")
+    stale_epochs = 0
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="min", factor=args.lr_factor, patience=max(1, args.lr_patience),
+        min_lr=args.min_lr,
+    )
     history = []
     for epoch in range(1, args.epochs + 1):
         if epoch == args.freeze_epochs + 1:
@@ -360,8 +429,10 @@ def train(args):
         row = {"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss, "train_metric": train_metric, "val_metric": val_metric}
         history.append(row)
         print(f"epoch={epoch:03d} train={train_loss['total']:.5f} val={val_loss['total']:.5f} MAE={val_metric['mae_px']:.2f}px PCK25={val_metric['pck25']:.3f}")
-        if val_loss["total"] < best:
+        scheduler.step(float(val_loss["total"]))
+        if float(val_loss["total"]) < best - args.min_delta:
             best = val_loss["total"]
+            stale_epochs = 0
             torch.save({
                 "architecture": ROI_ARCHITECTURE,
                 "backbone": model.backbone_name,
@@ -371,8 +442,14 @@ def train(args):
                 "roi_fraction": args.roi_fraction,
                 "heatmap_size": model.heatmap_size,
                 "temperature": model.temperature,
+                "dropout": model.dropout_p,
             }, args.output_dir / "best_roi.pth")
+        else:
+            stale_epochs += 1
         (args.output_dir / "history_roi.json").write_text(json.dumps(history, indent=2), encoding="utf-8")
+        if args.patience > 0 and stale_epochs >= args.patience:
+            print(f"early_stop epoch={epoch} best_val={best:.6f} stale_epochs={stale_epochs}", flush=True)
+            break
     checkpoint = torch.load(args.output_dir / "best_roi.pth", map_location=device, weights_only=False)
     model.load_state_dict(checkpoint["model"])
     test_loss, test_metric = run_roi_epoch(model, loaders["test"], device)
@@ -385,11 +462,11 @@ def main():
     root = Path(__file__).resolve().parent
     parser = argparse.ArgumentParser()
     parser.add_argument("--labels", type=Path, default=root / "fire-model-data" / "dataset_labels (1).json")
-    parser.add_argument("--dataset-root", type=Path, default=root / "fire-detection-from-cctv")
+    parser.add_argument("--dataset-root", type=Path, default=CCTV_DATASET)
     parser.add_argument("--init-checkpoint", type=Path, default=root / "fire-model-data" / "best.pth")
     parser.add_argument("--coarse-manifest", type=Path, default=None, help="JSON coarse points produced by an upstream detector")
     parser.add_argument("--output-dir", type=Path, default=root / "week6_roi_result")
-    parser.add_argument("--epochs", type=int, default=30); parser.add_argument("--batch-size", type=int, default=32); parser.add_argument("--workers", type=int, default=0); parser.add_argument("--lr", type=float, default=3e-4); parser.add_argument("--freeze-epochs", type=int, default=5); parser.add_argument("--repeats", type=int, default=3); parser.add_argument("--roi-fraction", type=float, default=0.70); parser.add_argument("--noise-std", type=float, default=0.08); parser.add_argument("--seed", type=int, default=42); parser.add_argument("--device", default=None); parser.add_argument("--no-pretrained", action="store_true")
+    parser.add_argument("--epochs", type=int, default=30); parser.add_argument("--batch-size", type=int, default=32); parser.add_argument("--workers", type=int, default=0); parser.add_argument("--lr", type=float, default=3e-4); parser.add_argument("--weight-decay", type=float, default=1e-4); parser.add_argument("--freeze-epochs", type=int, default=5); parser.add_argument("--repeats", type=int, default=3); parser.add_argument("--roi-fraction", type=float, default=0.70); parser.add_argument("--noise-std", type=float, default=0.08); parser.add_argument("--dropout", type=float, default=0.15); parser.add_argument("--patience", type=int, default=8); parser.add_argument("--min-delta", type=float, default=1e-4); parser.add_argument("--lr-factor", type=float, default=0.5); parser.add_argument("--lr-patience", type=int, default=2); parser.add_argument("--min-lr", type=float, default=1e-6); parser.add_argument("--seed", type=int, default=42); parser.add_argument("--device", default=None); parser.add_argument("--no-pretrained", action="store_true")
     args = parser.parse_args(); train(args)
 
 

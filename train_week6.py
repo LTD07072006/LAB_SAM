@@ -39,11 +39,18 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import functional as TF
 import timm
 
+from project_paths import CCTV_DATASET
 
 ARCHITECTURE = "spatial_heatmap_v2"
 IMAGE_SIZE = (224, 224)
 MEAN = (0.485, 0.456, 0.406)
 STD = (0.229, 0.224, 0.225)
+# The source CCTV set contains adjacent frames with consecutive-looking
+# filenames.  Holding out whole coarse frame windows prevents near-duplicate
+# frames from leaking from train into validation.  The value is deliberately
+# conservative: a slightly harder validation split is preferable to an
+# optimistic score for a downstream 3D localisation system.
+FRAME_GROUP_SIZE = 200
 
 
 @dataclass
@@ -73,13 +80,30 @@ def _source_split(path_text: str) -> str:
 
 
 def _group_name(path_text: str) -> str:
-    """Use the nearest dataset folder as a conservative scene/video group."""
-    p = Path(path_text.replace("\\", "/"))
+    """Return a conservative source/sequence group for split construction.
+
+    The original implementation returned ``data/img_data`` for every image,
+    so the later split function could only shuffle individual frames.  The
+    CCTV export does not include a video id in the label JSON, but its
+    ``img_<number>`` names do provide a useful conservative proxy.  We group
+    neighbouring frame numbers into wide windows and intentionally ignore the
+    class directory: if fire/default images share a nearby frame range, they
+    should stay in the same split as well.
+    """
+    normalized = str(path_text).replace("\\", "/").lower()
+    match = re.search(
+        r"(?:^|/)img_data/(train|test|val)/[^/]+/img_(\d+)(?:\.[^/]+)?$",
+        normalized,
+    )
+    if match:
+        source_split, frame_number = match.groups()
+        bucket = int(frame_number) // FRAME_GROUP_SIZE
+        return f"{source_split}/frame_window_{bucket:04d}"
+    p = Path(normalized)
     parts = list(p.parts)
     for marker in ("train", "test", "val"):
         if marker in parts:
             idx = parts.index(marker)
-            # Parent class is useful for stratification but not a scene id.
             return "/".join(parts[max(0, idx - 2):idx]) or marker
     return "/".join(parts[-3:-1]) or "unknown"
 
@@ -263,26 +287,82 @@ def _stratified_take(records: Sequence[Record], ratio: float, rng: random.Random
     return selected, remaining
 
 
+def _group_stratified_take(
+    records: Sequence[Record], ratio: float, rng: random.Random
+) -> Tuple[List[Record], List[Record]]:
+    """Select a validation subset without splitting a sequence group.
+
+    Groups can contain both classes.  A small greedy objective keeps the
+    selected class counts close to the requested ratio while preferring the
+    requested number of records.  At least one group is always left in the
+    remainder, which keeps the function safe on small datasets.
+    """
+    grouped: Dict[str, List[Record]] = defaultdict(list)
+    for record in records:
+        grouped[str(record.group)].append(record)
+    if len(grouped) <= 1:
+        return _stratified_take(records, ratio, rng)
+
+    total_count = len(records)
+    target_count = max(1, int(round(total_count * ratio)))
+    total_by_class = Counter(record.has_fire for record in records)
+    target_by_class = {label: count * ratio for label, count in total_by_class.items()}
+    candidates = list(grouped.items())
+    rng.shuffle(candidates)
+    selected_groups: list[tuple[str, list[Record]]] = []
+    selected_count = 0
+    selected_by_class: Counter = Counter()
+
+    while candidates and len(candidates) > 1 and selected_count < target_count:
+        best_index = 0
+        best_score: tuple[float, float, float] | None = None
+        for index, (_group, group_records) in enumerate(candidates):
+            new_count = selected_count + len(group_records)
+            new_by_class = selected_by_class.copy()
+            new_by_class.update(record.has_fire for record in group_records)
+            class_error = sum(
+                abs(float(new_by_class[label]) - float(target_by_class.get(label, 0.0)))
+                / max(float(target_by_class.get(label, 1.0)), 1.0)
+                for label in total_by_class
+            )
+            count_error = abs(new_count - target_count) / max(target_count, 1)
+            overshoot = max(0, new_count - target_count) / max(target_count, 1)
+            score = (class_error + 0.5 * count_error + 0.75 * overshoot, overshoot, count_error)
+            if best_score is None or score < best_score:
+                best_index, best_score = index, score
+        group = candidates.pop(best_index)
+        selected_groups.append(group)
+        selected_count += len(group[1])
+        selected_by_class.update(record.has_fire for record in group[1])
+
+    selected = [record for _group, group_records in selected_groups for record in group_records]
+    selected_keys = {id(record) for record in selected}
+    remaining = [record for record in records if id(record) not in selected_keys]
+    rng.shuffle(selected)
+    rng.shuffle(remaining)
+    return selected, remaining
+
+
 def split_records(records: Sequence[Record], seed: int = 42) -> Dict[str, List[Record]]:
     """Create leakage-safe splits.
 
     When source train/test metadata exists, all source-test records remain in
-    test and only source-train records are split into train/validation. This is
-    preferable to mixing an official test set into training. If source folders
-    are unavailable, a stratified 70/15/15 split is used.
+    test and only source-train records are split into train/validation. The
+    validation selection is group-aware, so adjacent frame windows stay in a
+    single split. This is preferable to mixing an official test set into
+    training or validating on near-duplicate frames. If source folders are
+    unavailable, a group-aware split is still attempted.
     """
     rng = random.Random(seed)
     source_train = [r for r in records if r.source_split == "train"]
     source_test = [r for r in records if r.source_split == "test"]
     if source_train and source_test:
-        val, train = _stratified_take(source_train, 0.15, rng)
+        val, train = _group_stratified_take(source_train, 0.15, rng)
         return {"train": train, "val": val, "test": list(source_test)}
 
-    shuffled = list(records)
-    rng.shuffle(shuffled)
-    # Stratify through two-stage class-wise selection.
-    test, rest = _stratified_take(shuffled, 0.15, rng)
-    val, train = _stratified_take(rest, 0.15 / 0.85, rng)
+    # Hold out groups in two stages rather than shuffling individual frames.
+    test, rest = _group_stratified_take(records, 0.15, rng)
+    val, train = _group_stratified_take(rest, 0.15 / 0.85, rng)
     return {"train": train, "val": val, "test": test}
 
 
@@ -538,7 +618,7 @@ def main():
     parser = argparse.ArgumentParser()
     root = Path(__file__).resolve().parent
     parser.add_argument("--labels", type=Path, default=root / "fire-model-data" / "dataset_labels (1).json")
-    parser.add_argument("--dataset-root", type=Path, default=root / "fire-detection-from-cctv")
+    parser.add_argument("--dataset-root", type=Path, default=CCTV_DATASET)
     parser.add_argument("--output-dir", type=Path, default=root / "fire-model-data" / "week6_spatial")
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=32)

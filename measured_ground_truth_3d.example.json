@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "status": "measured_real_room",
+    "units": "metres",
+    "coordinate_system": "same room marker frame as camera and mesh",
+    "annotation": "safe marker or LED substitute; no real fire required"
+  },
+  "records": [
+    {
+      "image": "test/position_01_frame_000.jpg",
+      "sequence_id": "position_01",
+      "p_fire_pixel": [812.4, 646.1],
+      "fire_xyz_world": [1.25, 3.40, 0.00],
+      "marker_id": "led_marker_01"
+    }
+  ]
+}
