@@ -16,7 +16,7 @@ because the current system has one CCTV view and a known room mesh.
 .\.venv\Scripts\Activate.ps1
 python paper_workflow_3d.py `
   --dataset working\synthetic_fire_3d_v3 `
-  --roi-checkpoint output\roi_domain_experiments\mixed\best_roi.pth `
+  --roi-checkpoint output\roi_domain_experiments_cpu_regularized\mixed\best_roi.pth `
   --output-dir output\paper_workflow_synthetic `
   --split test --max-records 24 --selection even --device cpu
 ```
@@ -25,6 +25,70 @@ The output contains `summary.json`, `sequence_metrics.json` and a contact
 sheet: green GT, blue coarse, orange raw ROI, red weighted blend. Use
 `--calibration-source estimated` to stress-test calibration noise. Synthetic
 metric results are not physical-room accuracy.
+
+## Five post-ROI workflows
+
+`benchmark_five_workflows.py` evaluates the same selected records through five
+post-ROI branches and keeps the main Ray Casting result protected:
+
+```text
+ROI pixel
+  ├─ Ray Casting + mesh + robust multi-ray aggregation        (primary)
+  ├─ Homography/IPM -> floor Z=0                              (planar baseline)
+  ├─ Ray estimate -> GPR/IDW residual correction              (calibration aid)
+  ├─ optional metric depth map -> calibrated 3D point         (auxiliary)
+  └─ uncertainty-aware fusion: ray > IPM/GPR > depth
+                         └─ EMA / EKF sequence filtering
+```
+
+Run a dependency-light CPU smoke test on the metric synthetic data:
+
+```powershell
+python benchmark_five_workflows.py `
+  --dataset working\synthetic_fire_3d_v3 `
+  --split test --max-records 24 --selection even `
+  --no-roi --depth-backend none `
+  --output-dir output\workflow_geometry_smoke_20261007 --device cpu
+```
+
+The default GPR branch is fitted only on the `train` split, then evaluated on
+the selected split. If scikit-learn is unavailable it uses a clearly recorded
+dependency-free IDW residual fallback. `--depth-backend none` is intentional
+until a metric depth map or a model with an explicitly calibrated scale is
+available. Relative monocular depth is never reported as metre XYZ.
+
+Use the actual mixed ROI checkpoint after the geometry smoke test:
+
+```powershell
+python benchmark_five_workflows.py `
+  --dataset working\synthetic_fire_3d_v3 `
+  --roi-checkpoint output\roi_domain_experiments_cpu_regularized\mixed\best_roi.pth `
+  --split test --max-records 24 --selection diverse `
+  --output-dir output\workflow_roi_smoke_20261007 --device cpu
+```
+
+For a precomputed metric depth-map folder, files are matched by sample id or
+image stem. Use `--depth-backend maps --depth-map-root path\to\depth
+--depth-units camera_z`; for relative output, provide a validated scale with
+`--depth-scale` and record how that scale was obtained. The depth branch
+remains auxiliary because flames can be assigned the depth of the background
+by a monocular model.
+
+The benchmark writes `summary.json`, `comparison_metrics.json`,
+`sequence_metrics.json`, `comparison_contact_sheet.png` and, when GPR is
+enabled, `gpr_residual.pkl`. Export the full 3D scene:
+
+```powershell
+python visualize_3d_results.py `
+  --summary output\workflow_roi_smoke_20261007\summary.json `
+  --dataset working\synthetic_fire_3d_v3 `
+  --output-dir output\workflow_roi_smoke_20261007\visualization `
+  --max-records 24 --write-ply
+```
+
+The visualizer includes Ray, IPM, GPR, depth, uncertainty fusion, EMA and EKF
+points in the PNG/HTML/PLY output. `depth` may be absent when its optional
+backend is unavailable; that is recorded rather than silently replaced.
 
 ## Reliability ablation
 
@@ -87,7 +151,7 @@ python paper_workflow_3d.py `
   --calibration-source external --calibration measured_camera.json `
   --mesh measured_room_mesh.json --labels-3d measured_ground_truth_3d.json `
   --coarse-source detector --detector-checkpoint fire-model-data\best.pth `
-  --roi-checkpoint output\roi_domain_experiments\mixed\best_roi.pth `
+  --roi-checkpoint output\roi_domain_experiments_cpu_regularized\mixed\best_roi.pth `
   --output-dir output\paper_workflow_real --split test --max-records 0 --device cuda
 ```
 

@@ -42,6 +42,43 @@ train/chạy pipeline mới.
 - `sam-week6-roi-train.ipynb`: bản notebook ROI rút gọn đã được thay thế bởi
   `sam-week6-roi-train-complete.ipynb`, bản có kiểm tra input/leakage, tạo
   coarse manifest, train, đánh giá và smoke test đầy đủ hơn.
+- `sam-detector2d-train-640-kaggle.ipynb`: notebook detector 640 cũ; đã được
+  thay bằng `sam-detector2d-train-640-kaggle-datazip.ipynb`, bản xử lý dataset
+  lớn chỉ chứa `data.zip`.
+
+## Recently archived experimental utilities
+
+- Các pilot/audit Python cũ của nhánh YOLO/ROI đã được loại khỏi checkout;
+  các artifact dữ liệu archive vẫn giữ nguyên.
+
+## Archived provisional 224x224 assets
+
+- `calibration_test_224.json`: calibration mô phỏng cũ cho bộ test 224x224;
+  chỉ giữ để tái lập các benchmark lịch sử.
+- `floor_mesh_test_224.json`: floor mesh mô phỏng cũ tương ứng với calibration
+  224x224.
+- `ground_truth.json`: tập điểm pixel nhỏ của benchmark cũ; evaluator legacy đã
+  được trỏ vào đường dẫn archive.
+
+Các file này được di chuyển nguyên trạng, không bị xóa. Workflow mới dùng
+`working/synthetic_fire_3d_v3`, mesh/calibration đo thật hoặc các manifest mới.
+
+## Archived synthetic and benchmark artifacts
+
+Thư mục `generated_benchmarks/` chứa các bản sinh thử nghiệm cũ được chuyển
+nguyên trạng để tránh làm đầy thư mục runtime. Đây là artifact có thể tái tạo,
+không phải input bắt buộc của workflow hiện tại:
+
+- `generated_benchmarks/working/`: các phiên bản synthetic fire 3D cũ,
+  benchmark smoke và asset-backed ReplicaCAD cũ.
+- `generated_benchmarks/output/`: các kết quả benchmark/visualization cũ,
+  gồm `summary.json`, `comparison_metrics.json`, `sequence_metrics.json`,
+  contact sheet PNG, HTML và PLY nếu có.
+
+Bản đang dùng để kiểm tra workflow hiện tại vẫn nằm tại
+`working/synthetic_fire_3d_v3/` và `output/workflow_final_smoke_20261007/`.
+Việc archive chỉ di chuyển artifact; không xóa dữ liệu và không thay đổi các
+checkpoint, ảnh/video hoặc mã nguồn Python.
 
 ## File vẫn giữ ở thư mục gốc
 

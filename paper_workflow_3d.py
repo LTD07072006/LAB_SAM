@@ -1094,7 +1094,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--roi-checkpoint",
         type=Path,
-        default=root / "output" / "roi_domain_experiments" / "mixed" / "best_roi.pth",
+        default=root / "output" / "roi_domain_experiments_cpu_regularized" / "mixed" / "best_roi.pth",
     )
     parser.add_argument(
         "--no-roi",

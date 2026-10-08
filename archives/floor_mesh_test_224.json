@@ -1,0 +1,18 @@
+{
+  "metadata": {
+    "status": "provisional_simulation",
+    "warning": "Finite floor mesh derived from the synthetic camera frustum; replace with measured room geometry.",
+    "units": "metres",
+    "coordinate_system": "same world frame as calibration_test_224.json"
+  },
+  "vertices": [
+    [-7.0, -8.0, 0.0],
+    [7.0, -8.0, 0.0],
+    [7.0, 10.0, 0.0],
+    [-7.0, 10.0, 0.0]
+  ],
+  "faces": [
+    [0, 1, 2],
+    [0, 2, 3]
+  ]
+}

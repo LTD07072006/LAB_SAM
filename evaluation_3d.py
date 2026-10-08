@@ -167,7 +167,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=("oracle", "noisy", "detector"), default="oracle")
     parser.add_argument("--images", type=Path, default=FIRE_SAMPLES)
-    parser.add_argument("--points", type=Path, default=root / "ground_truth.json")
+    parser.add_argument("--points", type=Path, default=root / "archives" / "ground_truth.json")
     parser.add_argument("--labels-3d", type=Path, default=None)
     parser.add_argument("--model", type=Path, default=root / "fire-model-data" / "best.pth")
     parser.add_argument("--roi-checkpoint", type=Path, default=root / "week6_roi_result" / "best_roi.pth")

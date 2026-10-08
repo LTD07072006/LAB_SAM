@@ -74,11 +74,8 @@ point-label cho ROI; chúng phù hợp để kiểm tra classification/visibilit
 
 ## 3. Đánh giá ray casting
 
-```powershell
-python evaluate_synthetic_fire_3d.py `
-  --dataset working\synthetic_fire_3d_v3 `
-  --split test
-```
+Use `benchmark_five_workflows.py` or `paper_workflow_3d.py` for the current
+synthetic evaluation entry points.
 
 Evaluator báo cáo bốn nhánh:
 
@@ -96,14 +93,8 @@ và sai số từng trục. Với mesh có vật cản, một ray có thể ch�
 Script này không sinh lại ảnh. Tất cả profile dùng cùng manifest và mesh;
 random direction cũng được cố định theo từng record.
 
-```powershell
-python benchmark_synthetic_noise.py `
-  --dataset working\synthetic_fire_3d_v3 `
-  --split test `
-  --point-noise-px 0 1 3 5 10 `
-  --calibration-scale 0 1 2 `
-  --output working\synthetic_fire_3d_v3\noise_benchmark_test.json
-```
+The old standalone noise evaluator was removed; noise profiles already present
+in `working/synthetic_fire_3d_v3` remain available to the active benchmarks.
 
 `calibration-scale=1` tương ứng với noise mặc định của generator; scale 0 là
 oracle calibration; scale 2 là stress test. Khi đưa vào báo cáo cần ghi rõ số
@@ -115,12 +106,8 @@ Generator procedural đủ để kiểm thử hình học. Khi cần ảnh gần
 chạy adapter bằng Blender; adapter vẫn giữ nguyên camera/XYZ/mesh từ manifest
 và thêm RGB, depth, mask:
 
-```powershell
-blender -b --python blender_render_synthetic_fire.py -- `
-  --dataset working\synthetic_fire_3d_v3 `
-  --split test --max-images 24 `
-  --output-dir working\synthetic_fire_3d_v3\blender_test
-```
+The optional Blender renderer was removed from the active checkout. The metric
+manifest and mesh remain available for the current Python visualization tools.
 
 Nếu chưa cài Blender, bỏ qua bước này; không ảnh hưởng generator/evaluator.
 Đây là renderer có kiểm soát, chưa phải mô phỏng vật lý đầy đủ của ngọn lửa.

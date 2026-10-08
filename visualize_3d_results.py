@@ -39,23 +39,61 @@ import numpy as np
 from camera_calibration import CameraCalibration
 
 
-BRANCHES = ("coarse", "roi_raw", "roi_blend", "ipm")
+BRANCHES = (
+    "ray",
+    "coarse",
+    "roi_raw",
+    "roi_blend",
+    "ipm",
+    "scene_mlp",
+    "gpr",
+    "depth",
+    "knn_idw",
+    "triangulation_noisy_estimated",
+    "triangulation_noisy_true",
+    "triangulation_clean_true_oracle",
+    "fusion",
+    "fusion_ema",
+    "fusion_ekf",
+)
 COLORS = {
     "mesh": "#8c8c8c",
     "camera": "#7b2cbf",
     "gt": "#1f9d55",
+    "ray": "#2878d0",
     "coarse": "#2878d0",
     "roi_raw": "#f28e2b",
     "roi_blend": "#d62728",
     "ipm": "#17a2b8",
+    "scene_mlp": "#2ca02c",
+    "gpr": "#9467bd",
+    "depth": "#ff7f0e",
+    "knn_idw": "#17becf",
+    "triangulation_noisy_estimated": "#bcbd22",
+    "triangulation_noisy_true": "#ff9896",
+    "triangulation_clean_true_oracle": "#000000",
+    "fusion": "#e41a1c",
+    "fusion_ema": "#8c2d04",
+    "fusion_ekf": "#c51b8a",
 }
 PLY_COLORS = {
     "camera": (123, 44, 191),
     "gt": (31, 157, 85),
+    "ray": (40, 120, 208),
     "coarse": (40, 120, 208),
     "roi_raw": (242, 142, 43),
     "roi_blend": (214, 39, 40),
     "ipm": (23, 162, 184),
+    "scene_mlp": (44, 160, 44),
+    "gpr": (148, 103, 189),
+    "depth": (255, 127, 14),
+    "knn_idw": (23, 190, 207),
+    "triangulation_noisy_estimated": (188, 189, 34),
+    "triangulation_noisy_true": (255, 152, 150),
+    "triangulation_clean_true_oracle": (0, 0, 0),
+    "fusion": (228, 26, 28),
+    "fusion_ema": (140, 45, 4),
+    "fusion_ekf": (197, 27, 138),
 }
 
 
@@ -265,7 +303,7 @@ def _extract_scene(
             warnings.append(f"No calibration for {record['sample_id']}; rays will be omitted")
         for branch in BRANCHES:
             branch_data = (row.get("branches", {}) or {}).get(branch, {}) or {}
-            location = branch_data.get("location", {}) or {}
+            location = branch_data.get("location", branch_data) or {}
             record["branches"][branch] = {
                 "point": _point(location.get("point")),
                 "pixel": _point(branch_data.get("pixel"), dimensions=2),
@@ -386,10 +424,21 @@ def _plot_static(
     ax.set_title(title)
     handles = [
         Line2D([0], [0], marker="o", color="w", markerfacecolor=COLORS["gt"], label="Ground truth 3D", markersize=8),
+        Line2D([0], [0], marker="x", color=COLORS["ray"], label="Ray Casting", markersize=8),
         Line2D([0], [0], marker="x", color=COLORS["coarse"], label="Coarse", markersize=8),
         Line2D([0], [0], marker="x", color=COLORS["roi_raw"], label="ROI", markersize=8),
         Line2D([0], [0], marker="x", color=COLORS["roi_blend"], label="Weighted blend", markersize=8),
         Line2D([0], [0], marker="x", color=COLORS["ipm"], label="IPM floor", markersize=8),
+        Line2D([0], [0], marker="x", color=COLORS["scene_mlp"], label="Learned scene coordinates", markersize=8),
+        Line2D([0], [0], marker="x", color=COLORS["gpr"], label="GPR residual", markersize=8),
+        Line2D([0], [0], marker="x", color=COLORS["depth"], label="Depth", markersize=8),
+        Line2D([0], [0], marker="x", color=COLORS["knn_idw"], label="KNN/IDW scene coordinates", markersize=8),
+        Line2D([0], [0], marker="x", color=COLORS["triangulation_noisy_estimated"], label="Triangulation noisy + estimated pose", markersize=8),
+        Line2D([0], [0], marker="x", color=COLORS["triangulation_noisy_true"], label="Triangulation noisy + true pose", markersize=8),
+        Line2D([0], [0], marker="x", color=COLORS["triangulation_clean_true_oracle"], label="Triangulation clean oracle", markersize=8),
+        Line2D([0], [0], marker="x", color=COLORS["fusion"], label="Fusion", markersize=8),
+        Line2D([0], [0], marker="x", color=COLORS["fusion_ema"], label="Fusion EMA", markersize=8),
+        Line2D([0], [0], marker="x", color=COLORS["fusion_ekf"], label="Fusion EKF", markersize=8),
         Line2D([0], [0], marker="^", color=COLORS["camera"], label="Camera", markersize=8),
     ]
     ax.legend(handles=handles, loc="upper left", fontsize=8)
@@ -417,7 +466,25 @@ def _plotly_figure(vertices: np.ndarray, faces: np.ndarray, scene_rows: list[dic
     # Scatter3d supports a smaller symbol set than 2D Scatter.  Keep the
     # symbols in Plotly's portable 3D set; triangle-up is not supported
     # consistently across installed Plotly releases.
-    for branch, label, marker in (("gt", "Ground truth 3D", "circle"), ("coarse", "Coarse", "x"), ("roi_raw", "ROI", "diamond"), ("roi_blend", "Weighted blend", "square"), ("ipm", "IPM floor", "circle-open"), ("camera", "Camera", "diamond-open")):
+    for branch, label, marker in (
+        ("gt", "Ground truth 3D", "circle"),
+        ("ray", "Ray Casting", "x"),
+        ("coarse", "Coarse", "x"),
+        ("roi_raw", "ROI", "diamond"),
+        ("roi_blend", "Weighted blend", "square"),
+        ("ipm", "IPM floor", "circle-open"),
+        ("scene_mlp", "Learned scene coordinates", "diamond"),
+        ("gpr", "GPR residual", "diamond-open"),
+        ("depth", "Monocular depth", "cross"),
+        ("knn_idw", "KNN/IDW scene coordinates", "circle-open"),
+        ("triangulation_noisy_estimated", "Triangulation noisy + estimated pose", "x"),
+        ("triangulation_noisy_true", "Triangulation noisy + true pose", "diamond-open"),
+        ("triangulation_clean_true_oracle", "Triangulation clean oracle", "square-open"),
+        ("fusion", "Uncertainty fusion", "square-open"),
+        ("fusion_ema", "Fusion EMA", "circle-open"),
+        ("fusion_ekf", "Fusion EKF", "diamond-open"),
+        ("camera", "Camera", "diamond-open"),
+    ):
         points = []
         ids = []
         for row in scene_rows:
@@ -539,7 +606,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "const data=" + json.dumps(payload, default=_json_default) + ";"
             "const traces=[{type:'mesh3d',x:data.vertices.map(v=>v[0]),y:data.vertices.map(v=>v[1]),z:data.vertices.map(v=>v[2]),"
             "i:data.faces.map(f=>f[0]),j:data.faces.map(f=>f[1]),k:data.faces.map(f=>f[2]),opacity:.25,color:'#8c8c8c',name:'Room mesh'}];"
-            "const branches={gt:'Ground truth 3D',coarse:'Coarse',roi_raw:'ROI',roi_blend:'Weighted blend',ipm:'IPM floor',camera:'Camera'};"
+            "const branches={gt:'Ground truth 3D',ray:'Ray Casting',coarse:'Coarse',roi_raw:'ROI',roi_blend:'Weighted blend',ipm:'IPM floor',scene_mlp:'Learned scene coordinates',gpr:'GPR residual',depth:'Monocular depth',fusion:'Uncertainty fusion',fusion_ema:'Fusion EMA',fusion_ekf:'Fusion EKF',camera:'Camera'};"
             "for(const [key,label] of Object.entries(branches)){const p=[];for(const r of data.records){const v=key==='gt'||key==='camera'?r[key]:r.branches[key].point;if(v)p.push(v);}if(p.length)traces.push({type:'scatter3d',mode:'markers',x:p.map(v=>v[0]),y:p.map(v=>v[1]),z:p.map(v=>v[2]),name:label,marker:{size:5}});}"
             "Plotly.newPlot('scene',traces,{title:'" + title.replace("'", "\\'") + "',scene:{aspectmode:'data',xaxis:{title:'X (m)'},yaxis:{title:'Y (m)'},zaxis:{title:'Z (m)'}}});"
             "</script></body></html>",

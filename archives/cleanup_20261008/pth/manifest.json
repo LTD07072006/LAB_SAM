@@ -1,0 +1,416 @@
+[
+  {
+    "source": "output\\ablation_3d_20261008_v2\\checkpoints\\scene_mlp_clean_estimated.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v2\\checkpoints\\scene_mlp_clean_estimated.pth",
+    "bytes": 51501,
+    "last_write_time": "2026-10-08T13:16:55.4729395+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_20261008_v2\\checkpoints\\scene_mlp_clean_true.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v2\\checkpoints\\scene_mlp_clean_true.pth",
+    "bytes": 51313,
+    "last_write_time": "2026-10-08T13:16:50.4952662+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_20261008_v2\\checkpoints\\scene_mlp_noisy_estimated.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v2\\checkpoints\\scene_mlp_noisy_estimated.pth",
+    "bytes": 51437,
+    "last_write_time": "2026-10-08T13:16:57.5603901+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_20261008_v2\\checkpoints\\scene_mlp_noisy_true.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v2\\checkpoints\\scene_mlp_noisy_true.pth",
+    "bytes": 51313,
+    "last_write_time": "2026-10-08T13:16:53.1040484+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_20261008_v3\\checkpoints\\scene_mlp_clean_estimated.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v3\\checkpoints\\scene_mlp_clean_estimated.pth",
+    "bytes": 51501,
+    "last_write_time": "2026-10-08T13:33:58.8535838+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_20261008_v3\\checkpoints\\scene_mlp_clean_true.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v3\\checkpoints\\scene_mlp_clean_true.pth",
+    "bytes": 51313,
+    "last_write_time": "2026-10-08T13:33:56.0950709+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_20261008_v3\\checkpoints\\scene_mlp_noisy_estimated.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v3\\checkpoints\\scene_mlp_noisy_estimated.pth",
+    "bytes": 51437,
+    "last_write_time": "2026-10-08T13:34:00.3742926+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_20261008_v3\\checkpoints\\scene_mlp_noisy_true.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v3\\checkpoints\\scene_mlp_noisy_true.pth",
+    "bytes": 51313,
+    "last_write_time": "2026-10-08T13:33:57.5433611+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_20261008_v4\\checkpoints\\scene_mlp_clean_estimated.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v4\\checkpoints\\scene_mlp_clean_estimated.pth",
+    "bytes": 51437,
+    "last_write_time": "2026-10-08T13:43:23.4860465+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_20261008_v4\\checkpoints\\scene_mlp_clean_true.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v4\\checkpoints\\scene_mlp_clean_true.pth",
+    "bytes": 51313,
+    "last_write_time": "2026-10-08T13:43:18.0120309+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_20261008_v4\\checkpoints\\scene_mlp_noisy_estimated.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v4\\checkpoints\\scene_mlp_noisy_estimated.pth",
+    "bytes": 51437,
+    "last_write_time": "2026-10-08T13:43:25.9613890+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_20261008_v4\\checkpoints\\scene_mlp_noisy_true.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_20261008_v4\\checkpoints\\scene_mlp_noisy_true.pth",
+    "bytes": 51313,
+    "last_write_time": "2026-10-08T13:43:20.3562720+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_rerun_20261008\\checkpoints\\scene_mlp_clean_estimated.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_rerun_20261008\\checkpoints\\scene_mlp_clean_estimated.pth",
+    "bytes": 51437,
+    "last_write_time": "2026-10-08T19:03:45.2606179+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_rerun_20261008\\checkpoints\\scene_mlp_clean_true.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_rerun_20261008\\checkpoints\\scene_mlp_clean_true.pth",
+    "bytes": 51313,
+    "last_write_time": "2026-10-08T19:03:43.6531928+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_rerun_20261008\\checkpoints\\scene_mlp_noisy_estimated.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_rerun_20261008\\checkpoints\\scene_mlp_noisy_estimated.pth",
+    "bytes": 51437,
+    "last_write_time": "2026-10-08T19:03:46.0326656+07:00"
+  },
+  {
+    "source": "output\\ablation_3d_rerun_20261008\\checkpoints\\scene_mlp_noisy_true.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\ablation_3d_rerun_20261008\\checkpoints\\scene_mlp_noisy_true.pth",
+    "bytes": 51313,
+    "last_write_time": "2026-10-08T19:03:44.4444927+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_smoke2\\checkpoints\\physics_scene_mlp_clean.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_smoke2\\checkpoints\\physics_scene_mlp_clean.pth",
+    "bytes": 85333,
+    "last_write_time": "2026-10-08T15:09:46.9411477+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_smoke2\\checkpoints\\physics_scene_mlp_mixed.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_smoke2\\checkpoints\\physics_scene_mlp_mixed.pth",
+    "bytes": 85397,
+    "last_write_time": "2026-10-08T15:09:52.6565883+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_smoke2\\checkpoints\\physics_scene_mlp_noisy.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_smoke2\\checkpoints\\physics_scene_mlp_noisy.pth",
+    "bytes": 85333,
+    "last_write_time": "2026-10-08T15:09:48.7636589+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v1\\checkpoints\\physics_scene_mlp_clean.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v1\\checkpoints\\physics_scene_mlp_clean.pth",
+    "bytes": 85333,
+    "last_write_time": "2026-10-08T15:12:36.9127420+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v1\\checkpoints\\physics_scene_mlp_mixed.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v1\\checkpoints\\physics_scene_mlp_mixed.pth",
+    "bytes": 85397,
+    "last_write_time": "2026-10-08T15:13:14.5342879+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v1\\checkpoints\\physics_scene_mlp_noisy.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v1\\checkpoints\\physics_scene_mlp_noisy.pth",
+    "bytes": 85333,
+    "last_write_time": "2026-10-08T15:12:43.0972369+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2_fair\\checkpoints\\physics_scene_mlp_v2_pinhole_domain_geometry.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2_fair\\checkpoints\\physics_scene_mlp_v2_pinhole_domain_geometry.pth",
+    "bytes": 129683,
+    "last_write_time": "2026-10-08T17:38:19.8924911+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2_fair\\checkpoints\\physics_scene_mlp_v2_pinhole_domain.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2_fair\\checkpoints\\physics_scene_mlp_v2_pinhole_domain.pth",
+    "bytes": 129557,
+    "last_write_time": "2026-10-08T17:38:14.5370799+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2_fair\\checkpoints\\physics_scene_mlp_v2_pinhole_full_mixed_geometry.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2_fair\\checkpoints\\physics_scene_mlp_v2_pinhole_full_mixed_geometry.pth",
+    "bytes": 129867,
+    "last_write_time": "2026-10-08T17:38:30.1054927+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2_fair\\checkpoints\\physics_scene_mlp_v2_pinhole_only.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2_fair\\checkpoints\\physics_scene_mlp_v2_pinhole_only.pth",
+    "bytes": 129401,
+    "last_write_time": "2026-10-08T17:38:08.5937230+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2_smoke\\checkpoints\\physics_scene_mlp_v2_pinhole_domain_geometry.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2_smoke\\checkpoints\\physics_scene_mlp_v2_pinhole_domain_geometry.pth",
+    "bytes": 55443,
+    "last_write_time": "2026-10-08T17:21:28.4175066+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2_smoke\\checkpoints\\physics_scene_mlp_v2_pinhole_domain.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2_smoke\\checkpoints\\physics_scene_mlp_v2_pinhole_domain.pth",
+    "bytes": 55317,
+    "last_write_time": "2026-10-08T17:21:24.3796218+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2_smoke\\checkpoints\\physics_scene_mlp_v2_pinhole_full_mixed_geometry.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2_smoke\\checkpoints\\physics_scene_mlp_v2_pinhole_full_mixed_geometry.pth",
+    "bytes": 55627,
+    "last_write_time": "2026-10-08T17:21:34.3917762+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2_smoke\\checkpoints\\physics_scene_mlp_v2_pinhole_only.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2_smoke\\checkpoints\\physics_scene_mlp_v2_pinhole_only.pth",
+    "bytes": 55161,
+    "last_write_time": "2026-10-08T17:21:21.7427551+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2\\checkpoints\\physics_scene_mlp_v2_pinhole_domain_geometry.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2\\checkpoints\\physics_scene_mlp_v2_pinhole_domain_geometry.pth",
+    "bytes": 129683,
+    "last_write_time": "2026-10-08T17:23:56.9709628+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2\\checkpoints\\physics_scene_mlp_v2_pinhole_domain.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2\\checkpoints\\physics_scene_mlp_v2_pinhole_domain.pth",
+    "bytes": 129557,
+    "last_write_time": "2026-10-08T17:23:50.5616348+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2\\checkpoints\\physics_scene_mlp_v2_pinhole_full_mixed_geometry.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2\\checkpoints\\physics_scene_mlp_v2_pinhole_full_mixed_geometry.pth",
+    "bytes": 129867,
+    "last_write_time": "2026-10-08T17:24:10.8322155+07:00"
+  },
+  {
+    "source": "output\\physics_scene_cross_20261008_v2\\checkpoints\\physics_scene_mlp_v2_pinhole_only.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_cross_20261008_v2\\checkpoints\\physics_scene_mlp_v2_pinhole_only.pth",
+    "bytes": 129401,
+    "last_write_time": "2026-10-08T17:23:43.1712104+07:00"
+  },
+  {
+    "source": "output\\physics_scene_rerun_20261008\\checkpoints\\physics_scene_mlp_v2_pinhole_domain_geometry.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_rerun_20261008\\checkpoints\\physics_scene_mlp_v2_pinhole_domain_geometry.pth",
+    "bytes": 129683,
+    "last_write_time": "2026-10-08T18:59:27.1305206+07:00"
+  },
+  {
+    "source": "output\\physics_scene_rerun_20261008\\checkpoints\\physics_scene_mlp_v2_pinhole_domain.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_rerun_20261008\\checkpoints\\physics_scene_mlp_v2_pinhole_domain.pth",
+    "bytes": 129557,
+    "last_write_time": "2026-10-08T18:59:24.3028419+07:00"
+  },
+  {
+    "source": "output\\physics_scene_rerun_20261008\\checkpoints\\physics_scene_mlp_v2_pinhole_full_mixed_geometry.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_rerun_20261008\\checkpoints\\physics_scene_mlp_v2_pinhole_full_mixed_geometry.pth",
+    "bytes": 129867,
+    "last_write_time": "2026-10-08T18:59:31.3755073+07:00"
+  },
+  {
+    "source": "output\\physics_scene_rerun_20261008\\checkpoints\\physics_scene_mlp_v2_pinhole_only.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\physics_scene_rerun_20261008\\checkpoints\\physics_scene_mlp_v2_pinhole_only.pth",
+    "bytes": 129401,
+    "last_write_time": "2026-10-08T18:59:21.5061924+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments_cpu_regularized\\mixed\\last_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments_cpu_regularized\\mixed\\last_roi.pth",
+    "bytes": 43038575,
+    "last_write_time": "2026-10-07T02:29:09.4169829+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments_smoke\\mixed\\best_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments_smoke\\mixed\\best_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T10:46:16.1481612+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments_smoke\\mixed\\last_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments_smoke\\mixed\\last_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T10:46:16.4150774+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments_smoke\\real\\best_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments_smoke\\real\\best_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T10:44:24.4786894+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments_smoke\\real\\last_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments_smoke\\real\\last_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T10:44:24.7015821+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments_smoke\\synthetic\\best_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments_smoke\\synthetic\\best_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T10:44:52.3516416+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments_smoke\\synthetic\\last_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments_smoke\\synthetic\\last_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T10:45:11.8058633+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments\\mixed\\best_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments\\mixed\\best_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T14:25:19.1389764+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments\\mixed\\last_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments\\mixed\\last_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T14:25:19.2846136+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments\\real\\best_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments\\real\\best_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T11:20:08.7583853+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments\\real\\last_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments\\real\\last_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T11:20:08.8700684+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments\\synthetic\\best_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments\\synthetic\\best_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T12:09:08.1525761+07:00"
+  },
+  {
+    "source": "output\\roi_domain_experiments\\synthetic\\last_roi.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\roi_domain_experiments\\synthetic\\last_roi.pth",
+    "bytes": 43038447,
+    "last_write_time": "2026-10-06T12:09:08.2427919+07:00"
+  },
+  {
+    "source": "output\\scene_coordinate_regression_full_20261008\\best_scene_coordinate_mlp.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\scene_coordinate_regression_full_20261008\\best_scene_coordinate_mlp.pth",
+    "bytes": 51501,
+    "last_write_time": "2026-10-08T11:55:24.2317962+07:00"
+  },
+  {
+    "source": "output\\scene_coordinate_regression_smoke_20261008\\best_scene_coordinate_mlp.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\scene_coordinate_regression_smoke_20261008\\best_scene_coordinate_mlp.pth",
+    "bytes": 51501,
+    "last_write_time": "2026-10-08T10:46:01.6919120+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_full\\checkpoints\\scene_relu_categorical.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_full\\checkpoints\\scene_relu_categorical.pth",
+    "bytes": 187573,
+    "last_write_time": "2026-10-08T19:06:56.8300894+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_full\\checkpoints\\scene_relu_scalar.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_full\\checkpoints\\scene_relu_scalar.pth",
+    "bytes": 154853,
+    "last_write_time": "2026-10-08T19:06:35.3834868+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_full\\checkpoints\\scene_siren_categorical.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_full\\checkpoints\\scene_siren_categorical.pth",
+    "bytes": 186029,
+    "last_write_time": "2026-10-08T19:07:08.2797903+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_full\\checkpoints\\scene_siren_scalar.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_full\\checkpoints\\scene_siren_scalar.pth",
+    "bytes": 153383,
+    "last_write_time": "2026-10-08T19:06:47.5060030+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_relu_seeded_smoke\\checkpoints\\scene_relu_categorical.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_relu_seeded_smoke\\checkpoints\\scene_relu_categorical.pth",
+    "bytes": 187573,
+    "last_write_time": "2026-10-08T19:19:04.5696179+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_relu_seeded_smoke\\checkpoints\\scene_relu_scalar.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_relu_seeded_smoke\\checkpoints\\scene_relu_scalar.pth",
+    "bytes": 154853,
+    "last_write_time": "2026-10-08T19:18:58.5166721+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_relu_seeded_smoke\\checkpoints\\scene_siren_categorical.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_relu_seeded_smoke\\checkpoints\\scene_siren_categorical.pth",
+    "bytes": 186029,
+    "last_write_time": "2026-10-08T19:19:07.6965862+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_relu_seeded_smoke\\checkpoints\\scene_siren_scalar.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_relu_seeded_smoke\\checkpoints\\scene_siren_scalar.pth",
+    "bytes": 153383,
+    "last_write_time": "2026-10-08T19:19:01.3660783+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_relu_seeded\\checkpoints\\scene_relu_categorical.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_relu_seeded\\checkpoints\\scene_relu_categorical.pth",
+    "bytes": 187573,
+    "last_write_time": "2026-10-08T19:20:40.5516623+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_relu_seeded\\checkpoints\\scene_relu_scalar.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_relu_seeded\\checkpoints\\scene_relu_scalar.pth",
+    "bytes": 154853,
+    "last_write_time": "2026-10-08T19:20:14.2414032+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_relu_seeded\\checkpoints\\scene_siren_categorical.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_relu_seeded\\checkpoints\\scene_siren_categorical.pth",
+    "bytes": 186029,
+    "last_write_time": "2026-10-08T19:20:55.2840508+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_relu_seeded\\checkpoints\\scene_siren_scalar.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_relu_seeded\\checkpoints\\scene_siren_scalar.pth",
+    "bytes": 153383,
+    "last_write_time": "2026-10-08T19:20:29.2773479+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_smoke\\checkpoints\\scene_relu_categorical.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_smoke\\checkpoints\\scene_relu_categorical.pth",
+    "bytes": 38623,
+    "last_write_time": "2026-10-08T19:04:21.7631359+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_smoke\\checkpoints\\scene_relu_scalar.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_smoke\\checkpoints\\scene_relu_scalar.pth",
+    "bytes": 30425,
+    "last_write_time": "2026-10-08T19:04:15.8766553+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_smoke\\checkpoints\\scene_siren_categorical.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_smoke\\checkpoints\\scene_siren_categorical.pth",
+    "bytes": 37589,
+    "last_write_time": "2026-10-08T19:04:24.6865034+07:00"
+  },
+  {
+    "source": "output\\siren_categorical_scene_20261008_smoke\\checkpoints\\scene_siren_scalar.pth",
+    "archive": "archives\\cleanup_20261008\\pth\\output\\siren_categorical_scene_20261008_smoke\\checkpoints\\scene_siren_scalar.pth",
+    "bytes": 29401,
+    "last_write_time": "2026-10-08T19:04:18.5930771+07:00"
+  }
+]

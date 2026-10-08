@@ -1,0 +1,101 @@
+{
+  "dataset": "working\\synthetic_fire_3d_v2_smoke",
+  "split": "test",
+  "records": 6,
+  "clean_true_camera": {
+    "field": "p_fire_pixel",
+    "camera_field": "camera",
+    "attempted": 6,
+    "ray_hits": 6,
+    "hit_rate": 1.0,
+    "statuses": {
+      "valid_mesh": 6
+    },
+    "mae_m": 3.856759524288417e-15,
+    "median_m": 3.247794538999871e-15,
+    "p95_m": 8.011147207509166e-15,
+    "under_0.05m": 1.0,
+    "under_0.10m": 1.0,
+    "under_0.25m": 1.0,
+    "max_m": 8.89287949701369e-15,
+    "mean_abs_x_m": 4.255854927729767e-16,
+    "mean_abs_y_m": 3.700743415417189e-15,
+    "mean_abs_z_m": 2.9605947323337506e-16,
+    "p95_abs_x_m": 1.1102230246251565e-15,
+    "p95_abs_y_m": 7.993605777301127e-15,
+    "p95_abs_z_m": 4.440892098500626e-16,
+    "pixel_mae_px": 0.0
+  },
+  "noisy_point_true_camera": {
+    "field": "p_fire_noisy_pixel",
+    "camera_field": "camera",
+    "attempted": 6,
+    "ray_hits": 6,
+    "hit_rate": 1.0,
+    "statuses": {
+      "valid_mesh": 6
+    },
+    "mae_m": 0.6098268281613765,
+    "median_m": 0.3449731817180875,
+    "p95_m": 1.5064360225114353,
+    "under_0.05m": 0.0,
+    "under_0.10m": 0.16666666666666666,
+    "under_0.25m": 0.16666666666666666,
+    "max_m": 1.7060821174890117,
+    "mean_abs_x_m": 0.11298967721030267,
+    "mean_abs_y_m": 0.5796511544011896,
+    "mean_abs_z_m": 0.0,
+    "p95_abs_x_m": 0.2467437183292568,
+    "p95_abs_y_m": 1.4897148857049438,
+    "p95_abs_z_m": 0.0,
+    "pixel_mae_px": 3.4990416684647396
+  },
+  "clean_point_estimated_camera": {
+    "field": "p_fire_pixel",
+    "camera_field": "camera_estimated",
+    "attempted": 6,
+    "ray_hits": 6,
+    "hit_rate": 1.0,
+    "statuses": {
+      "valid_mesh": 6
+    },
+    "mae_m": 0.44441125970565104,
+    "median_m": 0.34413353263436885,
+    "p95_m": 0.8983103879565544,
+    "under_0.05m": 0.0,
+    "under_0.10m": 0.0,
+    "under_0.25m": 0.16666666666666666,
+    "max_m": 1.0479791717365903,
+    "mean_abs_x_m": 0.06539916150362161,
+    "mean_abs_y_m": 0.4349749692614357,
+    "mean_abs_z_m": 0.0,
+    "p95_abs_x_m": 0.1578468693137579,
+    "p95_abs_y_m": 0.8892444223551719,
+    "p95_abs_z_m": 0.0,
+    "pixel_mae_px": 0.0
+  },
+  "noisy_point_estimated_camera": {
+    "field": "p_fire_noisy_pixel",
+    "camera_field": "camera_estimated",
+    "attempted": 6,
+    "ray_hits": 6,
+    "hit_rate": 1.0,
+    "statuses": {
+      "valid_mesh": 6
+    },
+    "mae_m": 0.7406941053623454,
+    "median_m": 0.23864611993875187,
+    "p95_m": 2.214497870047731,
+    "under_0.05m": 0.0,
+    "under_0.10m": 0.0,
+    "under_0.25m": 0.5,
+    "max_m": 2.5790692489487994,
+    "mean_abs_x_m": 0.11861877707491786,
+    "mean_abs_y_m": 0.7014429112303894,
+    "mean_abs_z_m": 3.7007434154171886e-16,
+    "p95_abs_x_m": 0.25678179638610077,
+    "p95_abs_y_m": 2.202539341884431,
+    "p95_abs_z_m": 4.440892098500626e-16,
+    "pixel_mae_px": 3.4990416684647396
+  }
+}

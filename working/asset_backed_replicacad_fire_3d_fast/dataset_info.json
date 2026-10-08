@@ -1,0 +1,67 @@
+{
+  "format": "LAB_SAM.asset_backed_fire_3d.v1",
+  "status": "asset_backed_synthetic",
+  "warning": "This is a synthetic fire/camera benchmark using a downloaded scene mesh; it is not real CCTV accuracy.",
+  "records": 12,
+  "points": 4,
+  "frames_per_point": 3,
+  "image_size": [
+    640,
+    640
+  ],
+  "floor_bounds_xy": [
+    -2.676597842143053,
+    4.581953511384967,
+    -4.834312781139694,
+    8.164581682565318
+  ],
+  "camera": {
+    "K": [
+      [
+        716.0,
+        0.0,
+        320.0
+      ],
+      [
+        0.0,
+        716.0,
+        320.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "R_world_to_camera": [
+      [
+        1.0,
+        -0.0,
+        0.0
+      ],
+      [
+        0.0,
+        -0.20166550198179137,
+        -0.9794544529024473
+      ],
+      [
+        0.0,
+        0.9794544529024473,
+        -0.20166550198179137
+      ]
+    ],
+    "camera_position": [
+      0.9526778346209568,
+      -6.834312781139694,
+      2.2
+    ]
+  },
+  "asset": {
+    "asset": "D:\\LAB\\SAM_Experiment\\datasets\\post_roi_3d\\habitat_replicacad\\stages\\frl_apartment_stage.glb",
+    "asset_vertices": 77027,
+    "asset_faces": 37283,
+    "loader": "trimesh"
+  },
+  "transform": "world=[asset_x, asset_z, asset_y-floor_asset_y]",
+  "floor_asset_y": 0.0
+}
