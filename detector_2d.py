@@ -220,6 +220,8 @@ class Detector2DFPNModel(nn.Module):
         image_size: Sequence[int] = DEFAULT_IMAGE_SIZE,
         fpn_channels: int = DEFAULT_FPN_CHANNELS,
         temperature: float = DEFAULT_TEMPERATURE,
+        multiscale_heatmap: bool = False,
+        direct_coordinate_head: bool = False,
         pretrained: bool = True,
     ):
         super().__init__()
@@ -227,6 +229,8 @@ class Detector2DFPNModel(nn.Module):
         self.image_size = _size_pair(image_size)
         self.fpn_channels = int(fpn_channels)
         self.temperature = float(temperature)
+        self.multiscale_heatmap = bool(multiscale_heatmap)
+        self.direct_coordinate_head = bool(direct_coordinate_head)
         self.backbone = timm.create_model(
             self.backbone_name,
             pretrained=bool(pretrained),
@@ -251,6 +255,23 @@ class Detector2DFPNModel(nn.Module):
             ConvBNAct(self.fpn_channels, self.fpn_channels),
         )
         self.heatmap_head = nn.Conv2d(self.fpn_channels, 1, 1)
+        if self.direct_coordinate_head:
+            self.coordinate_head = nn.Sequential(
+                nn.AdaptiveAvgPool2d(1), nn.Flatten(),
+                nn.Linear(self.fpn_channels, 128), nn.SiLU(inplace=True), nn.Linear(128, 2),
+            )
+        # Negative prior affects sigmoid background calibration, not softmax
+        # coordinates (softmax is invariant to a constant bias).
+        nn.init.constant_(self.heatmap_head.bias, -2.5)
+        if self.multiscale_heatmap:
+            self.heatmap8 = ConvBNAct(self.fpn_channels, self.fpn_channels)
+            self.heatmap_head8 = nn.Conv2d(self.fpn_channels, 1, 1)
+            self.heatmap_fuse = nn.Conv2d(2, 1, 1, bias=True)
+            nn.init.constant_(self.heatmap_head8.bias, -2.5)
+            nn.init.normal_(self.heatmap_head.weight, std=0.001)
+            nn.init.normal_(self.heatmap_head8.weight, std=0.001)
+            nn.init.constant_(self.heatmap_fuse.weight, 0.5)
+            nn.init.zeros_(self.heatmap_fuse.bias)
         self.class_head = nn.Sequential(
             nn.Linear(channels[self.reduction32_index], 256),
             nn.LayerNorm(256),
@@ -273,7 +294,10 @@ class Detector2DFPNModel(nn.Module):
         return torch.stack((x, y), dim=1)
 
     def forward(self, x: torch.Tensor) -> dict[str, torch.Tensor]:
-        features = self.backbone(x)
+        return self.forward_heads(self.backbone(x))
+
+    def forward_heads(self, features: Sequence[torch.Tensor]) -> dict[str, torch.Tensor]:
+        """Train heads on cached features only when backbone is frozen/eval."""
         f4 = features[self.reduction4_index]
         f8 = features[self.reduction8_index]
         f16 = features[self.reduction16_index]
@@ -283,7 +307,17 @@ class Detector2DFPNModel(nn.Module):
         p8 = F.interpolate(self.lat8(f8), size=p4.shape[-2:], mode="bilinear", align_corners=False)
         p16 = F.interpolate(self.lat16(f16), size=p4.shape[-2:], mode="bilinear", align_corners=False)
         fused = self.fpn_neck(p4 + p8 + p16)
-        heatmap_logits = self.heatmap_head(fused)
+        heatmap4 = self.heatmap_head(fused)
+        if self.multiscale_heatmap:
+            # Keep a native stride-8 branch so the point signal is not forced
+            # through the stride-4 feature alone. Both branches are resized to
+            # the configured output grid before a learned 1x1 fusion.
+            p8_native = self.lat8(f8)
+            heatmap8 = self.heatmap_head8(self.heatmap8(p8_native))
+            heatmap8 = F.interpolate(heatmap8, size=heatmap4.shape[-2:], mode="bilinear", align_corners=False)
+            heatmap_logits = self.heatmap_fuse(torch.cat([heatmap4, heatmap8], dim=1))
+        else:
+            heatmap_logits = heatmap4
         heatmap_logits = F.interpolate(
             heatmap_logits,
             size=self.heatmap_size,
@@ -292,10 +326,13 @@ class Detector2DFPNModel(nn.Module):
         )
         cls_feature = F.adaptive_avg_pool2d(f32, 1).flatten(1)
         confidence_logit = self.class_head(cls_feature).squeeze(1)
+        direct_coord = torch.sigmoid(self.coordinate_head(fused)) if self.direct_coordinate_head else None
         return {
             "confidence_logit": confidence_logit,
             "coord": self._soft_argmax(heatmap_logits, self.temperature),
             "heatmap_logits": heatmap_logits,
+            **({"heatmap4_logits": heatmap4, "heatmap8_logits": heatmap8} if self.multiscale_heatmap else {}),
+            **({"direct_coord": direct_coord} if direct_coord is not None else {}),
         }
 
 
@@ -308,11 +345,18 @@ class Detector2DDataset(Dataset):
         train: bool = False,
         image_size: Sequence[int] = DEFAULT_IMAGE_SIZE,
         flip_p: float = 0.30,
+        sample_weights: Optional[Mapping[str, float]] = None,
+        augment: bool = True,
     ):
         self.records = list(records)
         self.train = bool(train)
         self.image_size = _size_pair(image_size)
         self.flip_p = float(flip_p)
+        self.augment = bool(augment)
+        self.sample_weights = {
+            str(Path(key).resolve()).lower(): float(value)
+            for key, value in (sample_weights or {}).items()
+        }
 
     def __len__(self) -> int:
         return len(self.records)
@@ -322,12 +366,12 @@ class Detector2DDataset(Dataset):
         image = Image.open(record.image_path).convert("RGB")
         x_norm, y_norm = record.x_norm, record.y_norm
 
-        if self.train and random.random() < self.flip_p:
+        if self.train and self.augment and random.random() < self.flip_p:
             image = TF.hflip(image)
             if record.has_fire:
                 x_norm = 1.0 - x_norm
 
-        if self.train:
+        if self.train and self.augment:
             image = ImageEnhance.Brightness(image).enhance(random.uniform(0.82, 1.18))
             image = ImageEnhance.Contrast(image).enhance(random.uniform(0.82, 1.18))
             image = ImageEnhance.Color(image).enhance(random.uniform(0.88, 1.12))
@@ -339,7 +383,8 @@ class Detector2DDataset(Dataset):
         original_xy = torch.tensor([x_norm, y_norm], dtype=torch.float32)
         tensor = TF.normalize(TF.to_tensor(image), MEAN, STD)
         target = torch.tensor([float(record.has_fire), *input_xy], dtype=torch.float32)
-        return tensor, target, original_xy, meta.as_tensor(), record.image_path
+        weight = self.sample_weights.get(str(Path(record.image_path).resolve()).lower(), 1.0)
+        return tensor, target, original_xy, meta.as_tensor(), record.image_path, torch.tensor(weight, dtype=torch.float32)
 
 
 def gaussian_targets(
@@ -372,24 +417,44 @@ class Detector2DLoss(nn.Module):
         lambda_coord: float = 7.0,
         lambda_heatmap: float = 1.0,
         heatmap_sigma: float = 2.0,
+        confidence_weight: float = 1.0,
+        distribution_weight: float = 0.0,
+        temperature: float = DEFAULT_TEMPERATURE,
+        direct_weight: float = 0.0,
+        consistency_weight: float = 0.0,
     ):
         super().__init__()
         self.lambda_coord = float(lambda_coord)
         self.lambda_heatmap = float(lambda_heatmap)
         self.heatmap_sigma = float(heatmap_sigma)
+        self.confidence_weight = float(confidence_weight)
+        self.distribution_weight = float(distribution_weight)
+        self.temperature = float(temperature)
+        self.direct_weight = float(direct_weight)
+        self.consistency_weight = float(consistency_weight)
         self.confidence = nn.BCEWithLogitsLoss(pos_weight=torch.tensor(float(max(1.0, positive_weight))))
 
-    def forward(self, outputs: Mapping[str, torch.Tensor], targets: torch.Tensor) -> dict[str, torch.Tensor]:
+    def forward(self, outputs: Mapping[str, torch.Tensor], targets: torch.Tensor,
+                sample_weights: Optional[torch.Tensor] = None) -> dict[str, torch.Tensor]:
         positive = targets[:, 0] > 0.5
+        if sample_weights is None:
+            sample_weights = torch.ones(targets.shape[0], device=targets.device, dtype=targets.dtype)
+        sample_weights = sample_weights.to(device=targets.device, dtype=targets.dtype).clamp_min(1.0)
         # Move the fixed class-balance tensor with the output on first use.
         self.confidence.pos_weight = self.confidence.pos_weight.to(outputs["confidence_logit"].device)
         confidence_loss = self.confidence(outputs["confidence_logit"], targets[:, 0])
         if positive.any():
-            coordinate_loss = F.smooth_l1_loss(
-                outputs["coord"][positive], targets[positive, 1:], beta=0.02
-            )
+            per_coordinate = F.smooth_l1_loss(
+                outputs["coord"][positive], targets[positive, 1:], beta=0.02, reduction="none"
+            ).mean(dim=1)
+            coordinate_loss = (per_coordinate * sample_weights[positive]).sum() / sample_weights[positive].sum().clamp_min(1.0)
         else:
             coordinate_loss = outputs["coord"].sum() * 0.0
+        direct_loss = outputs["coord"].sum() * 0.0
+        consistency_loss = outputs["coord"].sum() * 0.0
+        if positive.any() and "direct_coord" in outputs:
+            direct_loss = (F.smooth_l1_loss(outputs["direct_coord"][positive], targets[positive, 1:], beta=0.02, reduction="none").mean(1) * sample_weights[positive]).sum() / sample_weights[positive].sum().clamp_min(1.0)
+            consistency_loss = F.smooth_l1_loss(outputs["direct_coord"][positive], outputs["coord"][positive], beta=0.02)
 
         _, _, height, width = outputs["heatmap_logits"].shape
         target_heatmap = gaussian_targets(
@@ -401,13 +466,33 @@ class Detector2DLoss(nn.Module):
         # Emphasize the gaussian centre without making the huge background
         # dominate the point signal.
         pixel_weight = 1.0 + 4.0 * target_heatmap
-        heatmap_loss = (pixel_loss * pixel_weight).mean()
-        total = confidence_loss + self.lambda_coord * coordinate_loss + self.lambda_heatmap * heatmap_loss
+        per_heatmap = (pixel_loss * pixel_weight).flatten(1).mean(dim=1)
+        heatmap_loss = (per_heatmap * sample_weights).sum() / sample_weights.sum().clamp_min(1.0)
+        distribution_loss = outputs["heatmap_logits"].sum() * 0.0
+        if self.distribution_weight > 0.0 and positive.any():
+            distributions = []
+            for key in ("heatmap_logits", "heatmap4_logits", "heatmap8_logits"):
+                if key not in outputs:
+                    continue
+                logits = outputs[key][positive].float()
+                # Targets and predictions share the same normalized grid and
+                # temperature as the coordinate decoder. CE keeps a spatial
+                # signal even when an incorrect soft-argmax peak saturates.
+                gaussian = gaussian_targets(targets[positive, 1:].float(),
+                    torch.ones_like(targets[positive, 0]), *logits.shape[-2:], sigma=self.heatmap_sigma).flatten(1)
+                probability = gaussian / gaussian.sum(1, keepdim=True).clamp_min(1e-12)
+                per = -(probability * F.log_softmax(logits.flatten(1) / self.temperature, dim=1)).sum(1)
+                distributions.append((per * sample_weights[positive]).sum() / sample_weights[positive].sum())
+            distribution_loss = torch.stack(distributions).mean()
+        total = self.confidence_weight * confidence_loss + self.lambda_coord * coordinate_loss + self.lambda_heatmap * heatmap_loss + self.distribution_weight * distribution_loss + self.direct_weight * direct_loss + self.consistency_weight * consistency_loss
         return {
             "total": total,
             "confidence": confidence_loss,
             "coordinate": coordinate_loss,
             "heatmap": heatmap_loss,
+            "distribution": distribution_loss,
+            "direct": direct_loss,
+            "consistency": consistency_loss,
         }
 
 
@@ -460,6 +545,8 @@ class Detector2DInference:
             image_size=self.image_size,
             fpn_channels=int(checkpoint.get("fpn_channels", DEFAULT_FPN_CHANNELS)),
             temperature=float(checkpoint.get("temperature", DEFAULT_TEMPERATURE)),
+            multiscale_heatmap=bool(checkpoint.get("multiscale_heatmap", False)),
+            direct_coordinate_head=bool(checkpoint.get("direct_coordinate_head", False)),
             pretrained=False,
         ).to(self.device)
         self.model.load_state_dict(checkpoint["model"], strict=True)
@@ -685,14 +772,21 @@ def run_epoch(
     metadata_values: list[torch.Tensor] = []
     if training:
         optimizer.zero_grad(set_to_none=True)
-    for batch_index, (images, targets, original_xy, meta, _) in enumerate(loader):
+    for batch_index, batch in enumerate(loader):
+        if len(batch) == 6:
+            images, targets, original_xy, meta, _, sample_weights = batch
+        else:
+            images, targets, original_xy, meta, _ = batch
+            sample_weights = None
         images = images.to(device, non_blocking=True)
         targets = targets.to(device, non_blocking=True)
         original_xy = original_xy.to(device, non_blocking=True)
         meta = meta.to(device, non_blocking=True)
+        if sample_weights is not None:
+            sample_weights = sample_weights.to(device, non_blocking=True)
         with _autocast(device):
             outputs = model(images)
-            loss_dict = criterion(outputs, targets)
+            loss_dict = criterion(outputs, targets, sample_weights)
         if training:
             loss_for_backward = loss_dict["total"] / accumulation_steps
             if scaler is not None and scaler.is_enabled():
@@ -807,10 +901,13 @@ def save_checkpoint(
             "heatmap_size": model.heatmap_size,
             "temperature": model.temperature,
             "fpn_channels": model.fpn_channels,
+            "multiscale_heatmap": model.multiscale_heatmap,
+            "direct_coordinate_head": model.direct_coordinate_head,
             "mean": MEAN,
             "std": STD,
             "split_info": dict(split_info),
             "args": vars(args),
+            "selection_metric": getattr(args, "selection_metric", "loss"),
         },
         path,
     )
@@ -846,6 +943,13 @@ def main() -> None:
     parser.add_argument("--backbone", default=DEFAULT_BACKBONE)
     parser.add_argument("--image-size", "--imgsz", dest="image_size", type=int, default=640)
     parser.add_argument("--fpn-channels", type=int, default=DEFAULT_FPN_CHANNELS)
+    parser.add_argument("--multiscale-heatmap", action="store_true")
+    parser.add_argument("--temperature", type=float, default=DEFAULT_TEMPERATURE)
+    parser.add_argument("--lambda-coord", type=float, default=7.0)
+    parser.add_argument("--warmup-lambda-coord", type=float, default=20.0)
+    parser.add_argument("--heatmap-sigma", type=float, default=2.0)
+    parser.add_argument("--distribution-weight", type=float, default=0.0)
+    parser.add_argument("--warmup-confidence-weight", type=float, default=0.2)
     parser.add_argument("--epochs", type=int, default=35)
     parser.add_argument("--freeze-epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=8)
@@ -876,6 +980,12 @@ def main() -> None:
         help="auto, cpu, cuda, cuda:0, or 0 (0 is normalized to cuda:0)",
     )
     parser.add_argument("--threshold", type=float, default=0.5)
+    parser.add_argument("--hard-tail-manifest", type=Path, default=None,
+                        help="train-only coarse issue JSON; weights coordinate/heatmap loss")
+    parser.add_argument("--hard-tail-weight", type=float, default=2.0,
+                        help="coordinate/heatmap multiplier for hard-tail positives")
+    parser.add_argument("--selection-metric", choices=("loss", "mae"), default="mae",
+                        help="validation metric used to promote a checkpoint")
     parser.add_argument("--no-pretrained", action="store_true")
     parser.add_argument("--smoke-test", action="store_true", help="run one train and validation epoch")
     args = parser.parse_args()
@@ -907,8 +1017,20 @@ def main() -> None:
     if any(split_info[name]["count"] == 0 for name in ("train", "val", "test")):
         raise RuntimeError(f"Empty split: {split_info}")
 
+    sample_weights: dict[str, float] = {}
+    if args.hard_tail_manifest is not None:
+        payload = json.loads(args.hard_tail_manifest.read_text(encoding="utf-8"))
+        hard_rows = payload.get("hard_tail_train", payload) if isinstance(payload, Mapping) else payload
+        train_keys = {str(Path(record.image_path).resolve()).lower() for record in splits["train"]}
+        for row in hard_rows if isinstance(hard_rows, list) else []:
+            if isinstance(row, Mapping) and row.get("image_path"):
+                key = str(Path(str(row["image_path"])).resolve()).lower()
+                if key in train_keys:
+                    sample_weights[key] = max(1.0, float(args.hard_tail_weight))
+        print(f"hard_tail_weighted_train={len(sample_weights)} weight={max(1.0, float(args.hard_tail_weight))}")
+
     train_loader = DataLoader(
-        Detector2DDataset(splits["train"], train=True, image_size=image_size),
+        Detector2DDataset(splits["train"], train=True, image_size=image_size, sample_weights=sample_weights),
         batch_size=args.batch_size,
         shuffle=True,
         num_workers=args.workers,
@@ -933,6 +1055,8 @@ def main() -> None:
         backbone=args.backbone,
         image_size=image_size,
         fpn_channels=args.fpn_channels,
+        temperature=args.temperature,
+        multiscale_heatmap=args.multiscale_heatmap,
         # When an existing checkpoint is supplied, use it as the local
         # backbone initialization and avoid an unnecessary timm download.
         pretrained=not args.no_pretrained and args.init_checkpoint is None,
@@ -944,7 +1068,9 @@ def main() -> None:
         print(f"backbone_init={args.init_checkpoint} transfer={transfer_info}")
     positive = split_info["train"]["fire"]
     negative = split_info["train"]["no_fire"]
-    criterion = Detector2DLoss(positive_weight=negative / max(1, positive))
+    criterion = Detector2DLoss(positive_weight=negative / max(1, positive),
+        lambda_coord=args.lambda_coord, heatmap_sigma=args.heatmap_sigma,
+        distribution_weight=args.distribution_weight, temperature=args.temperature)
     optimizer = torch.optim.AdamW(
         [
             {"params": model.backbone.parameters(), "lr": args.backbone_lr},
@@ -994,6 +1120,8 @@ def main() -> None:
     history: list[dict[str, Any]] = []
     for epoch in range(1, args.epochs + 1):
         _set_backbone_trainable(model, epoch > args.freeze_epochs)
+        criterion.lambda_coord = args.warmup_lambda_coord if epoch <= args.freeze_epochs else args.lambda_coord
+        criterion.confidence_weight = args.warmup_confidence_weight if epoch <= args.freeze_epochs else 1.0
         train_loss, train_metric = run_epoch(
             model,
             train_loader,
@@ -1020,8 +1148,9 @@ def main() -> None:
             f"val_f1={val_metric['f1']:.3f} val_mae={val_metric['mae_px']:.2f}px "
             f"val_pck10={val_metric['pck10']:.3f} val_pck25={val_metric['pck25']:.3f}"
         )
-        if val_loss["total"] < best:
-            best = val_loss["total"]
+        selection_score = val_metric["mae_px"] if args.selection_metric == "mae" else val_loss["total"]
+        if np.isfinite(selection_score) and selection_score < best:
+            best = selection_score
             save_checkpoint(
                 args.output_dir / "best_detector_2d.pth",
                 model,
@@ -1052,7 +1181,7 @@ def main() -> None:
     print(f"test_loss={test_loss}")
     print(f"test_metric={test_metric}")
     (args.output_dir / "test_metrics.json").write_text(
-        json.dumps({"architecture": ARCHITECTURE, "loss": test_loss, "metric": test_metric}, indent=2),
+        json.dumps({"architecture": ARCHITECTURE, "selection_metric": args.selection_metric, "selection_value": best, "loss": test_loss, "metric": test_metric}, indent=2),
         encoding="utf-8",
     )
 

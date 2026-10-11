@@ -1,0 +1,56 @@
+[
+  {
+    "name": "depth_anything_v2_readme",
+    "url": "https://raw.githubusercontent.com/DepthAnything/Depth-Anything-V2/main/README.md",
+    "status": 200,
+    "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_research_20261010\\sources\\depth_anything_v2_readme.txt",
+    "bytes": 9904
+  },
+  {
+    "name": "depth_anything_v2_metric",
+    "url": "https://raw.githubusercontent.com/DepthAnything/Depth-Anything-V2/main/metric_depth/README.md",
+    "status": 200,
+    "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_research_20261010\\sources\\depth_anything_v2_metric.txt",
+    "bytes": 4621
+  },
+  {
+    "name": "hf_metric_card",
+    "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Metric-Indoor-Small-hf/raw/main/README.md",
+    "status": 200,
+    "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_research_20261010\\sources\\hf_metric_card.txt",
+    "bytes": 4961
+  },
+  {
+    "name": "hf_metric_config",
+    "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Metric-Indoor-Small-hf/raw/main/config.json",
+    "status": 200,
+    "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_research_20261010\\sources\\hf_metric_config.json",
+    "bytes": 1063
+  },
+  {
+    "name": "monodgp_readme",
+    "url": "https://raw.githubusercontent.com/PuFanqi/MonoDGP/main/README.md",
+    "error": "404 Client Error: Not Found for url: https://raw.githubusercontent.com/PuFanqi/MonoDGP/main/README.md"
+  },
+  {
+    "name": "monodgp_arxiv",
+    "url": "https://export.arxiv.org/api/query?id_list=2410.19590",
+    "status": 200,
+    "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_research_20261010\\sources\\monodgp_arxiv.txt",
+    "bytes": 3046
+  },
+  {
+    "name": "dsnt_arxiv",
+    "url": "https://export.arxiv.org/api/query?id_list=1801.07372",
+    "status": 200,
+    "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_research_20261010\\sources\\dsnt_arxiv.txt",
+    "bytes": 2625
+  },
+  {
+    "name": "kendall_gal_arxiv",
+    "url": "https://export.arxiv.org/api/query?id_list=1703.04977",
+    "status": 200,
+    "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_research_20261010\\sources\\kendall_gal_arxiv.txt",
+    "bytes": 2488
+  }
+]

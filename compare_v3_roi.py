@@ -68,6 +68,12 @@ class Prediction:
     point: Optional[tuple[float, float]] = None
     detected: bool = False
     latency_ms: float = 0.0
+    stability_px: Optional[float] = None
+    stability_reference_px: Optional[float] = None
+    raw_point: Optional[tuple[float, float]] = None
+    position_reliability: Optional[float] = None
+    localization_accepted: bool = True
+    localization_status: str = "not_checked"
 
 
 @dataclass
@@ -137,10 +143,37 @@ def _normalise_prediction(raw: Any, image_size: tuple[int, int], threshold: floa
         else:
             explicit_normalized = hasattr(raw, "pixel") is False and hasattr(raw, "coord")
     point = _point(value, image_size, normalized=bool(explicit_normalized) if explicit_normalized is not None else None)
+    raw_value = _get(raw, "raw_pixel", "raw_point", default=None)
+    raw_point = _point(raw_value, image_size, normalized=False) if raw_value is not None else point
     detected_value = _get(raw, "detected", "is_fire", default=None)
     detected = confidence >= threshold if detected_value is None else bool(detected_value)
     detected = bool(detected and confidence >= threshold and point is not None)
-    return Prediction(confidence=confidence, point=point if detected else None, detected=detected)
+    stability_value = _get(raw, "stability_px", default=None)
+    reliability_value = _get(raw, "position_reliability", "localisation_reliability", default=None)
+    try:
+        stability = None if stability_value is None else float(stability_value)
+    except (TypeError, ValueError):
+        stability = None
+    try:
+        reliability = None if reliability_value is None else float(reliability_value)
+    except (TypeError, ValueError):
+        reliability = None
+    reference_value = _get(raw, "stability_reference_px", default=None)
+    try:
+        reference = None if reference_value is None else float(reference_value)
+    except (TypeError, ValueError):
+        reference = None
+    return Prediction(
+        confidence=confidence,
+        point=point if detected else None,
+        detected=detected,
+        stability_px=stability,
+        stability_reference_px=reference,
+        raw_point=raw_point,
+        position_reliability=reliability,
+        localization_accepted=bool(_get(raw, "localization_accepted", default=point is not None)),
+        localization_status=str(_get(raw, "localization_status", default="not_checked")),
+    )
 
 
 def _records_for_split(records: Sequence[Any], split: str, seed: int = 42) -> list[Any]:

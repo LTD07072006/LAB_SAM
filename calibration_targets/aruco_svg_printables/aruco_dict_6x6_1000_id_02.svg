@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297">
+<title>DICT_6X6_1000 marker 2</title>
+<rect width="100%" height="100%" fill="white"/>
+<g id="aruco-2" transform="translate(45 88.5)">
+<rect width="120" height="120" fill="white"/>
+<rect x="0" y="0" width="15" height="15" fill="black"/>
+<rect x="15" y="0" width="15" height="15" fill="black"/>
+<rect x="30" y="0" width="15" height="15" fill="black"/>
+<rect x="45" y="0" width="15" height="15" fill="black"/>
+<rect x="60" y="0" width="15" height="15" fill="black"/>
+<rect x="75" y="0" width="15" height="15" fill="black"/>
+<rect x="90" y="0" width="15" height="15" fill="black"/>
+<rect x="105" y="0" width="15" height="15" fill="black"/>
+<rect x="0" y="15" width="15" height="15" fill="black"/>
+<rect x="15" y="15" width="15" height="15" fill="black"/>
+<rect x="30" y="15" width="15" height="15" fill="black"/>
+<rect x="45" y="15" width="15" height="15" fill="black"/>
+<rect x="75" y="15" width="15" height="15" fill="black"/>
+<rect x="105" y="15" width="15" height="15" fill="black"/>
+<rect x="0" y="30" width="15" height="15" fill="black"/>
+<rect x="15" y="30" width="15" height="15" fill="black"/>
+<rect x="60" y="30" width="15" height="15" fill="black"/>
+<rect x="75" y="30" width="15" height="15" fill="black"/>
+<rect x="105" y="30" width="15" height="15" fill="black"/>
+<rect x="0" y="45" width="15" height="15" fill="black"/>
+<rect x="15" y="45" width="15" height="15" fill="black"/>
+<rect x="30" y="45" width="15" height="15" fill="black"/>
+<rect x="45" y="45" width="15" height="15" fill="black"/>
+<rect x="60" y="45" width="15" height="15" fill="black"/>
+<rect x="75" y="45" width="15" height="15" fill="black"/>
+<rect x="105" y="45" width="15" height="15" fill="black"/>
+<rect x="0" y="60" width="15" height="15" fill="black"/>
+<rect x="90" y="60" width="15" height="15" fill="black"/>
+<rect x="105" y="60" width="15" height="15" fill="black"/>
+<rect x="0" y="75" width="15" height="15" fill="black"/>
+<rect x="30" y="75" width="15" height="15" fill="black"/>
+<rect x="60" y="75" width="15" height="15" fill="black"/>
+<rect x="105" y="75" width="15" height="15" fill="black"/>
+<rect x="0" y="90" width="15" height="15" fill="black"/>
+<rect x="15" y="90" width="15" height="15" fill="black"/>
+<rect x="30" y="90" width="15" height="15" fill="black"/>
+<rect x="75" y="90" width="15" height="15" fill="black"/>
+<rect x="105" y="90" width="15" height="15" fill="black"/>
+<rect x="0" y="105" width="15" height="15" fill="black"/>
+<rect x="15" y="105" width="15" height="15" fill="black"/>
+<rect x="30" y="105" width="15" height="15" fill="black"/>
+<rect x="45" y="105" width="15" height="15" fill="black"/>
+<rect x="60" y="105" width="15" height="15" fill="black"/>
+<rect x="75" y="105" width="15" height="15" fill="black"/>
+<rect x="90" y="105" width="15" height="15" fill="black"/>
+<rect x="105" y="105" width="15" height="15" fill="black"/>
+</g>
+<text x="10" y="287" font-family="Arial" font-size="4">DICT_6X6_1000 ID=2; black square=120 mm; print at 100%</text>
+</svg>

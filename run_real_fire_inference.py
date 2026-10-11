@@ -138,6 +138,12 @@ def _infer_one(
         "confidence": float(detection.confidence),
         "detected": bool(detection.confidence >= threshold and detection.detected),
         "coarse_pixel": coarse,
+        "raw_coarse_pixel": _point(getattr(detection, "raw_pixel", None)),
+        "stability_px": getattr(detection, "stability_px", None),
+        "position_reliability": getattr(detection, "position_reliability", None),
+        "localization_accepted": bool(getattr(detection, "localization_accepted", True)),
+        "localization_status": str(getattr(detection, "localization_status", "not_checked")),
+        "tta_count": int(getattr(detection, "tta_count", 1)),
         "roi_pixel": refined,
         "roi_used": roi_used,
         "roi_confidence": roi_confidence,
@@ -260,6 +266,19 @@ def main() -> None:
     parser.add_argument("--selection", choices=("head", "diverse"), default="diverse")
     parser.add_argument("--threshold", type=float, default=0.5)
     parser.add_argument("--device", default=None)
+    parser.add_argument(
+        "--tta-mode",
+        choices=("none", "brightness3", "photometric5"),
+        default="none",
+        help="Optional geometry-preserving photometric TTA for the coarse detector",
+    )
+    parser.add_argument("--tta-reliability-scale-px", type=float, default=8.0)
+    parser.add_argument(
+        "--max-stability-px",
+        type=float,
+        default=None,
+        help="Reject unstable localisation while retaining fire detection; calibrate on validation",
+    )
     args = parser.parse_args()
 
     for path, label in ((args.model, "detector checkpoint"), (args.roi, "ROI checkpoint")):
@@ -279,7 +298,14 @@ def main() -> None:
     device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
     print(f"device={device}")
     print(f"image_roots={image_roots}")
-    detector = FireDetector(args.model, device=device, threshold=args.threshold)
+    detector = FireDetector(
+        args.model,
+        device=device,
+        threshold=args.threshold,
+        tta_mode=args.tta_mode,
+        tta_reliability_scale_px=args.tta_reliability_scale_px,
+        max_stability_px=args.max_stability_px,
+    )
     refiner = ROIRefinerInference(args.roi, device=str(device))
     detector.warmup(repeats=1)
 
@@ -325,6 +351,9 @@ def main() -> None:
             "detector": str(args.model.resolve()),
             "roi": str(args.roi.resolve()),
             "threshold": args.threshold,
+            "tta_mode": args.tta_mode,
+            "tta_reliability_scale_px": args.tta_reliability_scale_px,
+            "max_stability_px": args.max_stability_px,
             "3d_metrics": "not computed; real media has no matching measured calibration/mesh/XYZ labels in this run",
         },
         "image_summary": image_summary,

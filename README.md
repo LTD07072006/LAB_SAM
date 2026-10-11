@@ -12,16 +12,64 @@ The detector and ROI refiner are separate modules. `best.pth` is the upstream
 fire detector checkpoint and `week6_roi_result/best_roi.pth` is the point
 refinement checkpoint.
 
+For the Section 1.2 pre-ROI reliability experiment, run the current checkpoint
+on every record, including no-fire images:
+
+```powershell
+python research_section_1_2\benchmark_pre_roi_tta.py `
+  --split test --tta-mode brightness3 --max-stability-px 6 `
+  --output-dir output\section_1_2_pre_roi_20261010\pre_roi_tta_all_test
+```
+
+The gate is selected on validation and reports accepted localisation coverage
+separately from fire precision/recall. A rejected frame still contributes to
+fire detection but is not sent to ROI or ray casting.
+
+`brightness3` is the selected production compromise. A five-view
+`photometric5` ablation is cached under
+`output\section_1_2_pre_roi_20261010\pre_roi_tta_ablation_summary.json`; it did
+not improve validation consistently and is therefore not enabled by default.
+Incomplete or non-finite TTA outputs are rejected as localisation even when the
+fire alert remains active.
+
+The experimental soft-crop path is available through
+`ROIRefinerInference.refine(stability_px=..., expansion_factor=...)` and
+`research_section_1_2\benchmark_soft_roi.py`. It keeps all coarse fire points,
+expands the crop only when stability exceeds a validation threshold, and caps
+the crop side. The current database audit shows that crop containment is
+already 100%; dynamic expansion alone does not fix the high-confidence
+localisation outlier, so the default production path remains unchanged.
+
+For ordered video streams, the label-free `temporal_outlier_guard.py` can
+replace an isolated coarse jump when TTA stability is high and consecutive
+frames remain visually similar. On the current test sequence it repaired
+`img_243` and removed the >25 px ROI outlier; it is intentionally disabled for
+shuffled still-image evaluation.
+
+The full filter pass is reproducible with
+`research_section_1_2\filter_and_repair_outliers.py`. Its final artifacts are
+under `output\section_1_2_pre_roi_20261010\filtered_outliers_final2\`:
+the raw/guarded coarse manifest, a 15-image train hard-tail manifest, and an
+annotation-review list. Source Ground Truth JSON is never overwritten.
+
 ## Main files
 
 - `fire_detector.py`: detector adapter and checkpoint loader.
+- `fire_detector.py` also supports optional geometry-preserving photometric
+  TTA (`tta_mode="brightness3"`) for the legacy pre-ROI detector. It returns
+  `stability_px` and an optional `max_stability_px` gate; fire classification
+  remains separate from localisation acceptance.
 - `detector_2d.py`: higher-resolution FPN detector used before ROI; it keeps
   the old `best.pth` untouched and returns the same `confidence + pixel`
   contract.
 - `train_detector_2d.py`: command-line entry point for training that detector.
 - `compare_detector_2d.py`: detector-only old/new comparison with pixel
   metrics and a contact sheet.
+- `research_section_1_2/benchmark_pre_roi_tta.py`: leakage-safe benchmark of
+  TTA, reliability gating, all fire/no-fire records, coverage and latency.
 - `narrow_localizer.py`: ROIRefiner and inference adapter.
+- `temporal_outlier_guard.py`: optional ordered-video guard for isolated coarse
+  jumps; it records raw and guarded points separately.
 - `main_localization.py`: end-to-end image/sequence pipeline.
 - `benchmark_ab.py`: coarse-versus-refined A/B benchmark.
 - `compare_v3_roi.py`: same-image visual and pixel-level comparison of
@@ -30,6 +78,11 @@ refinement checkpoint.
 - `v3_detector.py`: v3 MobileNetV4 + FPN inference adapter.
 - `camera_calibration.py`: intrinsics, extrinsics and undistortion.
 - `locator.py`: ray casting, `GridMap` and `TriangleMesh`.
+- `ray_plane_intersection.py`: batched PyTorch ray/plane backend with
+  parallel/behind-camera masks and strict error mode.
+- `online_homography.py`: RANSAC-gated online floor calibration with
+  reprojection checks, versioning and rollback; `calibrate_online_homography.py`
+  is its JSON-stream CLI.
 - `mesh_loader.py`: JSON triangle-mesh loader.
 - `train_week6.py`: spatial fire detector training utilities.
 - `sam-week6-roi-train-complete.ipynb`: Kaggle ROIRefiner training workflow.
@@ -302,6 +355,32 @@ python main_localization.py `
   --output working\localization_mesh_test.json
 ```
 
+The same pipeline can use the closed-form plane backend while retaining mesh
+fallback for an invalid plane hypothesis:
+
+```powershell
+python main_localization.py `
+  --ray-backend plane --plane 0 0 1 0 `
+  --mesh path\to\room_mesh.json
+```
+
+`RayPlaneIntersectionLocator` solves `X(lambda)=C+lambda*r` and
+`n·X+d=0` for a whole pixel batch. It marks parallel rays, intersections
+behind the camera and invalid planes; each pipeline result records the active
+backend and fallback reason. Add `--no-plane-fallback` when a floor prior must
+be treated as a hard constraint.
+
+For a stream of measured floor anchors, `OnlineHomographyRefiner` uses RANSAC
+and inlier/reprojection/update-size gates before replacing the active map.
+Rejected updates leave the previous map untouched. The JSON CLI accepts
+`image_points_px` + `floor_points_xy`, or named `observations` and
+`anchor_world_xy`, and writes the accepted version plus an audit trail:
+
+```powershell
+python calibrate_online_homography.py `
+  --input anchors.json --output working\online_homography.json
+```
+
 For an A/B benchmark:
 
 ```powershell
@@ -317,6 +396,13 @@ The included public fire datasets contain 2D images, labels and videos. They
 do not provide the physical room dimensions, camera calibration or 3D fire
 coordinates needed for a valid metric 3D benchmark. Replace the provisional
 calibration/mesh with measured files before reporting metre-level accuracy.
+
+The local external-data audit is in
+`output/dataset_integration_20261010/dataset_audit.json`; the auxiliary
+manifest is in `output/dataset_integration_20261010/external_coarse_manifest.json`.
+D-Fire bottom-centres are weak box-derived targets, while FIRE-SMOKE is
+classification-only. Neither source is mixed into the leakage-safe CCTV
+validation or test split.
 
 ## Security note
 

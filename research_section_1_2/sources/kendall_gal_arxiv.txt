@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/EwuibCa/TQH7hrK0XZ6EYEYY5fg</id>
+  <title>arXiv Query: search_query=&amp;id_list=1703.04977&amp;start=0&amp;max_results=10</title>
+  <updated>2026-10-09T17:03:42Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=&amp;start=0&amp;max_results=10&amp;id_list=1703.04977" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/1703.04977v2</id>
+    <title>What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision?</title>
+    <updated>2017-10-05T13:04:51Z</updated>
+    <link href="https://arxiv.org/abs/1703.04977v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1703.04977v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>There are two major types of uncertainty one can model. Aleatoric uncertainty captures noise inherent in the observations. On the other hand, epistemic uncertainty accounts for uncertainty in the model -- uncertainty which can be explained away given enough data. Traditionally it has been difficult to model epistemic uncertainty in computer vision, but with new Bayesian deep learning tools this is now possible. We study the benefits of modeling epistemic vs. aleatoric uncertainty in Bayesian deep learning models for vision tasks. For this we present a Bayesian deep learning framework combining input-dependent aleatoric uncertainty together with epistemic uncertainty. We study models under the framework with per-pixel semantic segmentation and depth regression tasks. Further, our explicit uncertainty formulation leads to new loss functions for these tasks, which can be interpreted as learned attenuation. This makes the loss more robust to noisy data, also giving new state-of-the-art results on segmentation and depth regression benchmarks.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2017-03-15T07:27:12Z</published>
+    <arxiv:comment>NIPS 2017</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Alex Kendall</name>
+    </author>
+    <author>
+      <name>Yarin Gal</name>
+    </author>
+  </entry>
+</feed>

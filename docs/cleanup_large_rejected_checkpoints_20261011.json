@@ -1,0 +1,191 @@
+{
+  "policy": "Only rejected/smoke/debug model checkpoints removed; datasets, reports and production models retained.",
+  "files": [
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261010\\cctv_finetune_from_flame\\best_spatial.pth",
+      "bytes": 118566553,
+      "sha256": "5ccff9c356a430e93936b7a8d21d4fefcdd0dc18a2988972975eae591a93d2f8",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261010\\cctv_finetune_from_flame\\last_spatial.pth",
+      "bytes": 118566553,
+      "sha256": "5aacc066d780f069a54c12699f617090537732bd9f02f7d41a99247d54464c4e",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261010\\coarse_fpn_640_hardtail_40ep\\best_detector_2d.pth",
+      "bytes": 34571463,
+      "sha256": "c8d64e7f1651eba20d3db49b21cb0f0a5ff0a25f5c95d65bb4fa0e250a703500",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261010\\coarse_fpn_640_hardtail_40ep\\last_detector_2d.pth",
+      "bytes": 92388061,
+      "sha256": "e3edb67e69d6e6b045c3b04745c36dfdd1aa5a3bc7b32f3a463f8c0955e4041b",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261010\\coarse_spatial_hardtail_40ep\\best_spatial.pth",
+      "bytes": 118566489,
+      "sha256": "2fe95c11fe3e8333cbcbcf48836519f43234f64536f7ac45b9d12e777faa8194",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261010\\coarse_spatial_hardtail_40ep\\last_spatial.pth",
+      "bytes": 118566489,
+      "sha256": "883fbf94b248c103bd01d5cabd586676bcf7393ca5f3974bd3570d0402294d4e",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261010\\flame_pretrain\\best_flame_pretrained.pth",
+      "bytes": 43046387,
+      "sha256": "29bd8b3f2d52986bba46be077f1dde8c104fb314d8f8ed3571cb4852045e1f89",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261010\\roi_finetune_actual_coarse_40ep\\best_roi.pth",
+      "bytes": 43038319,
+      "sha256": "ddf1e82d5f7356f418bb0662e1c9afc3d7e6276a1f408e1df87b30a9401d3201",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261010\\roi_real_error_curriculum\\best_roi.pth",
+      "bytes": 43038319,
+      "sha256": "f00bc7432afe85eed18a5cf6e80dd210d82ed86d46ed19d6e11ee13931a87358",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_202611\\coarse_curriculum_640_direct_benchmark\\coarse_candidate_rejected.pth",
+      "bytes": 30809323,
+      "sha256": "761fcccf150164fa51f026e53789f8cea0809ac20d196852714d743ceec677ef",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_202611\\coarse_curriculum_640_direct_benchmark2\\coarse_candidate_rejected.pth",
+      "bytes": 30809323,
+      "sha256": "a84672ec55ad843ccf234aac706a8426df64e7e0ccb68015e12076950ecbff81",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_202611\\coarse_curriculum_640_direct_debug\\stage640\\best_detector_2d.pth",
+      "bytes": 31933010,
+      "sha256": "dafd17732575b74c44c935db364717af38579722081dfde8747acf9d6ebdf812",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_202611\\direct_head_smoke_holdout\\smoke_only.pth",
+      "bytes": 30413953,
+      "sha256": "37583faee204b6e534204ab109421fbc4dc2d1514a16be8e4427093bfd22bb5b",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\coarse_before_roi_benchmark\\coarse_candidate_rejected.pth",
+      "bytes": 43048683,
+      "sha256": "ed207e3c506e2487140ec9b51070a74262dcdb9862de6a44a1928c45addc9baa",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\coarse_curriculum_320_to_640_v2\\stage320\\best_detector_2d.pth",
+      "bytes": 33804512,
+      "sha256": "a8a60263a5679de5b2000c1ae9415d478b00dd4097a4e6f8bebb93f66c8c9590",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\coarse_curriculum_640_v3\\stage640\\best_detector_2d.pth",
+      "bytes": 31825250,
+      "sha256": "7a115a0d5a8eb2466f0b660440d43fd1f718d9d474ca1da26aeff01fcdee3042",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\coarse_fpn_320_benchmark\\coarse_candidate_rejected.pth",
+      "bytes": 31028427,
+      "sha256": "3c87a644341f87df4917d8e672e46b8ea43fc454afe3b426530fc4f1e4f8c224",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\coarse_fpn_320_warmup_15ep\\best_detector_2d.pth",
+      "bytes": 34571527,
+      "sha256": "0413900d0ee1c22895e81156e06463175cf9512f7d9ca3753df955f1fc6953d8",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\coarse_fpn_320_warmup_15ep\\last_detector_2d.pth",
+      "bytes": 92388061,
+      "sha256": "8e0264229d6db28f33dee783f010607e803551b08a40b34525211a28505f2680",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\coarse_fpn_640_heatmap_v2_40ep\\best_detector_2d.pth",
+      "bytes": 33805920,
+      "sha256": "4ebd554cee50be9a911b74797ee33a32f0402c926923d33bfb7a966c6b018fa8",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\coarse_fpn_640_heatmap_v2_40ep\\last_detector_2d.pth",
+      "bytes": 33805920,
+      "sha256": "8eab8915ab502e53c9353eb8eef9e71b1c91b7bb34a81b132e502a7ea9c525b1",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\coarse_spatial_warmup_40ep\\best_spatial.pth",
+      "bytes": 118566745,
+      "sha256": "4ff6eec83b9630127277f6526efaef6a97dc5a86dee934275a07e58746df651d",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\coarse_spatial_warmup_40ep\\last_spatial.pth",
+      "bytes": 118566745,
+      "sha256": "37627bd46bdbd0965b71dc04c12bd6ef5d26bcc397a38d3fd9d098928967cc10",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\heatmap_smoke_640\\smoke_only.pth",
+      "bytes": 30394557,
+      "sha256": "7514f8bf9ca74f193cf4a7085444258cc4788dc6ce0b5fa000ebc76c7d484769",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\dataset_integration_20261011\\heatmap_smoke_640_fullbatch\\smoke_only.pth",
+      "bytes": 30394557,
+      "sha256": "f0ec918b87f99202dbc2a44de209252d98ee3090e0065aa8c029c3f2901f2b9d",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_pre_roi_20261010\\coarse_fpn_hardtail_224\\best_detector_2d.pth",
+      "bytes": 92387997,
+      "sha256": "4cface5b3ac39ec5364e9063ccaf4fb2cd81c5529e2dc6c527c00b11e6e98551",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_pre_roi_20261010\\coarse_fpn_hardtail_224\\last_detector_2d.pth",
+      "bytes": 92387997,
+      "sha256": "6cbef290daa5ec95871d805bdd3546f6ee9058c3a4b9fd75d22733c79e1a5914",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_pre_roi_20261010\\detector_2d_candidate_320\\best_detector_2d.pth",
+      "bytes": 34571271,
+      "sha256": "0afecf1df9d61a8dac198035466babec4e797dd664c1c15bfc60a5b93822bbb5",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_pre_roi_20261010\\detector_2d_candidate_320\\last_detector_2d.pth",
+      "bytes": 92387869,
+      "sha256": "44f125e5f7b805d7e586632f3eebf8610448709e7e9ce6149142e1044ae7d5b0",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_pre_roi_20261010\\roi_actual_coarse_train\\best_roi.pth",
+      "bytes": 43038319,
+      "sha256": "04a4f84d36f28f5f8cb43d961c67510702ed5c8f4abaa4f9f38c3f2fd3010d99",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    },
+    {
+      "path": "D:\\LAB\\SAM_Experiment\\output\\section_1_2_pre_roi_20261010\\roi_finetune_actual_hardtail\\best_roi.pth",
+      "bytes": 43038319,
+      "sha256": "b8edc611adf5977ac23c2585555740ce55416a794cbc1218199e21130faeabf4",
+      "reason": "rejected/smoke/debug checkpoint; report artifacts retained"
+    }
+  ]
+}

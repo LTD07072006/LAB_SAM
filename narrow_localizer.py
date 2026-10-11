@@ -95,11 +95,23 @@ class RefinedPoint:
     heatmap: Optional[np.ndarray] = None
 
 
-def _crop_square(image: Image.Image, coarse_xy: Sequence[float], roi_fraction: float = 0.70):
+def _crop_square(
+    image: Image.Image,
+    coarse_xy: Sequence[float],
+    roi_fraction: float = 0.70,
+    *,
+    side_px: Optional[float] = None,
+):
     """Crop a square around a coarse point, padding outside image if needed."""
     image = image.convert("RGB")
     width, height = image.size
-    side = float(max(32.0, min(width, height) * roi_fraction))
+    if side_px is None:
+        side = float(max(32.0, min(width, height) * roi_fraction))
+    else:
+        side = float(side_px)
+        if not np.isfinite(side) or side <= 0.0:
+            raise ValueError("side_px must be finite and positive")
+        side = float(max(32.0, min(side, max(width, height))))
     coarse = np.asarray(coarse_xy, dtype=np.float64).reshape(2)
     left = int(round(float(coarse[0] - side / 2.0)))
     top = int(round(float(coarse[1] - side / 2.0)))
@@ -321,12 +333,75 @@ class ROIRefinerInference:
         self.model.eval()
         self.roi_fraction = float(checkpoint.get("roi_fraction", 0.70))
 
+    def dynamic_side_px(
+        self,
+        image_size: tuple[int, int],
+        stability_px: Optional[float],
+        *,
+        expansion_factor: float = 0.0,
+        max_roi_fraction: float = 1.0,
+        stability_threshold_px: float = 0.0,
+    ) -> float:
+        """Compute a validation-calibrated soft-gate crop side in pixels.
+
+        The legacy checkpoint was trained at ``roi_fraction``.  At inference,
+        an unstable upstream point receives a larger context window:
+
+        ``side = base_side + expansion_factor * stability_px``.
+
+        The cap is expressed as a fraction of the longer image dimension only
+        to allow non-square input, while the base side still follows the
+        checkpoint's shorter-dimension convention.  This method contains no
+        label or ground-truth access and is safe to call from a stream.
+        """
+        width, height = (int(image_size[0]), int(image_size[1]))
+        if width <= 0 or height <= 0:
+            raise ValueError("image_size must contain positive dimensions")
+        factor = float(expansion_factor)
+        cap_fraction = float(max_roi_fraction)
+        threshold = float(stability_threshold_px)
+        if not np.isfinite(factor) or factor < 0.0:
+            raise ValueError("expansion_factor must be finite and non-negative")
+        if not np.isfinite(cap_fraction) or cap_fraction <= 0.0:
+            raise ValueError("max_roi_fraction must be finite and positive")
+        if not np.isfinite(threshold) or threshold < 0.0:
+            raise ValueError("stability_threshold_px must be finite and non-negative")
+        stability = 0.0 if stability_px is None else float(stability_px)
+        if not np.isfinite(stability) or stability < 0.0:
+            stability = 0.0
+        base_side = float(max(32.0, min(width, height) * self.roi_fraction))
+        expanded = base_side + factor * max(0.0, stability - threshold)
+        cap = float(max(width, height) * cap_fraction)
+        return float(np.clip(expanded, 32.0, max(32.0, cap)))
+
     @torch.inference_mode()
-    def refine(self, image, coarse_xy: Sequence[float]) -> RefinedPoint:
+    def refine(
+        self,
+        image,
+        coarse_xy: Sequence[float],
+        *,
+        stability_px: Optional[float] = None,
+        expansion_factor: float = 0.0,
+        max_roi_fraction: float = 1.0,
+        stability_threshold_px: float = 0.0,
+    ) -> RefinedPoint:
+        """Refine a point, optionally using a stability-aware soft crop.
+
+        ``expansion_factor=0`` preserves the historical fixed crop exactly.
+        The dynamic path is deliberately opt-in until its factor is selected
+        on validation; no test labels are used inside this method.
+        """
         if not isinstance(image, Image.Image):
             image = Image.fromarray(np.asarray(image).astype(np.uint8)[..., :3])
         image = image.convert("RGB")
-        crop, box = _crop_square(image, coarse_xy, self.roi_fraction)
+        side_px = self.dynamic_side_px(
+            image.size,
+            stability_px,
+            expansion_factor=expansion_factor,
+            max_roi_fraction=max_roi_fraction,
+            stability_threshold_px=stability_threshold_px,
+        )
+        crop, box = _crop_square(image, coarse_xy, side_px=side_px)
         output = self.model(_prepare_image(crop).unsqueeze(0).to(self.device))
         relative = output["coord"][0].detach().cpu().numpy()
         point = np.array([box.left, box.top], dtype=np.float64) + relative * box.side
@@ -393,6 +468,44 @@ def train(args):
         # Exclude those records from ROI regression metrics; their recall is
         # still reported by the detector benchmark as a separate metric.
         positives = {key: [record for record in value if has_coarse(record)] for key, value in positives.items()}
+    # Optional hard-tail oversampling is restricted to train records.  The
+    # manifest error is metadata for sampling only; the ROI target remains the
+    # original annotation loaded from labels.
+    if args.hard_tail_manifest and args.hard_tail_boost > 1.0:
+        tail_source = json.loads(args.hard_tail_manifest.read_text(encoding="utf-8"))
+        tail_records = tail_source.get("records", []) if isinstance(tail_source, dict) else tail_source
+        severity_by_path = {}
+        for item in tail_records if isinstance(tail_records, list) else []:
+            if not isinstance(item, dict) or not item.get("image_path"):
+                continue
+            # Only issue rows are oversampled.  The full workflow manifest is
+            # accepted so all real-error bins can be used without importing
+            # validation/test records into the train loader.
+            categories = item.get("categories", [])
+            raw_error = item.get("raw_error_px")
+            if not categories and raw_error is None:
+                continue
+            try:
+                error = float(raw_error)
+            except (TypeError, ValueError):
+                error = 0.0
+            severity = 1.0
+            if error > 20.0:
+                severity = 2.0
+            elif error > 15.0:
+                severity = 1.5
+            elif error > 10.0:
+                severity = 1.25
+            severity_by_path[str(Path(str(item["image_path"])).resolve()).lower()] = severity
+        expanded = []
+        for record in positives["train"]:
+            expanded.append(record)
+            severity = severity_by_path.get(str(Path(record.image_path).resolve()).lower())
+            if severity is not None:
+                repeats = max(1, int(round(float(args.hard_tail_boost) * severity)))
+                expanded.extend([record] * repeats)
+        positives["train"] = expanded
+        print(f"error_curriculum_oversampled={len(expanded)} base={len({id(record) for record in expanded})} issue_records={len(severity_by_path)}")
     positive_counts = {key: len(value) for key, value in positives.items()}
     if not positive_counts["train"] or not positive_counts["val"] or not positive_counts["test"]:
         raise ValueError(f"Need positive fire records in all splits, got {positive_counts}")
@@ -407,7 +520,11 @@ def train(args):
     # download: its backbone weights are loaded immediately below.
     use_pretrained = not args.no_pretrained and not bool(args.init_checkpoint)
     model = ROIRefiner(pretrained=use_pretrained, dropout=args.dropout).to(device)
-    if args.init_checkpoint:
+    if args.resume_roi:
+        checkpoint = torch.load(args.resume_roi, map_location="cpu", weights_only=False)
+        model.load_state_dict(checkpoint["model"], strict=True)
+        print(f"resumed_roi={args.resume_roi}")
+    elif args.init_checkpoint:
         load_backbone_from_checkpoint(model, args.init_checkpoint)
     if args.freeze_epochs > 0:
         for parameter in model.backbone.parameters():
@@ -464,10 +581,18 @@ def main():
     parser.add_argument("--labels", type=Path, default=root / "fire-model-data" / "dataset_labels (1).json")
     parser.add_argument("--dataset-root", type=Path, default=CCTV_DATASET)
     parser.add_argument("--init-checkpoint", type=Path, default=root / "fire-model-data" / "best.pth")
+    parser.add_argument("--resume-roi", type=Path, default=None, help="Resume the complete ROI checkpoint, including the trained head")
     parser.add_argument("--coarse-manifest", type=Path, default=None, help="JSON coarse points produced by an upstream detector")
+    parser.add_argument("--hard-tail-manifest", type=Path, default=None, help="Train-only hard-tail manifest for oversampling")
+    parser.add_argument("--hard-tail-boost", type=float, default=1.0, help="Extra repeat multiplier for hard-tail train records")
     parser.add_argument("--output-dir", type=Path, default=root / "week6_roi_result")
     parser.add_argument("--epochs", type=int, default=30); parser.add_argument("--batch-size", type=int, default=32); parser.add_argument("--workers", type=int, default=0); parser.add_argument("--lr", type=float, default=3e-4); parser.add_argument("--weight-decay", type=float, default=1e-4); parser.add_argument("--freeze-epochs", type=int, default=5); parser.add_argument("--repeats", type=int, default=3); parser.add_argument("--roi-fraction", type=float, default=0.70); parser.add_argument("--noise-std", type=float, default=0.08); parser.add_argument("--dropout", type=float, default=0.15); parser.add_argument("--patience", type=int, default=8); parser.add_argument("--min-delta", type=float, default=1e-4); parser.add_argument("--lr-factor", type=float, default=0.5); parser.add_argument("--lr-patience", type=int, default=2); parser.add_argument("--min-lr", type=float, default=1e-6); parser.add_argument("--seed", type=int, default=42); parser.add_argument("--device", default=None); parser.add_argument("--no-pretrained", action="store_true")
-    args = parser.parse_args(); train(args)
+    args = parser.parse_args()
+    if args.resume_roi:
+        args.resume_roi = args.resume_roi.expanduser().resolve()
+    if args.hard_tail_manifest:
+        args.hard_tail_manifest = args.hard_tail_manifest.expanduser().resolve()
+    train(args)
 
 
 if __name__ == "__main__": main()

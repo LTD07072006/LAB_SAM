@@ -1,0 +1,62 @@
+[
+  {
+    "path": "D:\\LAB\\__pycache__",
+    "files": 7,
+    "bytes": 96142,
+    "reason": "reproducible Python bytecode cache"
+  },
+  {
+    "path": "D:\\LAB\\SAM_Experiment\\__pycache__",
+    "files": 150,
+    "bytes": 3507417,
+    "reason": "reproducible Python bytecode cache"
+  },
+  {
+    "path": "D:\\LAB\\SAM_Experiment\\research_section_1_2\\__pycache__",
+    "files": 17,
+    "bytes": 258496,
+    "reason": "reproducible Python bytecode cache"
+  },
+  {
+    "path": "D:\\LAB\\SAM_Experiment\\archives\\__pycache__",
+    "files": 13,
+    "bytes": 107648,
+    "reason": "reproducible Python bytecode cache"
+  },
+  {
+    "path": "D:\\LAB\\Grid-Map-Assisted-Monocular-3D-Localization\\__pycache__",
+    "files": 3,
+    "bytes": 27212,
+    "reason": "reproducible Python bytecode cache"
+  },
+  {
+    "path": "D:\\LAB\\Grid-Map-Assisted-Monocular-3D-Localization\\data\\__pycache__",
+    "files": 4,
+    "bytes": 1256,
+    "reason": "reproducible Python bytecode cache"
+  },
+  {
+    "path": "D:\\LAB\\Grid-Map-Assisted-Monocular-3D-Localization\\framework\\__pycache__",
+    "files": 10,
+    "bytes": 16645,
+    "reason": "reproducible Python bytecode cache"
+  },
+  {
+    "path": "D:\\LAB\\Grid-Map-Assisted-Monocular-3D-Localization\\modules\\__pycache__",
+    "files": 13,
+    "bytes": 34809,
+    "reason": "reproducible Python bytecode cache"
+  },
+  {
+    "path": "D:\\LAB\\Grid-Map-Assisted-Monocular-3D-Localization\\tools\\__pycache__",
+    "files": 11,
+    "bytes": 53705,
+    "reason": "reproducible Python bytecode cache"
+  },
+  {
+    "path": "D:\\LAB\\Grid-Map-Assisted-Monocular-3D-Localization\\tracker\\__pycache__",
+    "files": 3,
+    "bytes": 7722,
+    "reason": "reproducible Python bytecode cache"
+  }
+]

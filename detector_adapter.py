@@ -23,6 +23,15 @@ class Detection2D:
     image_size: tuple[int, int]
     latency_ms: float = 0.0
     source: str = "external"
+    # Geometry-specific reliability diagnostics supplied by the local
+    # detector's photometric TTA.  These are optional and remain None for
+    # external detectors that do not expose them.
+    stability_px: Optional[float] = None
+    stability_reference_px: Optional[float] = None
+    raw_point: Optional[tuple[float, float]] = None
+    position_reliability: Optional[float] = None
+    localization_accepted: bool = True
+    localization_status: str = "not_checked"
     # Optional detector-provided contact hypotheses in original-image
     # pixels.  This lets a bbox detector pass a bottom band to the 3D stage
     # without making the generic adapter guess the geometry again.
@@ -41,6 +50,8 @@ class Detection2D:
         """
         from localization import bottom_contact_pixels, mask_bottom_contact_pixels
 
+        if not self.detected or not self.localization_accepted:
+            return np.empty((0, 2), dtype=np.float64)
         if self.contact_candidates is not None:
             candidates = np.asarray(self.contact_candidates, dtype=np.float64).reshape(-1, 2)
             if len(candidates) and np.all(np.isfinite(candidates)):
@@ -74,6 +85,18 @@ def _bbox(value: Any) -> Optional[tuple[float, float, float, float]]:
     return tuple(float(x) for x in array[:4])
 
 
+def _optional_float(value: Any) -> Optional[float]:
+    """Read a finite optional diagnostic without making it look calibrated."""
+
+    if value is None:
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if np.isfinite(number) else None
+
+
 def _get(raw: Any, *names: str, default=None):
     if isinstance(raw, dict):
         for name in names:
@@ -100,18 +123,31 @@ def adapt_detection(raw: Any, image_size: Sequence[int], threshold: float = 0.5,
     detected = bool(confidence >= threshold) if detected_value is None else bool(detected_value)
     if point is None and bbox is not None:
         point = (float((bbox[0] + bbox[2]) * 0.5), float(bbox[3]))
+    detected = detected and np.isfinite(confidence) and confidence >= threshold
+    accepted = bool(detected and _get(
+        raw, "localization_accepted",
+        default=point is not None or bbox is not None or mask is not None,
+    ))
     return Detection2D(
-        detected=detected and confidence >= threshold,
+        detected=bool(detected),
         confidence=confidence,
-        point=point if detected and confidence >= threshold else None,
-        bbox=bbox if detected and confidence >= threshold else None,
-        mask=mask if detected and confidence >= threshold else None,
+        point=point if accepted else None,
+        bbox=bbox if accepted else None,
+        mask=mask if accepted else None,
         image_size=(width, height),
         latency_ms=float(_get(raw, "latency_ms", default=0.0) or 0.0),
         source=source,
+        stability_px=_optional_float(_get(raw, "stability_px", default=None)),
+        stability_reference_px=_optional_float(_get(raw, "stability_reference_px", default=None)),
+        raw_point=_pair(_get(raw, "raw_pixel", "raw_point", default=None)),
+        position_reliability=_optional_float(
+            _get(raw, "position_reliability", "localisation_reliability", default=None)
+        ),
+        localization_accepted=accepted,
+        localization_status=str(_get(raw, "localization_status", default="not_checked")),
         contact_candidates=(
             None
-            if _get(raw, "contact_candidates", "contact_pixels", default=None) is None
+            if not accepted or _get(raw, "contact_candidates", "contact_pixels", default=None) is None
             else np.asarray(_get(raw, "contact_candidates", "contact_pixels"), dtype=np.float64).reshape(-1, 2)
         ),
     )

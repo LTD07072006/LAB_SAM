@@ -370,11 +370,14 @@ class FireDataset(Dataset):
     """Image/label dataset with synchronized geometry augmentation."""
 
     def __init__(self, records: Sequence[Record], train: bool = False,
-                 image_size: Tuple[int, int] = IMAGE_SIZE, flip_p: float = 0.3):
+                 image_size: Tuple[int, int] = IMAGE_SIZE, flip_p: float = 0.3,
+                 sample_weights: Optional[Dict[str, float]] = None):
         self.records = list(records)
         self.train = train
         self.image_size = image_size
         self.flip_p = flip_p
+        self.sample_weights = {str(Path(k).resolve()).lower(): float(v)
+                               for k, v in (sample_weights or {}).items()}
 
     def __len__(self) -> int:
         return len(self.records)
@@ -400,7 +403,8 @@ class FireDataset(Dataset):
         tensor = TF.to_tensor(image)
         tensor = TF.normalize(tensor, MEAN, STD)
         target = torch.tensor([float(record.has_fire), x, y], dtype=torch.float32)
-        return tensor, target, original_size, record.image_path
+        weight = self.sample_weights.get(str(Path(record.image_path).resolve()).lower(), 1.0)
+        return tensor, target, original_size, record.image_path, torch.tensor(weight, dtype=torch.float32)
 
 
 class SpatialFireModel(nn.Module):
@@ -480,16 +484,22 @@ class FireLoss(nn.Module):
         self.confidence = nn.BCEWithLogitsLoss()
         self.coordinate = nn.SmoothL1Loss(reduction="none")
 
-    def forward(self, outputs: Dict[str, torch.Tensor], targets: torch.Tensor) -> Dict[str, torch.Tensor]:
+    def forward(self, outputs: Dict[str, torch.Tensor], targets: torch.Tensor,
+                sample_weights: Optional[torch.Tensor] = None) -> Dict[str, torch.Tensor]:
         positive = targets[:, 0] > 0.5
         conf_loss = self.confidence(outputs["confidence_logit"], targets[:, 0])
+        if sample_weights is None:
+            sample_weights = torch.ones(targets.shape[0], device=targets.device, dtype=targets.dtype)
+        sample_weights = sample_weights.to(device=targets.device, dtype=targets.dtype).clamp_min(1.0)
         if positive.any():
-            coord_loss = self.coordinate(outputs["coord"][positive], targets[positive, 1:]).mean()
+            per_coordinate = self.coordinate(outputs["coord"][positive], targets[positive, 1:]).mean(dim=1)
+            coord_loss = (per_coordinate * sample_weights[positive]).sum() / sample_weights[positive].sum().clamp_min(1.0)
         else:
             coord_loss = outputs["coord"].sum() * 0.0
         b, _, h, w = outputs["coord_logits"].shape
         target_heat = gaussian_targets(targets[:, 1:], positive.float(), h, w)
-        heat_loss = F.mse_loss(torch.sigmoid(outputs["coord_logits"]), target_heat)
+        per_heat = F.mse_loss(torch.sigmoid(outputs["coord_logits"]), target_heat, reduction="none").flatten(1).mean(dim=1)
+        heat_loss = (per_heat * sample_weights).sum() / sample_weights.sum().clamp_min(1.0)
         total = conf_loss + self.lambda_coord * coord_loss + self.lambda_heatmap * heat_loss
         return {"total": total, "confidence": conf_loss, "coordinate": coord_loss, "heatmap": heat_loss}
 
@@ -567,9 +577,19 @@ def _exact_metrics(confidence, coords, targets, sizes):
 def run_epoch(model, loader, criterion, device, optimizer=None):
     training = optimizer is not None
     model.train(training)
+    if training and not any(p.requires_grad for p in model.backbone.parameters()):
+        # Freezing parameters alone still updates BatchNorm running statistics.
+        model.backbone.eval()
     losses, confidence_values, coordinate_values, target_values, size_values = [], [], [], [], []
-    for images, targets, sizes, _ in loader:
+    for batch in loader:
+        if len(batch) == 5:
+            images, targets, sizes, _, sample_weights = batch
+        else:
+            images, targets, sizes, _ = batch
+            sample_weights = None
         images, targets, sizes = images.to(device), targets.to(device), sizes.to(device)
+        if sample_weights is not None:
+            sample_weights = sample_weights.to(device)
         if training:
             optimizer.zero_grad(set_to_none=True)
         # AMP is selected from the device here; callers do not need an amp
@@ -577,7 +597,7 @@ def run_epoch(model, loader, criterion, device, optimizer=None):
         autocast_enabled = device.type == "cuda"
         with torch.autocast(device_type=device.type, dtype=torch.float16, enabled=autocast_enabled):
             outputs = model(images)
-            loss_dict = criterion(outputs, targets)
+            loss_dict = criterion(outputs, targets, sample_weights)
         if training:
             loss_dict["total"].backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
@@ -614,6 +634,24 @@ def save_checkpoint(path: Path, model, optimizer, scheduler, epoch: int, val_los
     }, path)
 
 
+def load_compatible_checkpoint(model: nn.Module, checkpoint_path: Path) -> int:
+    """Load matching tensors from a pretraining checkpoint without changing architecture."""
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+    state = checkpoint.get("model", checkpoint) if isinstance(checkpoint, dict) else checkpoint
+    current = model.state_dict()
+    copied = 0
+    for raw_key, value in state.items():
+        key = str(raw_key)
+        for prefix in ("module.", "model."):
+            if key.startswith(prefix):
+                key = key[len(prefix):]
+        if key in current and torch.is_tensor(value) and tuple(current[key].shape) == tuple(value.shape):
+            current[key] = value
+            copied += 1
+    model.load_state_dict(current, strict=True)
+    return copied
+
+
 def main():
     parser = argparse.ArgumentParser()
     root = Path(__file__).resolve().parent
@@ -621,6 +659,11 @@ def main():
     parser.add_argument("--dataset-root", type=Path, default=CCTV_DATASET)
     parser.add_argument("--output-dir", type=Path, default=root / "fire-model-data" / "week6_spatial")
     parser.add_argument("--epochs", type=int, default=30)
+    parser.add_argument("--freeze-epochs", type=int, default=3,
+                        help="freeze the backbone for this many warm-up epochs")
+    parser.add_argument("--backbone-lr", type=float, default=1e-5,
+                        help="learning rate for the backbone after warm-up")
+    parser.add_argument("--selection-metric", choices=("mae", "loss"), default="mae")
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--workers", type=int, default=0)
     parser.add_argument("--lr", type=float, default=1e-4)
@@ -628,6 +671,12 @@ def main():
     parser.add_argument("--device", default=None)
     parser.add_argument("--smoke-test", action="store_true", help="one batch train/validation sanity check")
     parser.add_argument("--no-pretrained", action="store_true", help="do not download/use timm weights; useful for smoke tests")
+    parser.add_argument("--init-checkpoint", type=Path, default=None,
+                        help="optional compatible FLAME/previous spatial checkpoint")
+    parser.add_argument("--hard-tail-manifest", type=Path, default=None,
+                        help="JSON list/object containing train-only coarse hard-tail records")
+    parser.add_argument("--hard-tail-weight", type=float, default=2.0,
+                        help="multiplier for positive coordinate/heatmap loss on hard-tail samples")
     args = parser.parse_args()
     seed_everything(args.seed)
     device = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
@@ -641,12 +690,41 @@ def main():
     if not all(split_info[name]["count"] for name in ("train", "val", "test")):
         raise RuntimeError(f"Empty split: {split_info}")
 
-    train_loader = DataLoader(FireDataset(splits["train"], train=True), args.batch_size, shuffle=True, num_workers=args.workers)
+    sample_weights: Dict[str, float] = {}
+    if args.hard_tail_manifest is not None:
+        payload = json.loads(args.hard_tail_manifest.read_text(encoding="utf-8"))
+        hard_rows = payload.get("hard_tail_train", payload) if isinstance(payload, dict) else payload
+        if not isinstance(hard_rows, list):
+            raise ValueError("--hard-tail-manifest must contain a list or hard_tail_train list")
+        train_keys = {str(Path(r.image_path).resolve()).lower() for r in splits["train"]}
+        for row in hard_rows:
+            if not isinstance(row, dict) or not row.get("image_path"):
+                continue
+            key = str(Path(str(row["image_path"])).resolve()).lower()
+            if key in train_keys:
+                sample_weights[key] = max(1.0, float(args.hard_tail_weight))
+        print(f"hard_tail_weighted_train={len(sample_weights)} weight={max(1.0, float(args.hard_tail_weight))}")
+    train_loader = DataLoader(FireDataset(splits["train"], train=True, sample_weights=sample_weights), args.batch_size, shuffle=True, num_workers=args.workers)
     val_loader = DataLoader(FireDataset(splits["val"]), args.batch_size, shuffle=False, num_workers=args.workers)
     test_loader = DataLoader(FireDataset(splits["test"]), args.batch_size, shuffle=False, num_workers=args.workers)
     model = SpatialFireModel(pretrained=not args.no_pretrained).to(device)
+    if args.init_checkpoint is not None:
+        if not args.init_checkpoint.is_file():
+            raise FileNotFoundError(args.init_checkpoint)
+        copied = load_compatible_checkpoint(model, args.init_checkpoint)
+        print(f"init_checkpoint={args.init_checkpoint} tensors_loaded={copied}")
     criterion = FireLoss(lambda_coord=5.0, lambda_heatmap=0.5)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
+    # Warm up only the spatial/classification heads.  The legacy backbone is
+    # already a useful fire representation; updating it from epoch one causes
+    # the small hard-tail set to destroy the coarse coordinate geometry.
+    if args.freeze_epochs < 0 or args.backbone_lr <= 0:
+        raise ValueError("freeze-epochs must be nonnegative and backbone-lr positive")
+    for parameter in model.backbone.parameters():
+        parameter.requires_grad = args.freeze_epochs == 0
+    optimizer = torch.optim.AdamW([
+        {"params": list(model.spatial_neck.parameters()) + list(model.coord_head.parameters()) + list(model.class_head.parameters()), "lr": args.lr},
+        {"params": list(model.backbone.parameters()), "lr": args.backbone_lr},
+    ], weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, max(1, args.epochs), eta_min=args.lr / 100)
 
     if args.smoke_test:
@@ -661,6 +739,9 @@ def main():
     best = float("inf")
     history = []
     for epoch in range(1, args.epochs + 1):
+        if epoch == int(args.freeze_epochs) + 1:
+            for parameter in model.backbone.parameters():
+                parameter.requires_grad = True
         train_loss, train_metric = run_epoch(model, train_loader, criterion, device, optimizer)
         val_loss, val_metric = run_epoch(model, val_loader, criterion, device)
         scheduler.step()
@@ -671,16 +752,19 @@ def main():
             f"val_mae_px={val_metric['mae_px']:.2f} val_pck10={val_metric['pck10']:.3f} "
             f"val_pck25={val_metric['pck25']:.3f}"
         )
-        if val_loss["total"] < best:
-            best = val_loss["total"]
-            save_checkpoint(args.output_dir / "best_spatial.pth", model, optimizer, scheduler, epoch, best, split_info, args)
+        score = val_metric["mae_px"] if args.selection_metric == "mae" else val_loss["total"]
+        if score < best:
+            best = score
+            save_checkpoint(args.output_dir / "best_spatial.pth", model, optimizer, scheduler, epoch, val_loss["total"], split_info, args)
         save_checkpoint(args.output_dir / "last_spatial.pth", model, optimizer, scheduler, epoch, val_loss["total"], split_info, args)
         (args.output_dir / "history.json").write_text(json.dumps(history, indent=2), encoding="utf-8")
 
+    checkpoint = torch.load(args.output_dir / "best_spatial.pth", map_location=device, weights_only=False)
+    model.load_state_dict(checkpoint["model"], strict=True)
     test_loss, test_metric = run_epoch(model, test_loader, criterion, device)
     print(f"test_loss={test_loss}")
     print(f"test_metric={test_metric}")
-    (args.output_dir / "test_metrics.json").write_text(json.dumps({"loss": test_loss, "metric": test_metric}, indent=2), encoding="utf-8")
+    (args.output_dir / "test_metrics.json").write_text(json.dumps({"epoch": checkpoint["epoch"], "selection_metric": args.selection_metric, "loss": test_loss, "metric": test_metric}, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":

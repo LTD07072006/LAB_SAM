@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/jKRyX0whJ3xDArya/o/5c2M0qKw</id>
+  <title>arXiv Query: search_query=&amp;id_list=2410.19590&amp;start=0&amp;max_results=10</title>
+  <updated>2026-10-09T17:51:15Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=&amp;start=0&amp;max_results=10&amp;id_list=2410.19590" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2410.19590v2</id>
+    <title>MonoDGP: Monocular 3D Object Detection with Decoupled-Query and Geometry-Error Priors</title>
+    <updated>2025-03-12T14:48:22Z</updated>
+    <link href="https://arxiv.org/abs/2410.19590v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2410.19590v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Perspective projection has been extensively utilized in monocular 3D object detection methods. It introduces geometric priors from 2D bounding boxes and 3D object dimensions to reduce the uncertainty of depth estimation. However, due to depth errors originating from the object's visual surface, the height of the bounding box often fails to represent the actual projected central height, which undermines the effectiveness of geometric depth. Direct prediction for the projected height unavoidably results in a loss of 2D priors, while multi-depth prediction with complex branches does not fully leverage geometric depth. This paper presents a Transformer-based monocular 3D object detection method called MonoDGP, which adopts perspective-invariant geometry errors to modify the projection formula. We also try to systematically discuss and explain the mechanisms and efficacy behind geometry errors, which serve as a simple but effective alternative to multi-depth prediction. Additionally, MonoDGP decouples the depth-guided decoder and constructs a 2D decoder only dependent on visual features, providing 2D priors and initializing object queries without the disturbance of 3D detection. To further optimize and fine-tune input tokens of the transformer decoder, we also introduce a Region Segment Head (RSH) that generates enhanced features and segment embeddings. Our monocular method demonstrates state-of-the-art performance on the KITTI benchmark without extra data. Code is available at https://github.com/PuFanqi23/MonoDGP.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-10-25T14:31:43Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Fanqi Pu</name>
+    </author>
+    <author>
+      <name>Yifan Wang</name>
+    </author>
+    <author>
+      <name>Jiru Deng</name>
+    </author>
+    <author>
+      <name>Wenming Yang</name>
+    </author>
+  </entry>
+</feed>

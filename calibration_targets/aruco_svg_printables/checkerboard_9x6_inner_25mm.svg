@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297">
+<title>Checkerboard 9x6 inner corners</title>
+<rect width="100%" height="100%" fill="white"/>
+<g id="checkerboard" transform="translate(-20 61)">
+<rect x="0" y="0" width="25" height="25" fill="black"/>
+<rect x="50" y="0" width="25" height="25" fill="black"/>
+<rect x="100" y="0" width="25" height="25" fill="black"/>
+<rect x="150" y="0" width="25" height="25" fill="black"/>
+<rect x="200" y="0" width="25" height="25" fill="black"/>
+<rect x="25" y="25" width="25" height="25" fill="black"/>
+<rect x="75" y="25" width="25" height="25" fill="black"/>
+<rect x="125" y="25" width="25" height="25" fill="black"/>
+<rect x="175" y="25" width="25" height="25" fill="black"/>
+<rect x="225" y="25" width="25" height="25" fill="black"/>
+<rect x="0" y="50" width="25" height="25" fill="black"/>
+<rect x="50" y="50" width="25" height="25" fill="black"/>
+<rect x="100" y="50" width="25" height="25" fill="black"/>
+<rect x="150" y="50" width="25" height="25" fill="black"/>
+<rect x="200" y="50" width="25" height="25" fill="black"/>
+<rect x="25" y="75" width="25" height="25" fill="black"/>
+<rect x="75" y="75" width="25" height="25" fill="black"/>
+<rect x="125" y="75" width="25" height="25" fill="black"/>
+<rect x="175" y="75" width="25" height="25" fill="black"/>
+<rect x="225" y="75" width="25" height="25" fill="black"/>
+<rect x="0" y="100" width="25" height="25" fill="black"/>
+<rect x="50" y="100" width="25" height="25" fill="black"/>
+<rect x="100" y="100" width="25" height="25" fill="black"/>
+<rect x="150" y="100" width="25" height="25" fill="black"/>
+<rect x="200" y="100" width="25" height="25" fill="black"/>
+<rect x="25" y="125" width="25" height="25" fill="black"/>
+<rect x="75" y="125" width="25" height="25" fill="black"/>
+<rect x="125" y="125" width="25" height="25" fill="black"/>
+<rect x="175" y="125" width="25" height="25" fill="black"/>
+<rect x="225" y="125" width="25" height="25" fill="black"/>
+<rect x="0" y="150" width="25" height="25" fill="black"/>
+<rect x="50" y="150" width="25" height="25" fill="black"/>
+<rect x="100" y="150" width="25" height="25" fill="black"/>
+<rect x="150" y="150" width="25" height="25" fill="black"/>
+<rect x="200" y="150" width="25" height="25" fill="black"/>
+</g>
+<text x="10" y="287" font-family="Arial" font-size="4">9x6 inner corners; square=25 mm; print at 100%</text>
+</svg>

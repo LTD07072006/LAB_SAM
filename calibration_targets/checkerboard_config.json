@@ -1,0 +1,23 @@
+{
+  "pattern": "checkerboard",
+  "inner_corners": [9, 6],
+  "squares": [10, 7],
+  "square_size_mm": 25.0,
+  "board_size_mm": [250.0, 175.0],
+  "page": "A4",
+  "print_scale": "100_percent_actual_size",
+  "recommended_capture_count": "15_to_25",
+  "capture_protocol": [
+    "lock focus, exposure and zoom",
+    "cover the whole image area with different board positions",
+    "include tilt and rotation, not only fronto-parallel views",
+    "keep the checkerboard flat",
+    "record the real measured square_size_mm"
+  ],
+  "opencv_detector_inner_corner_count": [9, 6],
+  "large_room_alternative": {
+    "page": "A3",
+    "square_size_mm": 35.0,
+    "board_size_mm": [350.0, 245.0]
+  }
+}

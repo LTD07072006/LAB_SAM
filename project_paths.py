@@ -36,9 +36,16 @@ D_FIRE_ROOT = _existing_or_new(
     PROJECT_ROOT / "home-fire-dataset",
 )
 
-ARCHIVE_ZIP = DATASETS_ROOT / "archive.zip"
-D_FIRE_ZIP = DATASETS_ROOT / "D-Fire.zip"
-FIRE_SMOKE_ZIP = DATASETS_ROOT / "FIRE-SMOKE-DATASET.zip"
+# Dataset archives are unpacked in-place under ``datasets``.  Keep directory
+# paths here so callers do not depend on removable ZIP files.
+ARCHIVE_ROOT = DATASETS_ROOT / "archive"
+D_FIRE_ROOT_EXTRACTED = DATASETS_ROOT / "D-Fire"
+FIRE_SMOKE_ROOT = DATASETS_ROOT / "fire_smoke_dataset" / "FIRE-SMOKE-DATASET"
+# Backward-compatible names for callers that imported the old constants.
+# They now resolve to extracted directories when available.
+ARCHIVE_ZIP = ARCHIVE_ROOT if ARCHIVE_ROOT.exists() else DATASETS_ROOT / "archive.zip"
+D_FIRE_ZIP = D_FIRE_ROOT_EXTRACTED if D_FIRE_ROOT_EXTRACTED.exists() else DATASETS_ROOT / "D-Fire.zip"
+FIRE_SMOKE_ZIP = FIRE_SMOKE_ROOT if FIRE_SMOKE_ROOT.exists() else DATASETS_ROOT / "FIRE-SMOKE-DATASET.zip"
 SYNTHETIC_3D_DATASET = PROJECT_ROOT / "working" / "synthetic_fire_3d_v3"
 
 

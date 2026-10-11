@@ -1,0 +1,22 @@
+{
+  "dictionary": "DICT_6X6_1000",
+  "marker_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "tag_size_mm": 120.0,
+  "margin_mm": 20.0,
+  "page": "A4",
+  "checkerboard_inner_corners": [
+    9,
+    6
+  ],
+  "checkerboard_square_size_mm": 25.0,
+  "print_scale": "100_percent_actual_size"
+}

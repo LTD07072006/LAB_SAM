@@ -1,5 +1,5 @@
 {
-  "source": "D:\\LAB\\SAM_Experiment\\datasets\\D-Fire.zip",
+  "source": "D:\\LAB\\SAM_Experiment\\datasets\\D-Fire",
   "fire_class_id": 1,
   "weak_point_weight": 0.25,
   "image_count": 21527,

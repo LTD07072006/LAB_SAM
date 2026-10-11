@@ -1,7 +1,6 @@
 {
   "dataset": "FIRE-SMOKE-DATASET",
-  "source_zip": "D:\\LAB\\SAM_Experiment\\datasets\\FIRE-SMOKE-DATASET.zip",
-  "extracted_root": "D:\\LAB\\SAM_Experiment\\datasets\\fire_smoke_dataset",
+  "extracted_root": "D:\\LAB\\SAM_Experiment\\datasets\\fire_smoke_dataset\\FIRE-SMOKE-DATASET",
   "manifest": "D:\\LAB\\SAM_Experiment\\working\\fire_smoke_binary\\manifest.jsonl",
   "records": 3000,
   "class_mapping": {

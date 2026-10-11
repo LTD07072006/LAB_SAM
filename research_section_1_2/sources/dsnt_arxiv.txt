@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/QHpICPeHVOfo5q4fuDZJlGtHTlk</id>
+  <title>arXiv Query: search_query=&amp;id_list=1801.07372&amp;start=0&amp;max_results=10</title>
+  <updated>2026-10-09T17:51:16Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=&amp;start=0&amp;max_results=10&amp;id_list=1801.07372" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/1801.07372v2</id>
+    <title>Numerical Coordinate Regression with Convolutional Neural Networks</title>
+    <updated>2018-05-03T22:19:39Z</updated>
+    <link href="https://arxiv.org/abs/1801.07372v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1801.07372v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We study deep learning approaches to inferring numerical coordinates for points of interest in an input image. Existing convolutional neural network-based solutions to this problem either take a heatmap matching approach or regress to coordinates with a fully connected output layer. Neither of these approaches is ideal, since the former is not entirely differentiable, and the latter lacks inherent spatial generalization. We propose our differentiable spatial to numerical transform (DSNT) to fill this gap. The DSNT layer adds no trainable parameters, is fully differentiable, and exhibits good spatial generalization. Unlike heatmap matching, DSNT works well with low heatmap resolutions, so it can be dropped in as an output layer for a wide range of existing fully convolutional architectures. Consequently, DSNT offers a better trade-off between inference speed and prediction accuracy compared to existing techniques. When used to replace the popular heatmap matching approach used in almost all state-of-the-art methods for pose estimation, DSNT gives better prediction accuracy for all model architectures tested.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2018-01-23T02:18:04Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Aiden Nibali</name>
+    </author>
+    <author>
+      <name>Zhen He</name>
+    </author>
+    <author>
+      <name>Stuart Morgan</name>
+    </author>
+    <author>
+      <name>Luke Prendergast</name>
+    </author>
+  </entry>
+</feed>

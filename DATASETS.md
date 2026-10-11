@@ -91,18 +91,45 @@ license and citation requirements before downloading or redistributing data.
 
 ## Recommended use in this project
 
+### Links for the next coarse-detector experiment
+
+- [D-Fire](https://github.com/gaia-solutions-on-demand/DFireDataset) — fire/smoke bounding-box detection; good first candidate for detector pretraining or hard negatives.
+- [FASDD](https://github.com/SpiritVegeta/FASDD) — fire/smoke object detection annotations; inspect the repository license and convert boxes to the point convention before mixing.
+- [Fire-Smoke Dataset](https://github.com/DeepQuestAI/Fire-Smoke-Dataset) — useful for classification and domain pretraining; it does not provide the same `p_fire` target.
+- [MIVIA Fire Detection Dataset](https://mivia.unisa.it/datasets/video-analysis-datasets/fire-detection-dataset/) — video frames for temporal robustness and false-positive testing.
+- [FLAME dataset](https://github.com/sunnyiisc/Fire-Detection-from-FLAME-Dataset) — fire imagery/video and segmentation-oriented annotations; verify the original terms before download.
+
+Recommended order: start with D-Fire/FASDD for box-to-point auxiliary training, then use the existing CCTV labels for the final point head. Keep public data out of the leakage-safe real test split, and audit each dataset's license, annotation format, image resolution and camera-domain gap before downloading.
+
 ## Optional D-Fire add-on (keeps the old datasets unchanged)
 
-The downloaded D-Fire archive is stored as `datasets/D-Fire.zip`. Create the
-small manifests directly from the ZIP; this does not make a second 3 GB image
-copy:
+The current local layout is:
+
+```text
+datasets/D-Fire/                            # extracted YOLO smoke/fire boxes
+datasets/fire_smoke_dataset/FIRE-SMOKE-DATASET/  # extracted classification data
+datasets/external_fire_smoke_video/Test/    # extracted 8,617 video frames
+datasets/external_fire_smoke_video/Masks/   # extracted masks
+datasets/external_fire_smoke_video/2-Zenmuse_X4S_2.mp4
+```
+
+The audit and explicit auxiliary manifest are stored at
+`output/dataset_integration_20261010/dataset_audit.json` and
+`output/dataset_integration_20261010/external_coarse_manifest.json`.
+The manifest marks D-Fire bottom-centres as weak box-derived targets and marks
+FIRE-SMOKE samples as classification-only. Both sources stay out of the real
+CCTV validation/test protocol.
+
+The D-Fire archive has been unpacked to `datasets/D-Fire`. The preparation
+utility reads that directory and creates the small manifests without creating
+another image copy.
 
 The optional D-Fire preparation utility was removed from the active checkout;
 the source archive and existing manifests remain untouched.
 
 ## FIRE-SMOKE-DATASET add-on
 
-`FIRE-SMOKE-DATASET.zip` is a folder-labelled binary classification dataset:
+`FIRE-SMOKE-DATASET` is a folder-labelled binary classification dataset:
 `Fire=1`, `Smoke=0`, `Neutral=0`. Prepare it separately with:
 
 The optional FIRE-SMOKE preparation utility was removed from the active

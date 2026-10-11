@@ -22,9 +22,24 @@ def main():
     parser.add_argument("--output", type=Path, default=root / "fire-model-data" / "coarse_manifest.json")
     parser.add_argument("--threshold", type=float, default=0.2)
     parser.add_argument("--device", default=None)
+    parser.add_argument(
+        "--tta-mode",
+        choices=("none", "brightness3", "photometric5"),
+        default="none",
+        help="Optional geometry-preserving photometric TTA; brightness3 is the validated compromise",
+    )
+    parser.add_argument("--tta-reliability-scale-px", type=float, default=8.0)
+    parser.add_argument("--max-stability-px", type=float, default=None)
     args = parser.parse_args()
 
-    detector = FireDetector(args.model, device=args.device, threshold=args.threshold)
+    detector = FireDetector(
+        args.model,
+        device=args.device,
+        threshold=args.threshold,
+        tta_mode=args.tta_mode,
+        tta_reliability_scale_px=args.tta_reliability_scale_px,
+        max_stability_px=args.max_stability_px,
+    )
     records, _ = load_records(args.labels, args.dataset_root)
     output = {}
     for index, record in enumerate(records, 1):
@@ -35,12 +50,23 @@ def main():
             "confidence": float(result.confidence),
             "detected": bool(result.detected),
             "size": [int(image.width), int(image.height)],
+            "stability_px": None if result.stability_px is None else float(result.stability_px),
+            "stability_reference_px": (
+                None if result.stability_reference_px is None else float(result.stability_reference_px)
+            ),
+            "position_reliability": (
+                None if result.position_reliability is None else float(result.position_reliability)
+            ),
+            "localization_accepted": bool(result.localization_accepted),
+            "localization_status": str(result.localization_status),
+            "tta_count": int(result.tta_count),
+            "tta_valid_count": int(result.tta_valid_count),
         }
         if index % 50 == 0 or index == len(records):
             print(f"processed={index}/{len(records)}")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(output, indent=2), encoding="utf-8")
-    print(f"saved={args.output} records={len(output)}")
+    print(f"saved={args.output} records={len(output)} tta_mode={args.tta_mode}")
 
 
 if __name__ == "__main__":

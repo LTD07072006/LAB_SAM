@@ -8,12 +8,13 @@ with a practical uncertainty estimate.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence
 
 import numpy as np
 
 from locator import CameraGeometry, GridMap, RayHit, intersect_ray_with_grid_result
 from point_filter import robust_filter_points
+from ray_plane_intersection import RayPlaneIntersectionLocator
 
 
 @dataclass
@@ -30,6 +31,10 @@ class FireLocalization:
     covariance: Optional[np.ndarray] = None
     std: Optional[np.ndarray] = None
     samples: int = 0
+    backend: str = "mesh"
+    valid_rays: int = 0
+    total_rays: int = 0
+    fallback_reason: Optional[str] = None
 
 
 def bottom_contact_pixels(bbox: Sequence[float], columns: int = 5, bottom_fraction: float = 0.18) -> np.ndarray:
@@ -91,7 +96,13 @@ def localize_pixels(
     """Localise several 2D points and robustly aggregate valid 3D hits."""
     pixels = np.asarray(pixels, dtype=np.float64).reshape(-1, 2)
     if len(pixels) == 0:
-        return FireLocalization(False, status="no_pixels", points=np.empty((0, 3)), kept_indices=np.empty(0, dtype=int))
+        return FireLocalization(
+            False,
+            status="no_pixels",
+            points=np.empty((0, 3)),
+            kept_indices=np.empty(0, dtype=int),
+            total_rays=0,
+        )
     if weights is None:
         weights = np.ones(len(pixels), dtype=np.float64)
     weights = np.asarray(weights, dtype=np.float64).reshape(-1)
@@ -112,7 +123,14 @@ def localize_pixels(
             hits.append(np.asarray(result.point, dtype=np.float64))
             hit_weights.append(float(weight))
     if not hits:
-        return FireLocalization(False, status="no_valid_intersection", points=np.empty((0, 3)), kept_indices=np.empty(0, dtype=int), samples=len(pixels))
+        return FireLocalization(
+            False,
+            status="no_valid_intersection",
+            points=np.empty((0, 3)),
+            kept_indices=np.empty(0, dtype=int),
+            samples=len(pixels),
+            total_rays=len(pixels),
+        )
 
     points = np.asarray(hits, dtype=np.float64)
     filtered = robust_filter_points(points, min_points=3)
@@ -134,6 +152,8 @@ def localize_pixels(
         covariance=covariance,
         std=std,
         samples=len(pixels),
+        valid_rays=len(points),
+        total_rays=len(pixels),
     )
 
 
@@ -153,3 +173,95 @@ def localize_with_uncertainty(
     result = localize_pixels(camera, grid_map, cloud, **kwargs)
     result.samples = len(cloud)
     return result
+
+
+def localize_pixels_ray_plane(
+    calibration: Any,
+    pixels: Sequence[Sequence[float]],
+    plane: Sequence[float] = (0.0, 0.0, 1.0, 0.0),
+    weights: Optional[Sequence[float]] = None,
+    *,
+    dtype: Any = None,
+    device: Optional[str] = None,
+    eps: float = 1e-8,
+    extrinsic_convention: str = "world_to_camera",
+    undistort: bool = True,
+) -> FireLocalization:
+    """Localise contact pixels by closed-form ray/plane intersection.
+
+    The pixel batch is passed to PyTorch at once.  Plane-invalid rays are
+    removed before the same robust 3-D aggregation used by mesh localisation.
+    Set ``undistort=False`` when the caller has already converted pixels to
+    ideal/undistorted image coordinates (as the main pipeline does).
+    The returned diagnostic fields make it possible for a caller to decide
+    whether to fall back to the mesh backend.
+    """
+
+    values = np.asarray(pixels, dtype=np.float64).reshape(-1, 2)
+    if len(values) == 0:
+        return FireLocalization(False, status="no_pixels", points=np.empty((0, 3)),
+                                kept_indices=np.empty(0, dtype=int), backend="ray_plane")
+    if weights is None:
+        ray_weights = np.ones(len(values), dtype=np.float64)
+    else:
+        ray_weights = np.asarray(weights, dtype=np.float64).reshape(-1)
+        if (
+            len(ray_weights) != len(values)
+            or not np.all(np.isfinite(ray_weights))
+            or np.any(ray_weights < 0)
+            or not np.any(ray_weights > 0)
+        ):
+            raise ValueError("weights must be finite, non-negative, not all zero, and match pixels")
+    try:
+        import torch
+
+        work_dtype = torch.float64 if dtype is None else dtype
+        if not isinstance(work_dtype, torch.dtype):
+            raise TypeError("dtype must be a torch floating-point dtype")
+        locator = RayPlaneIntersectionLocator(
+            plane=plane,
+            extrinsic_convention=extrinsic_convention, eps=eps,
+            dtype=work_dtype, device=device,
+        )
+        ideal = calibration.undistort_pixels(values) if undistort else values
+        result = locator.locate(
+            torch.as_tensor(ideal, dtype=work_dtype, device=device),
+            torch.as_tensor(calibration.K, dtype=work_dtype, device=device),
+            torch.as_tensor(calibration.R, dtype=work_dtype, device=device),
+            torch.as_tensor(calibration.t, dtype=work_dtype, device=device),
+        )
+        valid = result.valid_mask.detach().cpu().numpy().astype(bool)
+        points = result.points_world.detach().cpu().numpy()
+    except (ImportError, RuntimeError, TypeError, ValueError) as exc:
+        return FireLocalization(False, status="ray_plane_error", points=np.empty((0, 3)),
+                                kept_indices=np.empty(0, dtype=int), samples=len(values),
+                                backend="ray_plane", total_rays=len(values), fallback_reason=str(exc))
+    valid_indices = np.flatnonzero(valid)
+    if len(valid_indices) == 0:
+        status_values = result.status.detach().cpu().numpy()
+        labels = {
+            1: "parallel",
+            2: "behind_camera",
+            3: "invalid_input_or_plane",
+        }
+        statuses = [labels.get(int(item), str(int(item))) for item in status_values]
+        reason = "all_rays_invalid:" + ",".join(statuses)
+        return FireLocalization(False, status="no_valid_plane_intersection", points=np.empty((0, 3)),
+                                kept_indices=np.empty(0, dtype=int), samples=len(values), backend="ray_plane",
+                                valid_rays=0, total_rays=len(values), fallback_reason=reason)
+    hit_points = points[valid_indices]
+    filtered = robust_filter_points(hit_points, min_points=3)
+    filtered_indices = valid_indices[np.asarray(filtered.kept_indices, dtype=int)]
+    kept_weights = ray_weights[filtered_indices]
+    center = _weighted_median(filtered.points, kept_weights) if len(filtered.points) else filtered.center
+    centered = filtered.points - center
+    covariance = np.cov(centered.T, aweights=kept_weights, ddof=0) if len(filtered.points) >= 2 else np.zeros((3, 3))
+    covariance = np.atleast_2d(covariance)
+    std = np.sqrt(np.maximum(np.diag(covariance), 0.0))
+    confidence = float(np.clip(filtered.confidence * len(valid_indices) / len(values), 0.0, 1.0))
+    return FireLocalization(
+        True, point=center, status="valid_ray_plane", points=filtered.points,
+        kept_indices=filtered_indices, spread=filtered.spread, confidence=confidence,
+        covariance=covariance, std=std, samples=len(values), backend="ray_plane",
+        valid_rays=len(valid_indices), total_rays=len(values),
+    )
